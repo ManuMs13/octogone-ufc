@@ -1,1 +1,11 @@
 app.zip
+android-package/
+*.keystore
+phone-check*.png
+DOSSIER-FINAL-PLAY-STORE.md
+play-store-listing.md
+guide-play-console.md
+feature-graphic.html
+feature-graphic.png
+node_modules/
+.netlify/

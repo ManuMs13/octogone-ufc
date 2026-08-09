@@ -1,0 +1,16 @@
+{
+  "name": "octogone-ufc",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "OCTOGONE - UFC Tracker (site statique + fonctions Netlify pour les notifications push)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ManuMs13/octogone-ufc.git"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@netlify/blobs": "^10.7.12",
+    "web-push": "^3.6.7"
+  }
+}
