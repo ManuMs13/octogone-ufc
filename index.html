@@ -97,7 +97,7 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 
 /* ===== BANDEAU CHAMPIONS (N&B fondu) ===== */
 /* ===== SPLASH : bandeau combattants N&B dramatique (partie haute, fondu vers le logo) ===== */
-.sp-hero{position:absolute;top:0;left:0;right:0;height:58vh;max-height:480px;display:flex;overflow:hidden;z-index:0;background:#000}
+.sp-hero{position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:860px;height:58vh;max-height:480px;display:flex;overflow:hidden;z-index:0;background:#000}
 .sp-hero .sh-item{flex:1;position:relative;overflow:hidden}
 .sp-hero .sh-item:not(:last-child){border-right:1px solid rgba(0,0,0,.7)}
 .sp-hero .sh-img{position:absolute;inset:0;background-size:cover;background-position:center 20%;filter:grayscale(1) contrast(2.1) brightness(.7) saturate(0);animation:shZoom 16s ease-in-out infinite alternate;transform-origin:center 25%}
@@ -1124,6 +1124,17 @@ document.body.dataset.mode="events";
     else if(dx>0&&i>0)goPage(NAV_ORDER[i-1]);
   },{passive:true});
 })();
+/* Navigation au clavier (flèches ← →) — PC, TV connectée, télécommandes qui envoient des touches */
+document.addEventListener("keydown",e=>{
+  if(e.key!=="ArrowLeft"&&e.key!=="ArrowRight")return;
+  const tag=(document.activeElement&&document.activeElement.tagName)||"";
+  if(/INPUT|TEXTAREA|SELECT/.test(tag))return;
+  if(document.getElementById("modal")?.classList.contains("on"))return;
+  if(!document.getElementById("splash")?.classList.contains("off"))return;
+  const cur=document.querySelector("section.on"),i=NAV_ORDER.indexOf(cur?cur.id:"s-events");
+  if(e.key==="ArrowRight"&&i<NAV_ORDER.length-1)goPage(NAV_ORDER[i+1]);
+  else if(e.key==="ArrowLeft"&&i>0)goPage(NAV_ORDER[i-1]);
+});
 
 /* ============ HORLOGE + HERO ============ */
 setInterval(()=>{$("#clock").textContent=new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Paris"})},1000);
@@ -1773,6 +1784,9 @@ function closeSplash(){
     el.addEventListener("animationend",()=>el.classList.remove("enter"),{once:true});
   });
 }
+document.addEventListener("keydown",e=>{
+  if((e.key==="Enter"||e.key===" ")&&!document.getElementById("splash")?.classList.contains("off"))closeSplash();
+});
 /* Splash = écran de déverrouillage : fermeture au tap uniquement (pas d'auto-close) */
 /* PWA : service worker (uniquement en ligne, https) */
 if("serviceWorker" in navigator && location.protocol==="https:"){
