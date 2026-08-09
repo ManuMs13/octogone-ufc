@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0a0a0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="OCTOGONE">
+<title>OCTOGONE · UFC Tracker</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="%230a0a0d"/><g transform="skewX(-10)" font-family="Arial,sans-serif" font-weight="bold" font-size="30" text-anchor="middle" letter-spacing="-2"><text x="55" y="47" fill="white">OCTO</text><text x="55" y="76" fill="%23e01212">GONE</text></g><rect x="18" y="84" width="64" height="3.4" fill="%23c9a227" transform="skewX(-10)"/></svg>'>
+<style>
+:root{
+  --bg:#07070a; --bg2:rgba(22,22,28,.72); --bg3:#1c1c24; --line:rgba(255,255,255,.08);
+  --red:#d20a0a; --red2:#ff2e2e; --gold:#c9a227; --gold2:#ffd76a;
+  --txt:#f4f4f6; --mut:#9a9aa8; --grn:#2ecc71;
+  --accent:#ff2e2e; --accent-rgb:255,46,46;
+}
+/* Un "mode" (couleur d'ambiance) par onglet — change à chaque page */
+body[data-mode="events"]  {--accent:#ff2e2e;--accent-rgb:255,46,46}
+body[data-mode="pronos"]  {--accent:#ffd76a;--accent-rgb:255,215,106}
+body[data-mode="rank"]    {--accent:#e6b53c;--accent-rgb:230,181,60}
+body[data-mode="fighters"]{--accent:#4aa3ff;--accent-rgb:74,163,255}
+body[data-mode="news"]    {--accent:#ff6a3d;--accent-rgb:255,106,61}
+body[data-mode="social"]  {--accent:#9146ff;--accent-rgb:145,70,255}
+body[data-mode="alarms"]  {--accent:#2ecc71;--accent-rgb:46,204,113}
+body[data-mode="live"]    {--accent:#ff1f6b;--accent-rgb:255,31,107}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;overflow-x:hidden}
+
+/* ===== FOND ARÈNE : octogones + jeux de lumière ===== */
+.arena{position:fixed;inset:0;z-index:-1;overflow:hidden;background:
+  radial-gradient(1200px 600px at 50% -10%,rgba(var(--accent-rgb),.15),transparent 60%),
+  radial-gradient(900px 500px at 85% 110%,rgba(201,162,39,.08),transparent 60%),
+  #07070a}
+/* Texture carbone sombre + grain film (fond uniquement, derrière le contenu) */
+.arena::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.6;background:
+  repeating-linear-gradient(45deg,rgba(255,255,255,.016) 0 1px,transparent 1px 4px),
+  repeating-linear-gradient(-45deg,rgba(0,0,0,.30) 0 1px,transparent 1px 4px);background-size:5px 5px}
+.arena::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.arena .spot{position:absolute;inset:-40%;background:conic-gradient(from 0deg at 50% 50%,transparent 0deg,rgba(255,46,46,.05) 18deg,transparent 40deg,transparent 160deg,rgba(255,215,106,.04) 185deg,transparent 210deg,transparent 360deg);animation:sweep 22s linear infinite}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.arena svg{position:absolute;left:50%;top:42%;width:150vmax;height:150vmax;transform:translate(-50%,-50%);opacity:.5}
+.arena .oc1{animation:spin 90s linear infinite}
+.arena .oc2{animation:spinr 140s linear infinite}
+@keyframes spin{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes spinr{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(-360deg)}}
+.arena .haze{position:absolute;inset:0;background:radial-gradient(80% 55% at 50% 118%,rgba(7,7,10,.94) 40%,transparent 100%)}
+
+.app{max-width:860px;margin:0 auto;padding-bottom:82px}
+
+/* ===== HEADER ===== */
+header{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:14px 16px 11px;
+  background:linear-gradient(180deg,rgba(13,13,17,.92),rgba(10,10,13,.78));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(var(--accent-rgb),.5);box-shadow:0 8px 30px rgba(var(--accent-rgb),.14);transition:border-color .5s,box-shadow .5s}
+.octa{width:40px;height:40px;flex:none;filter:drop-shadow(0 0 8px rgba(210,10,10,.7));animation:octaPulse 4s ease-in-out infinite}
+@keyframes octaPulse{0%,100%{filter:drop-shadow(0 0 6px rgba(210,10,10,.55))}50%{filter:drop-shadow(0 0 14px rgba(210,10,10,.95))}}
+.brand{line-height:1.1}
+.brand b{font-size:21px;letter-spacing:2.5px;font-weight:900;font-style:italic;text-shadow:0 0 18px rgba(255,46,46,.35)}
+.brand b span{color:var(--red2)}
+.brand small{color:var(--mut);font-size:10.5px;letter-spacing:3.5px;text-transform:uppercase}
+.live-dot{margin-left:auto;font-size:11.5px;color:var(--mut);display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.live-dot i{width:8px;height:8px;border-radius:50%;background:var(--grn);box-shadow:0 0 8px var(--grn);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ===== NAV ===== */
+/* Points indicateurs (remplacent la barre) — on navigue au glissement */
+.dots{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;flex-direction:column;align-items:center;gap:7px;
+  padding:10px 0 max(12px,env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,transparent,rgba(7,7,10,.9) 45%);pointer-events:none}
+.dots-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:800;text-shadow:0 0 10px rgba(var(--accent-rgb),.5);transition:color .35s}
+.dots-row{display:flex;gap:10px;align-items:center;pointer-events:auto}
+.dot{width:8px;height:8px;border-radius:50%;border:none;background:rgba(255,255,255,.24);cursor:pointer;padding:0;transition:width .3s,background .3s,box-shadow .3s}
+.dot.on{width:24px;border-radius:5px;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+.dot:active{transform:scale(.9)}
+
+/* ===== SECTIONS ===== */
+section{display:none;padding:16px}
+section.on{display:block;animation:fade .3s}
+section.on.dir-r{animation:turnIn-r .44s cubic-bezier(.2,.7,.2,1)}
+section.on.dir-l{animation:turnIn-l .44s cubic-bezier(.2,.7,.2,1)}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+@keyframes turnIn-r{from{opacity:0;transform:perspective(1100px) translateX(46px) rotateY(-7deg)}to{opacity:1;transform:none}}
+@keyframes turnIn-l{from{opacity:0;transform:perspective(1100px) translateX(-46px) rotateY(7deg)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){section.on,section.on.dir-r,section.on.dir-l{animation:fade .2s}}
+h2{font-size:15px;letter-spacing:3px;text-transform:uppercase;font-weight:900;font-style:italic;margin:8px 0 14px;display:flex;align-items:center;gap:10px}
+h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--accent),rgba(201,162,39,.5),transparent);transition:background .4s}
+
+/* ===== CARTES VERRE ===== */
+.glass{background:var(--bg2);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px}
+
+/* ===== BANDEAU CHAMPIONS (N&B fondu) ===== */
+/* ===== SPLASH : bandeau combattants N&B dramatique (partie haute, fondu vers le logo) ===== */
+.sp-hero{position:absolute;top:0;left:0;right:0;height:58vh;max-height:480px;display:flex;overflow:hidden;z-index:0;background:#000}
+.sp-hero .sh-item{flex:1;position:relative;overflow:hidden}
+.sp-hero .sh-item:not(:last-child){border-right:1px solid rgba(0,0,0,.7)}
+.sp-hero .sh-img{position:absolute;inset:0;background-size:cover;background-position:center 20%;filter:grayscale(1) contrast(2.1) brightness(.7) saturate(0);animation:shZoom 16s ease-in-out infinite alternate;transform-origin:center 25%}
+.sp-hero .sh-item:nth-child(2) .sh-img{animation-delay:-4s}
+.sp-hero .sh-item:nth-child(3) .sh-img{animation-delay:-8s}
+.sp-hero .sh-item:nth-child(4) .sh-img{animation-delay:-12s}
+@keyframes shZoom{from{transform:scale(1.02)}to{transform:scale(1.16)}}
+.sp-hero .sh-vig{position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 9%,transparent 25%,rgba(50,6,6,.5) 100%)}
+.sp-hero .sh-red{position:absolute;inset:0;mix-blend-mode:screen;background:
+  linear-gradient(180deg,rgba(180,10,10,.4) 0%,transparent 26%),
+  linear-gradient(180deg,transparent 28%,rgba(255,255,255,.3) 40%,rgba(255,255,255,.14) 48%,transparent 58%),
+  linear-gradient(0deg,rgba(30,120,240,.7) 0%,rgba(20,90,210,.4) 30%,transparent 62%)}
+.sp-hero::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,
+    rgba(7,7,10,0) 0%,
+    rgba(10,45,100,.14) 18%,
+    rgba(15,75,170,.3) 32%,
+    rgba(20,95,210,.46) 46%,
+    rgba(15,75,170,.62) 58%,
+    rgba(10,50,110,.78) 70%,
+    rgba(6,25,60,.9) 82%,
+    #051428 92%,
+    #07070a 100%),
+  repeating-linear-gradient(45deg,rgba(255,255,255,.025) 0 1px,transparent 1px 4px)}
+@media(prefers-reduced-motion:reduce){.sp-hero .sh-img{animation:none}}
+#splash .sp-octa,#splash .sp-name,#splash .sp-tag,#splash .sp-bar{position:relative;z-index:1}
+/* ===== HERO ===== */
+.hero{position:relative;overflow:hidden;border-radius:16px;padding:18px;margin-bottom:18px;
+  background:linear-gradient(135deg,rgba(48,8,8,.85),rgba(19,19,25,.8) 60%);backdrop-filter:blur(10px);
+  border:1px solid rgba(210,10,10,.4);box-shadow:0 0 40px rgba(210,10,10,.15) inset,0 10px 40px rgba(0,0,0,.4)}
+.hero::before{content:"";position:absolute;top:-60%;left:-30%;width:60%;height:220%;transform:rotate(20deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.055),transparent);animation:shine 5.5s ease-in-out infinite}
+@keyframes shine{0%,100%{left:-40%}50%{left:110%}}
+.hero .tag{font-size:10px;letter-spacing:2.5px;color:var(--red2);font-weight:800;text-transform:uppercase}
+.hero .name{font-size:20px;font-weight:900;font-style:italic;margin:5px 0 3px;text-shadow:0 2px 14px rgba(0,0,0,.6)}
+.hero .sub{color:var(--mut);font-size:12.5px}
+.cd{display:flex;gap:9px;margin-top:14px}
+.cd div{flex:1;background:rgba(10,10,14,.75);border:1px solid var(--line);border-radius:12px;text-align:center;padding:9px 2px}
+.cd b{font-size:23px;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 0 14px rgba(255,46,46,.65)}
+.cd span{display:block;font-size:9.5px;color:var(--mut);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+
+/* ===== ÉVÉNEMENTS ===== */
+.ev{margin-bottom:12px;overflow:hidden;transition:border-color .3s,box-shadow .3s}
+.ev.open{border-color:rgba(210,10,10,.5);box-shadow:0 0 26px rgba(210,10,10,.12)}
+.ev-hero{position:relative;height:140px;display:flex;cursor:pointer;overflow:hidden;background:#0d0d11;border-bottom:1px solid var(--line)}
+.ev-hero .evh-tag{position:absolute;top:10px;left:12px;z-index:3;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#fff;background:rgba(210,10,10,.85);padding:3px 9px;border-radius:20px;box-shadow:0 0 12px rgba(210,10,10,.5)}
+.ev-hero .evh-ph{flex:1;position:relative;background-size:cover;background-position:top center;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900;color:#3a3a46}
+.ev-hero .evh-ph:first-child{border-right:1px solid rgba(0,0,0,.55)}
+.ev-hero .evh-ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,13,0) 42%,rgba(9,9,13,.94) 100%)}
+.ev-hero .evh-vs{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;font-style:italic;color:var(--red2);background:rgba(9,9,13,.7);border:1px solid rgba(255,46,46,.5);box-shadow:0 0 14px rgba(255,46,46,.4)}
+.ev-hero .evh-names{position:absolute;bottom:10px;left:12px;right:12px;z-index:2;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.ev-hero .evh-names span{flex:1;font-size:12.5px;font-weight:900;font-style:italic;line-height:1.2;text-shadow:0 2px 10px rgba(0,0,0,.95)}
+.ev-hero .evh-names span:last-child{text-align:right}
+.ev-h{padding:13px 14px;cursor:pointer;display:flex;gap:12px;align-items:center}
+.ev-date{flex:none;width:54px;text-align:center;background:rgba(28,28,36,.8);border:1px solid var(--line);border-radius:11px;padding:7px 0}
+.ev-date b{display:block;font-size:20px;color:var(--red2);text-shadow:0 0 10px rgba(255,46,46,.5)}
+.ev-date span{font-size:10px;letter-spacing:1px;color:var(--mut);text-transform:uppercase}
+.ev-t{flex:1;min-width:0}
+.ev-t b{display:block;font-size:14.5px;font-weight:800}
+.ev-t small{color:var(--mut);font-size:12px;display:block;margin-top:2px}
+.badge{font-size:9.5px;font-weight:800;letter-spacing:1px;padding:3px 8px;border-radius:20px;text-transform:uppercase;flex:none}
+.badge.ppv{background:var(--red);color:#fff;box-shadow:0 0 14px rgba(210,10,10,.55)}
+.badge.fn{background:rgba(28,28,36,.8);border:1px solid var(--line);color:var(--mut)}
+.ev-body{display:none;border-top:1px solid var(--line);padding:13px 14px;background:rgba(10,10,14,.55)}
+.ev.open .ev-body{display:block;animation:fade .3s}
+.ev-body h4{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold2);margin:11px 0 6px}
+.ev-body h4:first-child{margin-top:0}
+.fight{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.07);font-size:13px}
+.fight:last-child{border:none}
+.fight .wc{color:var(--mut);font-size:11px;text-align:right;flex:none;margin-left:10px}
+.fight .title-f{color:var(--gold2);font-weight:700}
+.times{margin-top:11px;background:rgba(28,28,36,.7);border-radius:10px;padding:9px 11px;font-size:12.5px;color:var(--mut)}
+.times b{color:var(--txt)}
+.est{color:var(--gold2);font-size:11px}
+.watch{margin-top:11px;background:rgba(201,162,39,.06);border:1px solid rgba(201,162,39,.22);border-radius:10px;padding:9px 11px}
+.watch-t{font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--gold2);text-transform:uppercase;margin-bottom:8px}
+.watch-links{display:flex;flex-wrap:wrap;gap:7px}
+.watch-links a{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;text-decoration:none;color:var(--txt);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:6px 10px;transition:transform .15s,box-shadow .15s}
+.watch-links a:active{transform:scale(.97)}
+.watch-links a.tw{border-color:rgba(145,70,255,.5);box-shadow:0 0 12px rgba(145,70,255,.18)}
+.watch-links a.rmc{border-color:rgba(210,10,10,.5);box-shadow:0 0 12px rgba(210,10,10,.18)}
+.watch-links a.dc{border-color:rgba(88,101,242,.5);box-shadow:0 0 12px rgba(88,101,242,.18)}
+.ev-actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:linear-gradient(135deg,#e01212,#a80707);color:#fff;border:none;border-radius:10px;padding:10px 15px;font-weight:800;font-size:12.5px;cursor:pointer;letter-spacing:.5px;box-shadow:0 4px 16px rgba(210,10,10,.3);transition:transform .15s}
+.btn:active{transform:scale(.96)}
+.btn.ghost{background:rgba(28,28,36,.7);border:1px solid var(--line);color:var(--txt);box-shadow:none}
+.btn.gold{background:linear-gradient(135deg,#dbb42e,#a8831a);color:#141414;box-shadow:0 4px 16px rgba(201,162,39,.3)}
+
+/* ===== CLASSEMENTS ===== */
+.div-pick{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:8px;scrollbar-width:none}
+.div-pick::-webkit-scrollbar{display:none}
+.div-pick button{flex:none;background:rgba(28,28,36,.75);border:1px solid var(--line);color:var(--mut);border-radius:20px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .25s}
+.div-pick button.on{background:linear-gradient(135deg,#e01212,#a80707);border-color:transparent;color:#fff;box-shadow:0 0 16px rgba(210,10,10,.45)}
+.rk{overflow:hidden}
+.rk-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;transition:background .2s}
+.rk-row:last-child{border:none}
+.rk-row:active{background:rgba(210,10,10,.12)}
+.rk-num{flex:none;width:30px;text-align:center;font-weight:900;color:var(--mut);font-size:14px}
+.rk-num.c{font-size:16px}
+.rk-ava{flex:none;width:42px;height:42px;border-radius:50%;background:#23232c center 18%/cover no-repeat;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:var(--mut);overflow:hidden}
+.rk-name{flex:1;font-weight:700;font-size:14px}
+.rk-name small{display:block;color:var(--mut);font-weight:400;font-size:11px}
+.champ-row{position:relative;background:linear-gradient(90deg,rgba(201,162,39,.16),rgba(201,162,39,.02));overflow:hidden}
+.champ-row::after{content:"";position:absolute;top:0;left:-80%;width:50%;height:100%;transform:skewX(-20deg);background:linear-gradient(90deg,transparent,rgba(255,215,106,.12),transparent);animation:shine 4s ease-in-out infinite}
+.champ-row .rk-ava{border-color:var(--gold);box-shadow:0 0 12px rgba(201,162,39,.4)}
+.chev{color:var(--mut)}
+
+/* ===== COMBATTANTS ===== */
+.search{width:100%;background:rgba(22,22,28,.8);border:1px solid var(--line);border-radius:12px;color:var(--txt);padding:13px 15px;font-size:14px;margin-bottom:13px;outline:none;transition:border-color .25s,box-shadow .25s}
+.search:focus{border-color:var(--red);box-shadow:0 0 16px rgba(210,10,10,.25)}
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(min-width:620px){.f-grid{grid-template-columns:1fr 1fr 1fr}}
+.f-card{position:relative;overflow:hidden;background:var(--bg2);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px;cursor:pointer;transition:transform .2s,border-color .25s,box-shadow .25s}
+.f-card:active{transform:scale(.97);border-color:var(--red);box-shadow:0 0 18px rgba(210,10,10,.3)}
+.f-img{height:130px;background:linear-gradient(180deg,#1d1d26,#14141a) center 12%/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900;color:#3a3a46;position:relative}
+.f-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(12,12,16,.95))}
+.f-info{padding:10px 12px 12px;position:relative;margin-top:-26px}
+.f-card b{font-size:13.5px;display:block;text-shadow:0 1px 8px rgba(0,0,0,.9)}
+.f-card small{color:var(--mut);font-size:11px}
+.rank-b{margin-top:7px;display:inline-block;font-size:10px;font-weight:800;padding:3px 9px;border-radius:12px;background:rgba(28,28,36,.85);border:1px solid var(--line);color:var(--mut)}
+.rank-b.c{background:rgba(201,162,39,.16);border-color:var(--gold);color:var(--gold2);box-shadow:0 0 10px rgba(201,162,39,.25)}
+
+/* ===== MODAL FICHE ===== */
+.modal{position:fixed;inset:0;background:rgba(4,4,6,.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.modal.on{display:flex}
+/* ===== COMMENTAIRES ===== */
+.cm-head{padding:16px 18px 10px;border-bottom:1px solid var(--line)}
+.cm-head b{display:block;font-size:14px;line-height:1.35}
+.cm-head small{color:var(--mut);font-size:11px}
+.cm-note{margin:10px 18px 0;font-size:10.5px;color:var(--mut);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:6px 9px}
+.cm-compose{padding:12px 18px;display:flex;flex-direction:column;gap:7px;border-bottom:1px solid var(--line)}
+.cm-pseudo{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:8px 10px;color:var(--txt);font-size:12px;width:140px}
+.cm-text{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--txt);font-size:13px;resize:none;min-height:56px;font-family:inherit}
+.cm-text:focus,.cm-pseudo:focus{outline:none;border-color:var(--accent)}
+.cm-send{align-self:flex-end;background:linear-gradient(135deg,#e01212,#a80707);color:#fff;border:none;border-radius:9px;padding:8px 16px;font-weight:800;font-size:12px;cursor:pointer}
+.cm-send:active{transform:scale(.96)}
+.cm-list{padding:6px 18px 10px;display:flex;flex-direction:column;gap:12px}
+.cm-item{display:flex;gap:10px}
+.cm-ava{flex:none;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--red),#5a0404);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
+.cm-body{flex:1;min-width:0}
+.cm-body b{font-size:12.5px}
+.cm-body time{color:var(--mut);font-size:10.5px;margin-left:7px}
+.cm-body p{font-size:13px;line-height:1.45;margin-top:2px;word-wrap:break-word}
+.cm-empty{color:var(--mut);font-size:12.5px;text-align:center;padding:22px 10px}
+/* ===== LIVE ===== */
+.live-card{border-radius:16px;padding:18px;margin-bottom:6px;overflow:hidden;position:relative;
+  background:linear-gradient(135deg,rgba(48,8,20,.85),rgba(19,19,25,.85) 60%);border:1px solid rgba(255,31,107,.4);
+  box-shadow:0 0 40px rgba(255,31,107,.15) inset,0 10px 40px rgba(0,0,0,.4);animation:octaGlow 3.6s ease-in-out infinite}
+.live-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:20px;margin-bottom:10px}
+.live-badge.on{background:rgba(255,31,107,.85);color:#fff;box-shadow:0 0 14px rgba(255,31,107,.6)}
+.live-badge.on i{width:7px;height:7px;border-radius:50%;background:#fff;animation:pulse 1.3s infinite}
+.live-badge.wait{background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--mut)}
+.live-evname{font-size:17px;font-weight:900;font-style:italic;margin-bottom:2px}
+.live-sub{color:var(--mut);font-size:12px;margin-bottom:12px}
+.live-timer{font-variant-numeric:tabular-nums;font-weight:800;color:var(--gold2)}
+.live-note{margin-top:12px;font-size:10.5px;color:var(--mut);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:7px 10px;line-height:1.5}
+.live-empty{text-align:center;color:var(--mut);font-size:13px;padding:30px 14px}
+.live-chat-wrap{padding:12px;margin-bottom:12px}
+.live-chat-wrap iframe{border-radius:12px;display:block}
+.live-chat-fallback{text-align:center;font-size:11.5px;color:var(--mut);margin-top:9px}
+.live-chat-fallback a{color:var(--red2);font-weight:700;text-decoration:none}
+.sheet{position:relative;background:linear-gradient(180deg,#17171e,#101015);width:100%;max-width:580px;max-height:90vh;overflow-y:auto;overflow-x:hidden;border-radius:20px 20px 0 0;border:1px solid rgba(210,10,10,.35);border-bottom:none;padding:0 0 34px;animation:up .38s cubic-bezier(.2,.9,.3,1.05)}
+@keyframes up{from{transform:translateY(70px);opacity:0}to{transform:none;opacity:1}}
+.sheet .close{position:absolute;top:14px;right:14px;z-index:5;background:rgba(28,28,36,.85);border:1px solid var(--line);color:var(--txt);width:34px;height:34px;border-radius:50%;font-size:15px;cursor:pointer}
+.fp-stage{position:relative;height:250px;overflow:hidden;border-radius:20px 20px 0 0;background:
+  radial-gradient(75% 90% at 50% 0%,rgba(210,10,10,.32),transparent 65%),
+  radial-gradient(60% 60% at 50% 110%,rgba(201,162,39,.10),transparent 70%),#0b0b0f;display:flex;align-items:flex-end;justify-content:center}
+.fp-stage::before{content:"";position:absolute;left:50%;top:-30px;width:290px;height:290px;transform:translateX(-50%) rotate(22.5deg);
+  border:2px solid rgba(210,10,10,.35);clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);
+  animation:octaGlow 3.6s ease-in-out infinite}
+@keyframes octaGlow{0%,100%{box-shadow:0 0 22px rgba(210,10,10,.25) inset;opacity:.7}50%{box-shadow:0 0 46px rgba(210,10,10,.55) inset;opacity:1}}
+.fp-stage::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,#101015 98%)}
+.fp-photo{position:relative;z-index:2;height:240px;max-width:88%;object-fit:contain;object-position:bottom;
+  filter:drop-shadow(0 12px 28px rgba(0,0,0,.85)) drop-shadow(0 0 26px rgba(210,10,10,.3));
+  animation:reveal .6s cubic-bezier(.2,.85,.3,1.08)}
+@keyframes reveal{from{transform:translateY(36px) scale(.92);opacity:0}to{transform:none;opacity:1}}
+.fp-photo.fallback{display:flex;align-items:center;justify-content:center;width:170px;height:190px;font-size:56px;font-weight:900;color:#3c3c4a;background:radial-gradient(circle at 50% 30%,#22222c,#15151b);clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%)}
+.fp-body{padding:16px 18px 0}
+.fp-body h3{font-size:22px;font-weight:900;font-style:italic;letter-spacing:.5px}
+.fp-body .nick{color:var(--red2);font-size:13px;font-weight:700;margin-top:1px}
+.fp-body .div{color:var(--mut);font-size:12.5px;margin-top:3px}
+.rec{display:flex;gap:9px;margin:14px 0 4px}
+.rec div{flex:1;background:rgba(28,28,36,.7);border:1px solid var(--line);border-radius:12px;text-align:center;padding:10px 0}
+.rec b{font-size:21px;font-variant-numeric:tabular-nums}
+.rec span{display:block;font-size:9.5px;color:var(--mut);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.stat{background:rgba(28,28,36,.7);border:1px solid var(--line);border-radius:11px;padding:10px 12px;font-size:13px;animation:fade .5s both}
+.stat:nth-child(2){animation-delay:.05s}.stat:nth-child(3){animation-delay:.1s}.stat:nth-child(4){animation-delay:.15s}
+.stat:nth-child(5){animation-delay:.2s}.stat:nth-child(6){animation-delay:.25s}.stat:nth-child(7){animation-delay:.3s}.stat:nth-child(8){animation-delay:.35s}
+.stat span{display:block;color:var(--mut);font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+.fp-links{margin-top:15px;display:flex;gap:8px;flex-wrap:wrap;padding:0 0 4px}
+.fp-links a{text-decoration:none;flex:1;min-width:200px}
+.fp-links button{width:100%}
+.loading{color:var(--mut);font-size:12.5px;padding:10px 0;display:flex;align-items:center;gap:9px}
+.spinner{width:15px;height:15px;border:2px solid var(--line);border-top-color:var(--red2);border-radius:50%;animation:spin2 .8s linear infinite;flex:none}
+@keyframes spin2{to{transform:rotate(360deg)}}
+
+/* ===== PRONOSTICS : DUELS ===== */
+.duel{padding:12px 0;border-bottom:1px dashed rgba(255,255,255,.07)}
+.duel:last-of-type{border-bottom:none}
+.d-label{text-align:center;font-size:10.5px;color:var(--mut);letter-spacing:1.5px;margin-bottom:8px;text-transform:uppercase;font-weight:700}
+.d-label.title{color:var(--gold2)}
+.d-row{display:flex;align-items:stretch;gap:9px}
+.d-side{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;background:rgba(28,28,36,.6);border:1px solid var(--line);border-radius:13px;padding:10px 6px;cursor:pointer;position:relative;transition:all .25s}
+.d-side:active{transform:scale(.96)}
+.d-ava{width:46px;height:46px;border-radius:50%;background:#23232c center 12%/cover no-repeat;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--mut);transition:border-color .25s}
+.d-name{font-size:12px;font-weight:700;text-align:center;line-height:1.25}
+.d-side.picked{background:linear-gradient(160deg,rgba(210,10,10,.38),rgba(100,4,4,.28));border-color:var(--red);box-shadow:0 0 18px rgba(210,10,10,.4)}
+.d-side.picked .d-ava{border-color:var(--red2)}
+.d-check{position:absolute;top:7px;right:7px;background:var(--red);width:19px;height:19px;border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:900;box-shadow:0 0 8px rgba(210,10,10,.6);animation:checkIn .3s}
+@keyframes checkIn{from{transform:scale(0)}to{transform:scale(1)}}
+.d-side.win{background:linear-gradient(160deg,rgba(31,138,77,.42),rgba(14,90,48,.28));border-color:#2ecc71;box-shadow:0 0 16px rgba(46,204,113,.3)}
+.d-side.win .d-ava{border-color:#2ecc71}
+.d-side.win .d-check{background:#1f8a4d}
+.d-side.lose{opacity:.42}
+.d-side.locked{cursor:default}
+.d-vs{align-self:center;font-weight:900;font-style:italic;color:var(--red2);font-size:13px;flex:none;text-shadow:0 0 12px rgba(255,46,46,.6)}
+.d-pts{position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);background:#1f8a4d;color:#fff;font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:10px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+@keyframes pickPop{0%{transform:scale(1)}40%{transform:scale(1.08)}70%{transform:scale(.96)}100%{transform:scale(1)}}
+.d-side.pop{animation:pickPop .45s cubic-bezier(.3,1.4,.5,1)}
+.lock-note{text-align:center;font-size:11px;color:var(--gold2);background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.25);border-radius:9px;padding:6px;margin-bottom:9px}
+/* ===== ARÈNE DES PRONOS ===== */
+.arena-ev{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--red2);font-weight:800;text-align:center;padding:13px 10px 3px}
+.arena-div{text-align:center;font-size:11px;color:var(--mut);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;padding-bottom:11px}
+.arena-div.title{color:var(--gold2)}
+.arena-row{display:flex;gap:10px;padding:0 12px;align-items:stretch}
+.a-side{flex:1;border-radius:16px;overflow:hidden;position:relative;cursor:pointer;border:1.5px solid var(--line);background:#15151b;transition:all .3s}
+.a-side:active{transform:scale(.97)}
+.a-img{height:158px;background:linear-gradient(180deg,#1e1e28,#121218) center 8%/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900;color:#3a3a46;position:relative}
+.a-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(14,14,18,.95))}
+.a-nm{padding:9px 8px 12px;text-align:center;font-weight:800;font-size:13px;line-height:1.25;position:relative;margin-top:-18px;z-index:2;text-shadow:0 2px 8px rgba(0,0,0,.9)}
+.a-side.picked{border-color:var(--red);box-shadow:0 0 28px rgba(210,10,10,.5);transform:scale(1.03)}
+.a-side.picked::before{content:"✓ MON PRONO";position:absolute;top:9px;left:50%;transform:translateX(-50%);z-index:3;background:var(--red);color:#fff;font-size:9px;font-weight:900;letter-spacing:1px;padding:4px 10px;border-radius:12px;box-shadow:0 0 12px rgba(210,10,10,.7);animation:checkIn .35s}
+.a-vs{align-self:center;flex:none;font-size:19px;font-weight:900;font-style:italic;color:var(--red2);text-shadow:0 0 16px rgba(255,46,46,.8);animation:vsFlash 2.4s ease-in-out infinite}
+@keyframes vsFlash{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.65;transform:scale(1.12)}}
+.arena-foot{display:flex;align-items:center;justify-content:space-between;padding:14px 12px 14px}
+.arena-foot button{background:rgba(28,28,36,.85);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px 16px;font-weight:800;font-size:13px;cursor:pointer}
+.arena-foot .prg{font-size:12px;color:var(--mut);font-weight:700;letter-spacing:1px}
+/* QG : série + badges */
+.streak-row{display:flex;gap:9px;margin-top:12px}
+.streak-row div{flex:1;background:rgba(10,10,14,.7);border:1px solid var(--line);border-radius:11px;text-align:center;padding:9px 4px}
+.streak-row b{font-size:19px}
+.streak-row span{display:block;font-size:9px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
+.badge-c{background:rgba(28,28,36,.6);border:1px solid var(--line);border-radius:12px;text-align:center;padding:11px 5px;transition:all .3s}
+.badge-c .bi{font-size:23px;display:block;margin-bottom:4px}
+.badge-c b{font-size:10.5px;display:block;line-height:1.25}
+.badge-c small{font-size:9px;color:var(--mut);display:block;margin-top:2px;line-height:1.3}
+.badge-c.off{opacity:.32;filter:grayscale(1)}
+.badge-c.onb{border-color:rgba(201,162,39,.5);box-shadow:0 0 14px rgba(201,162,39,.25);animation:fade .5s}
+/* bannière slim événements */
+.prono-slim{display:flex;align-items:center;gap:12px;padding:12px 15px;margin-bottom:16px;cursor:pointer;border-color:rgba(201,162,39,.35)!important}
+.prono-slim .ps-ic{font-size:22px}
+.prono-slim b{display:block;font-size:13.5px}
+.prono-slim small{color:var(--mut);font-size:11.5px}
+.prono-slim .go{margin-left:auto;color:var(--gold2);font-weight:900;font-size:18px}
+/* Score & rang */
+.ring-wrap{display:flex;gap:16px;align-items:center;margin-top:12px}
+.ring-box{position:relative;width:92px;height:92px;flex:none}
+.ring-box svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(255,255,255,.08);stroke-width:7}
+.ring-fg{fill:none;stroke:#c9a227;stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset 1.1s cubic-bezier(.3,.8,.3,1);filter:drop-shadow(0 0 6px rgba(201,162,39,.6))}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-center b{font-size:21px;line-height:1}
+.ring-center span{font-size:8.5px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.rank-info{flex:1}
+.rank-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(201,162,39,.13);border:1px solid rgba(201,162,39,.4);border-radius:20px;padding:6px 13px;font-weight:900;font-style:italic;font-size:14.5px;color:var(--gold2)}
+.rank-next{color:var(--mut);font-size:11.5px;margin-top:7px;line-height:1.5}
+.prono{padding:14px;margin-bottom:16px;border-color:rgba(201,162,39,.35)!important}
+.pr-h{font-weight:900;font-style:italic;letter-spacing:1px;font-size:14px}
+.pr-row{display:flex;gap:8px;margin-top:11px}
+.pr-row div{flex:1;background:rgba(10,10,14,.7);border:1px solid var(--line);border-radius:10px;text-align:center;padding:8px 2px}
+.pr-row b{font-size:18px}
+.pr-row .pc-ok{color:var(--grn)}
+.pr-row span{display:block;font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.pr-tip{color:var(--mut);font-size:11.5px;margin-top:10px;line-height:1.5}
+.pr-favs{margin-top:10px;border-top:1px dashed rgba(255,255,255,.1);padding-top:9px;font-size:12.5px;color:var(--mut);display:flex;flex-direction:column;gap:5px}
+/* ===== FAVORIS ===== */
+.fav-star{position:absolute;top:8px;right:8px;z-index:3;background:rgba(10,10,14,.65);border:1px solid var(--line);border-radius:50%;width:31px;height:31px;color:#777;font-size:15px;cursor:pointer;backdrop-filter:blur(4px);transition:all .2s}
+.fav-star.on{color:var(--gold2);border-color:var(--gold);text-shadow:0 0 10px rgba(255,215,106,.7)}
+.fav-btn{background:none;border:1px solid var(--line);border-radius:20px;color:var(--mut);padding:5px 13px;font-size:13px;cursor:pointer;margin-left:10px;vertical-align:middle;transition:all .2s}
+.fav-btn.on{color:var(--gold2);border-color:var(--gold);text-shadow:0 0 10px rgba(255,215,106,.6)}
+/* ===== RÉSEAUX ===== */
+.soc{display:flex;flex-direction:column;gap:13px}
+.soc a{text-decoration:none;color:var(--txt)}
+.soc-card{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;background:var(--bg2);backdrop-filter:blur(10px);border:1px solid var(--line);transition:transform .2s,box-shadow .3s,border-color .3s}
+.soc-card:active{transform:scale(.98)}
+.soc-card::before{content:"";position:absolute;top:-70%;left:-40%;width:55%;height:240%;transform:rotate(20deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);animation:shine 6s ease-in-out infinite}
+.soc-ic{flex:none;width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.soc-ic svg{width:28px;height:28px;fill:#fff}
+.soc-t{flex:1;min-width:0}
+.soc-t b{display:block;font-size:15.5px;font-weight:900;font-style:italic;letter-spacing:.5px}
+.soc-t small{color:var(--mut);font-size:12px;display:block;margin-top:2px}
+.soc-go{flex:none;font-weight:800;font-size:12px;padding:8px 13px;border-radius:20px;letter-spacing:.5px}
+.soc-card.twitch{border-color:rgba(145,70,255,.4)}
+.soc-card.twitch:active{box-shadow:0 0 24px rgba(145,70,255,.35)}
+.soc-card.twitch .soc-ic{background:linear-gradient(135deg,#9146FF,#5c2da8);box-shadow:0 0 18px rgba(145,70,255,.45)}
+.soc-card.twitch .soc-go{background:#9146FF;color:#fff}
+.soc-card.discord{border-color:rgba(88,101,242,.4)}
+.soc-card.discord:active{box-shadow:0 0 24px rgba(88,101,242,.35)}
+.soc-card.discord .soc-ic{background:linear-gradient(135deg,#5865F2,#3a44b8);box-shadow:0 0 18px rgba(88,101,242,.45)}
+.soc-card.discord .soc-go{background:#5865F2;color:#fff}
+.soc-card.x{border-color:rgba(255,255,255,.2)}
+.soc-card.x:active{box-shadow:0 0 24px rgba(255,255,255,.15)}
+.soc-card.x .soc-ic{background:linear-gradient(135deg,#2a2a2e,#000);border:1px solid rgba(255,255,255,.2)}
+.soc-card.x .soc-go{background:#fff;color:#000}
+.soc-card.tipeee{border-color:rgba(201,162,39,.5)}
+.soc-card.tipeee:active{box-shadow:0 0 24px rgba(201,162,39,.35)}
+.soc-card.tipeee .soc-ic{background:linear-gradient(135deg,#f0cf6b,#a37f16);box-shadow:0 0 18px rgba(201,162,39,.5);font-size:26px}
+.soc-card.tipeee .soc-go{background:linear-gradient(135deg,#f0cf6b,#c9a227);color:#141414}
+
+/* ===== ACTUS (aérées, avec visuels) ===== */
+.news{padding:0;margin-bottom:18px;overflow:hidden;border-radius:16px}
+.nban{position:relative;aspect-ratio:16/8;background:linear-gradient(135deg,#26060a,#131317) center 18%/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:34px}
+.nban::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(14,14,18,.96))}
+.nban .nt{position:absolute;top:11px;left:12px;z-index:2;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#fff;font-weight:800;background:rgba(210,10,10,.9);padding:4px 10px;border-radius:14px;box-shadow:0 2px 12px rgba(210,10,10,.5)}
+.nbody{padding:14px 16px 17px;position:relative;margin-top:-30px;z-index:2}
+.news b{display:block;font-size:15.5px;line-height:1.35;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.news p{color:var(--mut);font-size:13px;line-height:1.65;margin-top:8px}
+.news a{color:var(--gold2);font-size:12px;text-decoration:none;display:inline-block;margin-top:10px}
+/* ===== FIL VIDÉOS ===== */
+.sub-pick{display:flex;gap:8px;margin-bottom:14px}
+.sub-pick button{flex:1;background:rgba(28,28,36,.75);border:1px solid var(--line);color:var(--mut);border-radius:12px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:.5px;transition:all .25s}
+.sub-pick button.on{background:linear-gradient(135deg,#e01212,#a80707);border-color:transparent;color:#fff;box-shadow:0 0 18px rgba(210,10,10,.4)}
+.feed{height:calc(100dvh - 245px);overflow-y:auto;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-radius:18px;background:#000;border:1px solid var(--line)}
+.feed::-webkit-scrollbar{display:none}
+.vid{position:relative;height:100%;scroll-snap-align:start;scroll-snap-stop:always;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.vbg{position:absolute;inset:0;background:center/cover no-repeat;filter:blur(28px) brightness(.3);transform:scale(1.2)}
+.vstage{position:relative;width:100%;aspect-ratio:16/9;z-index:2;background:#000}
+.vstage img{width:100%;height:100%;object-fit:cover;display:block}
+.vstage iframe{width:100%;height:100%;border:0;display:block}
+.vplay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(transparent 30%,rgba(0,0,0,.45));z-index:3}
+.vplay i{width:60px;height:60px;border-radius:50%;background:rgba(210,10,10,.92);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:21px;color:#fff;padding-left:5px;box-shadow:0 0 30px rgba(210,10,10,.65)}
+.voverlay{position:absolute;left:14px;right:76px;bottom:16px;z-index:5}
+.voverlay .vtag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold2);background:rgba(20,20,26,.72);border:1px solid rgba(201,162,39,.4);padding:3px 10px;border-radius:14px;margin-bottom:8px;backdrop-filter:blur(6px)}
+.voverlay b{display:block;font-size:14.5px;line-height:1.4;text-shadow:0 2px 10px rgba(0,0,0,.9)}
+.voverlay small{color:rgba(255,255,255,.75);font-size:11.5px;display:block;margin-top:5px;text-shadow:0 1px 8px rgba(0,0,0,.9)}
+.vrail{position:absolute;right:10px;bottom:16px;z-index:6;display:flex;flex-direction:column;gap:13px;align-items:center}
+.vrail .vbtn{display:flex;flex-direction:column;align-items:center;gap:3px}
+.vrail button{background:rgba(20,20,26,.68);border:1px solid rgba(255,255,255,.16);width:47px;height:47px;border-radius:50%;font-size:19px;color:#fff;cursor:pointer;backdrop-filter:blur(8px);transition:transform .15s,border-color .2s}
+.vrail button:active{transform:scale(1.15)}
+.vrail button.lk.on{border-color:#ff2e50;box-shadow:0 0 14px rgba(255,46,80,.5)}
+.vrail span{font-size:9.5px;color:rgba(255,255,255,.8);font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.9)}
+.vswipe{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:5;color:rgba(255,255,255,.45);font-size:10px;letter-spacing:2px;animation:swipeHint 2.2s ease-in-out infinite}
+@keyframes swipeHint{0%,100%{transform:translateX(-50%) translateY(0);opacity:.45}50%{transform:translateX(-50%) translateY(-6px);opacity:.9}}
+/* ===== DRAPEAU RÉALISTE COMBATTANT ===== */
+.fp-flag{position:absolute;top:12px;left:50%;width:92%;aspect-ratio:3/2;transform:translateX(-50%) rotate(-5deg);z-index:1;opacity:.55;border-radius:5px;overflow:hidden;pointer-events:none;box-shadow:0 20px 46px rgba(0,0,0,.65);animation:flagWave 8s ease-in-out infinite;display:none}
+.fp-flag img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.85) saturate(1.15)}
+.fp-flag .ripple{position:absolute;inset:-12%;background:repeating-linear-gradient(112deg,rgba(0,0,0,.28) 0 14px,transparent 14px 30px,rgba(255,255,255,.16) 30px 44px,transparent 44px 60px);animation:rippleMove 3.8s linear infinite;mix-blend-mode:overlay}
+.fp-flag .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,15,.15) 0%,transparent 30%,transparent 45%,rgba(11,11,15,.92) 96%)}
+@keyframes rippleMove{to{transform:translateX(60px)}}
+@keyframes flagWave{0%,100%{transform:translateX(-50%) rotate(-5deg) skewY(-1.8deg) scale(1)}50%{transform:translateX(-50%) rotate(-2.5deg) skewY(1.8deg) scale(1.025)}}
+
+/* ===== ALARMES ===== */
+.al-form{padding:15px;margin-bottom:16px}
+.al-form label{display:block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin:11px 0 6px}
+.al-form select{width:100%;background:rgba(28,28,36,.85);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:12px;font-size:14px;outline:none}
+.al-item{padding:12px 14px;margin-bottom:9px;display:flex;align-items:center;gap:11px}
+.al-item .ic{font-size:18px}
+.al-item b{display:block;font-size:13.5px}
+.al-item small{color:var(--mut);font-size:11.5px}
+.al-item .del{margin-left:auto;background:none;border:1px solid var(--line);color:var(--mut);border-radius:8px;padding:6px 11px;cursor:pointer;font-size:12px}
+.note{background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.3);border-radius:12px;padding:12px 14px;font-size:12.5px;color:var(--gold2);line-height:1.55;margin-bottom:14px}
+.mini-note{color:var(--mut);font-size:11.5px;line-height:1.55;margin-top:14px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:104px;background:linear-gradient(135deg,#e01212,#a80707);color:#fff;padding:12px 20px;border-radius:30px;font-weight:700;font-size:13px;z-index:200;display:none;box-shadow:0 8px 26px rgba(210,10,10,.4)}
+/* ===== ENTRÉE DANS L'ARÈNE (au déverrouillage du splash) ===== */
+#flash{position:fixed;inset:0;z-index:550;background:radial-gradient(60% 60% at 50% 38%,#fff 0%,rgba(255,80,80,.9) 30%,rgba(210,10,10,.4) 55%,transparent 75%);opacity:0;pointer-events:none}
+#flash.go{animation:flashPulse .7s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes flashPulse{0%{opacity:0}12%{opacity:1}100%{opacity:0}}
+header.enter{animation:headerDrop .6s .05s cubic-bezier(.16,1,.3,1) both}
+@keyframes headerDrop{from{opacity:0;transform:translateY(-22px)}to{opacity:1;transform:none}}
+.hero.enter{animation:heroPop .7s .16s cubic-bezier(.16,1,.3,1) both}
+@keyframes heroPop{0%{opacity:0;transform:scale(.9) translateY(14px)}70%{opacity:1;transform:scale(1.015) translateY(0)}100%{transform:none}}
+#prono-card.enter{animation:riseIn .55s .3s cubic-bezier(.16,1,.3,1) both}
+#ev-list.enter{animation:riseIn .55s .4s cubic-bezier(.16,1,.3,1) both}
+@keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){#flash.go,header.enter,.hero.enter,#prono-card.enter,#ev-list.enter{animation:none}}
+/* ===== SPLASH D'ACCUEIL ===== */
+#splash{position:fixed;inset:0;z-index:500;background:radial-gradient(90% 70% at 50% 30%,#1c0505 0%,#07070a 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .6s,visibility .6s}
+#splash.off{opacity:0;visibility:hidden;pointer-events:none}
+#splash .sp-octa{width:110px;height:110px;filter:drop-shadow(0 0 24px rgba(210,10,10,.8));animation:spIn 1s cubic-bezier(.2,.9,.3,1.1),octaPulse 3s ease-in-out 1s infinite}
+@keyframes spIn{0%{transform:scale(.3) rotate(-90deg);opacity:0}70%{transform:scale(1.08) rotate(8deg)}100%{transform:scale(1) rotate(0)}}
+#splash .sp-name{font-size:38px;font-weight:900;font-style:italic;letter-spacing:4px;animation:spTxt .8s .35s both}
+#splash .sp-name span{color:var(--red2);text-shadow:0 0 26px rgba(255,46,46,.7)}
+@keyframes spTxt{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+#splash .sp-tag{color:var(--mut);font-size:12px;letter-spacing:5px;text-transform:uppercase;animation:spTxt .8s .55s both}
+#splash .sp-bar{width:150px;height:3px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;animation:spTxt .6s .7s both}
+#splash .sp-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold));animation:spLoad 1.5s .7s forwards}
+@keyframes spLoad{to{width:100%}}
+#splash .sp-skip{position:absolute;bottom:46px;display:flex;align-items:center;gap:9px;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#fff;background:linear-gradient(135deg,rgba(210,10,10,.92),rgba(140,6,6,.85));border:1px solid rgba(255,46,46,.6);border-radius:30px;padding:13px 24px;cursor:pointer;opacity:0;animation:spFade .5s 2.1s forwards,spPulse 1.9s 2.5s ease-in-out infinite}
+@keyframes spFade{to{opacity:1}}
+@keyframes spPulse{0%,100%{box-shadow:0 0 18px rgba(210,10,10,.45);transform:scale(1)}50%{box-shadow:0 0 36px rgba(210,10,10,.85);transform:scale(1.05)}}
+/* ===== ANALYSE IA ===== */
+.ai-btn{display:block;margin:0 12px 4px;background:rgba(120,60,220,.15);border:1px solid rgba(150,90,255,.4);color:#c9b3ff;border-radius:10px;padding:9px;font-weight:800;font-size:12px;cursor:pointer;width:calc(100% - 24px);letter-spacing:.5px;transition:all .25s}
+.ai-btn:active{transform:scale(.97)}
+.ai-box{display:none;margin:4px 12px 8px;background:rgba(120,60,220,.08);border:1px solid rgba(150,90,255,.25);border-radius:12px;padding:12px 14px;font-size:12.5px;line-height:1.6;color:#d9d0f2;animation:fade .3s}
+.ai-box.on{display:block}
+.ai-box small{display:block;margin-top:8px;color:#8a80a5;font-size:10px}
+</style>
+</head>
+<body>
+<div id="splash" onclick="closeSplash()">
+  <div class="sp-hero" id="sp-hero"></div>
+  <svg class="sp-octa" viewBox="0 0 100 100"><polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="none" stroke="#d20a0a" stroke-width="7"/><polygon points="38,22 62,22 78,38 78,62 62,78 38,78 22,62 22,38" fill="none" stroke="#c9a227" stroke-width="4"/></svg>
+  <div class="sp-name">OCTO<span>GONE</span></div>
+  <div class="sp-tag">UFC Tracker</div>
+  <div class="sp-bar"><i></i></div>
+  <div class="sp-skip">🔓 Appuyez pour déverrouiller</div>
+</div>
+<div id="flash"></div>
+<div class="arena">
+  <div class="spot"></div>
+  <svg class="oc1" viewBox="0 0 100 100"><polygon points="30,6 70,6 94,30 94,70 70,94 30,94 6,70 6,30" fill="none" stroke="rgba(210,10,10,.05)" stroke-width=".5"/><polygon points="36,16 64,16 84,36 84,64 64,84 36,84 16,64 16,36" fill="none" stroke="rgba(210,10,10,.04)" stroke-width=".4"/></svg>
+  <svg class="oc2" viewBox="0 0 100 100"><polygon points="33,11 67,11 89,33 89,67 67,89 33,89 11,67 11,33" fill="none" stroke="rgba(201,162,39,.045)" stroke-width=".4"/></svg>
+  <div class="haze"></div>
+</div>
+
+<div class="app">
+<header>
+  <svg class="octa" viewBox="0 0 100 100"><polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="none" stroke="#d20a0a" stroke-width="7"/><polygon points="38,22 62,22 78,38 78,62 62,78 38,78 22,62 22,38" fill="none" stroke="#c9a227" stroke-width="4"/></svg>
+  <div class="brand"><b>OCTO<span>GONE</span></b><br><small>UFC Tracker</small></div>
+  <div class="live-dot"><i></i><span id="clock"></span></div>
+</header>
+
+<!-- ÉVÉNEMENTS -->
+<section id="s-events" class="on">
+  <div class="hero" id="hero"></div>
+  <div id="prono-card"></div>
+  <h2>Événements à venir</h2>
+  <div id="ev-list"></div>
+  <div class="mini-note">🕐 Horaires en <b>heure française</b>. Les horaires marqués <span class="est">« estimé »</span> seront confirmés par l'UFC pendant la fight week — tes notifications push te tiendront au courant.</div>
+</section>
+
+<!-- MODE PRONOS -->
+<section id="s-pronos">
+  <h2>Mon QG Pronos</h2>
+  <div id="pr-hq"></div>
+  <h2>L'Arène — fais tes picks</h2>
+  <div class="glass" id="arena" style="overflow:hidden"></div>
+  <div class="ev-actions" style="margin-top:14px">
+    <button class="btn gold" onclick="sharePronos()">📤 Partager mes pronos (image)</button>
+  </div>
+  <div class="mini-note">🎯 Touche un combattant pour valider ton prono — l'arène passe automatiquement au combat suivant. Bon prono : +10 pts, combat de titre : +20 pts. Les pronos se verrouillent au début de chaque événement, résultats chaque lundi.</div>
+</section>
+
+<!-- CLASSEMENTS -->
+<section id="s-rank">
+  <h2>Classements officiels</h2>
+  <div class="div-pick" id="div-pick"></div>
+  <div class="rk glass" id="rk-list"></div>
+  <div class="mini-note">Classements officiels UFC (mise à jour : 9 août 2026). Touche un combattant pour ouvrir sa fiche.</div>
+</section>
+
+<!-- COMBATTANTS -->
+<section id="s-fighters">
+  <h2>Combattants</h2>
+  <input class="search" id="f-search" placeholder="🔍 Rechercher un combattant…">
+  <div class="div-pick" id="f-mode">
+    <button class="on" data-m="all" onclick="setMode('all',this)">Tous</button>
+    <button data-m="fav" onclick="setMode('fav',this)">⭐ Favoris</button>
+    <button data-m="fr" onclick="setMode('fr',this)">🇫🇷 Français</button>
+  </div>
+  <div class="f-grid" id="f-grid"></div>
+  <div class="mini-note">Champions + top 15 de chaque division, plus les Français de l'UFC (liste mise à jour chaque lundi). Touche l'étoile pour ajouter un combattant à tes favoris. Photos officielles UFC chargées en direct.</div>
+</section>
+
+<!-- ACTUS + FIL VIDÉOS -->
+<section id="s-news">
+  <h2>Médias UFC</h2>
+  <div class="sub-pick">
+    <button class="on" onclick="setSub('feed',this)">🎬 Fil vidéos</button>
+    <button onclick="setSub('news',this)">📰 Actus</button>
+  </div>
+  <div id="feed" class="feed"></div>
+  <div id="news-list" style="display:none"></div>
+  <div class="mini-note">🎬 Fil vidéos et actus renouvelés chaque lundi automatiquement : Countdown, face-à-face, interviews, podcasts, contenu 🇫🇷. Touche une vidéo pour la lire directement dans l'app. · <a href="https://www.tipeee.com/octogone" target="_blank" style="color:var(--gold2);text-decoration:none">☕ Soutenir Octogone-Tracker</a></div>
+</section>
+
+<!-- RÉSEAUX -->
+<section id="s-social">
+  <h2>Mes réseaux</h2>
+  <div class="soc">
+    <a href="https://www.twitch.tv/manums13" target="_blank" rel="noopener">
+      <div class="soc-card twitch">
+        <div class="soc-ic"><svg viewBox="0 0 24 24"><path d="M2.5 3L1 6.5V20h5v3h3l3-3h4.5L22 14.5V3H2.5zM20 13.5l-3 3h-5l-3 3v-3H4V5h16v8.5zM15 8v5h2V8h-2zm-5 0v5h2V8h-2z"/></svg></div>
+        <div class="soc-t"><b>Twitch</b><small>manums13 — viens voir mes lives !</small></div>
+        <span class="soc-go">SUIVRE</span>
+      </div>
+    </a>
+    <a href="https://discord.gg/VJzfvgeSyz" target="_blank" rel="noopener">
+      <div class="soc-card discord">
+        <div class="soc-ic"><svg viewBox="0 0 24 24"><path d="M20.3 4.9A19.8 19.8 0 0 0 15.4 3.4l-.2.4a13 13 0 0 1 3.3 1.7 15.7 15.7 0 0 0-13 0 13 13 0 0 1 3.3-1.7l-.2-.4a19.8 19.8 0 0 0-4.9 1.5A20.5 20.5 0 0 0 .6 18.6a19.9 19.9 0 0 0 6 3l.5-.7a12.8 12.8 0 0 1-2-1l.5-.4a14.2 14.2 0 0 0 12.2 0l.5.4a12.8 12.8 0 0 1-2 1l.5.7a19.9 19.9 0 0 0 6-3A20.5 20.5 0 0 0 20.3 4.9zM8.6 15.8c-1.2 0-2.2-1.1-2.2-2.4S7.4 11 8.6 11s2.2 1.1 2.2 2.4-1 2.4-2.2 2.4zm6.8 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4z"/></svg></div>
+        <div class="soc-t"><b>Discord</b><small>Rejoins le serveur de la commu !</small></div>
+        <span class="soc-go">REJOINDRE</span>
+      </div>
+    </a>
+    <a href="https://x.com/ManuMar42772401" target="_blank" rel="noopener">
+      <div class="soc-card x">
+        <div class="soc-ic"><svg viewBox="0 0 24 24"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.2l7.3-8.3L1 2h6.4l4.4 5.9L18.9 2zm-1.1 18h1.7L6.5 3.9H4.7L17.8 20z"/></svg></div>
+        <div class="soc-t"><b>X (Twitter)</b><small>@ManuMar42772401 — mes hot takes UFC</small></div>
+        <span class="soc-go">SUIVRE</span>
+      </div>
+    </a>
+    <a href="https://www.tipeee.com/octogone" target="_blank" rel="noopener">
+      <div class="soc-card tipeee">
+        <div class="soc-ic">☕</div>
+        <div class="soc-t"><b>Soutenir Octogone-Tracker</b><small>L'app est gratuite — un café aide à la faire vivre !</small></div>
+        <span class="soc-go">SOUTENIR</span>
+      </div>
+    </a>
+  </div>
+  <div class="mini-note">💡 Partage le lien de l'app à ta commu : <b>octogone-ufc.netlify.app</b> — elle marche pour tout le monde !</div>
+</section>
+
+<!-- ALARMES -->
+<section id="s-alarms">
+  <h2>Alarmes</h2>
+  <div class="note">⏰ <b>Deux systèmes :</b> 1) L'alarme sonne + notification si l'app est ouverte. 2) <b>« Ajouter au calendrier »</b> crée un rappel dans le calendrier de ton téléphone/PC qui sonnera même app fermée — recommandé !</div>
+  <div class="al-form glass">
+    <label>Événement</label>
+    <select id="al-ev"></select>
+    <label>Quand ?</label>
+    <select id="al-when">
+      <option value="fw">Début de la fight week (lundi 9h)</option>
+      <option value="24h">24h avant la carte principale</option>
+      <option value="3h">3h avant la carte principale</option>
+      <option value="1h">1h avant la carte principale</option>
+      <option value="prelims">Au début des prélims</option>
+      <option value="main">Au début de la carte principale</option>
+    </select>
+    <div class="ev-actions">
+      <button class="btn" onclick="addAlarm()">🔔 Activer l'alarme</button>
+      <button class="btn gold" onclick="dlIcs()">📅 Ajouter au calendrier (.ics)</button>
+    </div>
+  </div>
+  <h2>Mes alarmes</h2>
+  <div id="al-list"></div>
+</section>
+
+<section id="s-live">
+  <h2>Live</h2>
+  <div id="live-hero"></div>
+  <h2>📺 RMC Sport en direct</h2>
+  <div class="live-chat-wrap glass">
+    <div class="watch"><div class="watch-t">🟣 RMC Sport a désactivé l'intégration de son flux Twitch</div><div class="watch-links"><a class="tw" href="https://www.twitch.tv/rmcsport" target="_blank" rel="noopener noreferrer">🟣 Regarder sur Twitch</a></div></div>
+    <div class="live-chat-fallback">📡 Prélims gratuites uniquement (la carte principale est sur Canal+/RMC Sport payant).</div>
+  </div>
+  <h2>💬 Chat de la commu</h2>
+  <div class="live-chat-wrap glass">
+    <iframe id="live-discord" src="https://discord.com/widget?id=1530551957280788562&theme=dark" width="100%" height="420" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+    <div class="live-chat-fallback">Le chat ne s'affiche pas ? <a href="https://discord.gg/VJzfvgeSyz" target="_blank" rel="noopener">Rejoins directement sur Discord →</a></div>
+  </div>
+</section>
+</div>
+
+<!-- MODAL FICHE COMBATTANT -->
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="sheet" id="sheet"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<div class="dots" id="dotsWrap">
+  <div class="dots-label" id="dotsLabel">🗓️ Événements</div>
+  <div class="dots-row" id="dots"></div>
+</div>
+
+<script>
+/* ============ DONNÉES ============ */
+const EVENTS=[
+{id:"ufc330",name:"UFC 330 : Makhachev vs Machado Garry",type:"ppv",date:"15 août",
+ mainUTC:"2026-08-16T02:00:00Z",prelimsUTC:"2026-08-16T00:00:00Z",est:false,
+ loc:"Xfinity Mobile Arena, Philadelphie, USA",
+ main:[["Islam Makhachev","Ian Machado Garry","Titre Welterweight",1],
+       ["Mackenzie Dern","Gillian Robertson","Titre Strawweight (F)",1]],
+ prelims:[["Geoff Neal","Chidi Njokuani","Welterweight",0],
+          ["Myktybek Orolbai","Jeremiah Wells","Welterweight",0],
+          ["Vicente Luque","Tresean Gore","Middleweight",0],
+          ["Dustin Stoltzfus","Mansur Abdul-Malik","Middleweight",0]],
+ notes:"Michael Morales est le remplaçant (backup) du main event. Borralho vs Pyfer annulé (blessure aux côtes de Borralho)."},
+{id:"sacramento",name:"UFC Fight Night : Hernandez vs Rodrigues",type:"fn",date:"22 août",
+ mainUTC:"2026-08-23T01:00:00Z",prelimsUTC:"2026-08-22T22:00:00Z",est:true,
+ loc:"Golden 1 Center, Sacramento, USA",
+ main:[["Anthony Hernandez","Gregory Rodrigues","Middleweight",0]],prelims:[],notes:""},
+{id:"shanghai",name:"UFC Fight Night : Nurmagomedov vs Song",type:"fn",date:"29 août",
+ mainUTC:"2026-08-29T12:00:00Z",prelimsUTC:"2026-08-29T09:00:00Z",est:true,
+ loc:"Oriental Sports Center, Shanghai, Chine",
+ main:[["Umar Nurmagomedov","Song Yadong","Bantamweight",0]],prelims:[],notes:"Carte en journée (heure française) — événement en Asie."},
+{id:"paris",name:"UFC Paris : Hooker vs Parnasse",type:"fn",fr:true,date:"5 sept",
+ mainUTC:"2026-09-05T19:00:00Z",prelimsUTC:"2026-09-05T16:00:00Z",est:false,
+ loc:"Accor Arena, Paris, France 🇫🇷",
+ main:[["Dan Hooker","Salahdine Parnasse","Lightweight",0],
+       ["Michael Venom Page","Nursulton Ruziboev","Middleweight",0],
+       ["Morgan Charrière","Felipe Lima","Featherweight",0]],
+ prelims:[["Nathaniel Wood","Mairon Santos","Featherweight",0],
+          ["Mario Pinto","Ryan Spann","Heavyweight",0],
+          ["Kurtis Campbell","Trevor Peek","Featherweight",0],
+          ["Matthieu Letho Duclos","Luis Felipe Dias","Middleweight",0]],
+ notes:"L'événement de l'année pour la France : Parnasse (star du MMA français, ex-double champion KSW) en main event à Bercy ! Charrière et Letho Duclos aussi sur la carte."},
+{id:"glendale",name:"Noche UFC : Rodriguez vs Silva",type:"fn",date:"12 sept",
+ mainUTC:"2026-09-13T01:00:00Z",prelimsUTC:"2026-09-12T22:00:00Z",est:true,
+ loc:"Desert Diamond Arena, Glendale, USA",
+ main:[["Yair Rodriguez","Jean Silva","Featherweight",0]],prelims:[],notes:""},
+{id:"ufc331",name:"UFC 331 : Van vs Pantoja 2",type:"ppv",date:"19 sept",
+ mainUTC:"2026-09-20T02:00:00Z",prelimsUTC:"2026-09-20T00:00:00Z",est:true,
+ loc:"Crypto.com Arena, Los Angeles, USA",
+ main:[["Joshua Van","Alexandre Pantoja","Titre Flyweight — revanche",1]],prelims:[],
+ notes:"La revanche : Pantoja tente de reprendre sa ceinture face au prodige Joshua Van."},
+{id:"apex926",name:"UFC Fight Night (carte à annoncer)",type:"fn",date:"26 sept",
+ mainUTC:"2026-09-27T01:00:00Z",prelimsUTC:"2026-09-26T22:00:00Z",est:true,
+ loc:"UFC Apex, Las Vegas, USA",main:[],prelims:[],notes:"Main event pas encore annoncé — tu seras notifié dès l'annonce."}
+];
+
+/* Où regarder l'UFC en France — liens maintenus ici (aucun tarif affiché, ça bouge trop souvent) */
+const DIFFUSION_FR={
+  links:[
+    {ic:"🟣",t:"Twitch RMC Sport",u:"https://www.twitch.tv/rmcsport",c:"tw"},
+    {ic:"📱",t:"App / site RMC Sport",u:"https://rmcsport.tv",c:"rmc"},
+    {ic:"💬",t:"Liens de diffusion (Discord)",u:"https://discord.gg/VJzfvgeSyz",c:"dc"}
+  ]
+};
+
+const RANKINGS=[
+{n:"P4P Hommes",c:null,f:["Islam Makhachev","Alexander Volkanovski","Petr Yan","Justin Gaethje","Ilia Topuria","Tom Aspinall","Sean Strickland","Merab Dvalishvili","Alex Pereira","Ciryl Gane","Joshua Van","Khamzat Chimaev","Alexandre Pantoja","Arman Tsarukyan","Charles Oliveira"]},
+{n:"Poids Mouches",lb:"125 lb",c:"Joshua Van",f:["Alexandre Pantoja","Manel Kape","Brandon Royval","Tatsuro Taira","Kyoji Horiguchi","Lone'er Kavanagh","Asu Almabayev","Brandon Moreno","Amir Albazi","Ramazan Temirov","Alex Perez","Steve Erceg","Tim Elliott","Tagir Ulanbekov","Edgar Chairez"]},
+{n:"Poids Coqs",lb:"135 lb",c:"Petr Yan",f:["Merab Dvalishvili","Sean O'Malley","Umar Nurmagomedov","Mario Bautista","Cory Sandhagen","Song Yadong","Aiemann Zahabi","David Martinez","Deiveson Figueiredo","Marlon Vera","Payton Talbott","Raul Rosas Jr.","Raoni Barcelos","Farid Basharat","Marcus McGhee"]},
+{n:"Poids Plumes",lb:"145 lb",c:"Alexander Volkanovski",f:["Movsar Evloev","Diego Lopes","Lerone Murphy","Aljamain Sterling","Yair Rodriguez","Jean Silva","Arnold Allen","Youssef Zalal","Kevin Vallejos","Steve Garcia","Brian Ortega","Aaron Pico","Melquizael Costa","David Onama","Patricio Pitbull"]},
+{n:"Poids Légers",lb:"155 lb",c:"Justin Gaethje",f:["Ilia Topuria","Arman Tsarukyan","Charles Oliveira","Max Holloway","Paddy Pimblett","Benoît Saint Denis","Mauricio Ruffy","Mateusz Gamrot","Dan Hooker","Renato Moicano","Rafael Fiziev","Quillan Salkilld","Tom Nolan","Beneil Dariush","Manuel Torres"]},
+{n:"Poids Welters",lb:"170 lb",c:"Islam Makhachev",f:["Ian Machado Garry","Carlos Prates","Michael Morales","Jack Della Maddalena","Gabriel Bonfim","Sean Brady","Belal Muhammad","Leon Edwards","Kamaru Usman","Joaquin Buckley","Yaroslav Amosov","Uroš Medić","Mike Malott","Michael Venom Page","Daniel Rodriguez"]},
+{n:"Poids Moyens",lb:"185 lb",c:"Sean Strickland",f:["Khamzat Chimaev","Dricus Du Plessis","Nassourdine Imavov","Brendan Allen","Caio Borralho","Anthony Hernandez","Joe Pyfer","Israel Adesanya","Reinier de Ridder","Christian Leroy Duncan","Gregory Rodrigues","Jared Cannonier","Ikram Aliskerov","Bo Nickal","Roman Dolidze"]},
+{n:"Mi-Lourds",lb:"205 lb",c:"Carlos Ulberg",f:["Magomed Ankalaev","Jiří Procházka","Alex Pereira","Khalil Rountree Jr.","Navajo Stirling","Paulo Costa","Jamahal Hill","Azamat Murzakanov","Jan Błachowicz","Dominick Reyes","Bogdan Guskov","Robert Whittaker","Johnny Walker","Alonzo Menifield","Nikita Krylov"]},
+{n:"Poids Lourds",lb:"265 lb",c:"Tom Aspinall",f:["Ciryl Gane","Alexander Volkov","Sergei Pavlovich","Josh Hokit","Waldo Cortes Acosta","Serghei Spivac","Curtis Blaydes","Rizvan Kuniev","Ante Delija","Valter Walker","Tyrell Fortune","Aleksandar Rakić","Derrick Lewis","Marcin Tybura","Brando Peričić"]},
+{n:"P4P Femmes",c:null,f:["Valentina Shevchenko","Kayla Harrison","Zhang Weili","Natalia Silva","Manon Fiorot","Mackenzie Dern","Alexa Grasso","Erin Blanchfield","Julianna Peña","Tatiana Suarez","Virna Jandiroba","Yan Xiaonan","Raquel Pennington","Rose Namajunas","Maycee Barber"]},
+{n:"Pailles (F)",lb:"115 lb",c:"Mackenzie Dern",f:["Zhang Weili","Tatiana Suarez","Virna Jandiroba","Yan Xiaonan","Gillian Robertson","Fatima Kline","Loopy Godinez","Amanda Lemos","Jéssica Andrade","Tabatha Ricci","Amanda Ribas","Alexia Thainara","Denise Gomes","Angela Hill","Mizuki"]},
+{n:"Mouches (F)",lb:"125 lb",c:"Valentina Shevchenko",f:["Natalia Silva","Manon Fiorot","Alexa Grasso","Erin Blanchfield","Rose Namajunas","Maycee Barber","Jasmine Jasudavicius","Wang Cong","Tracy Cortez","Miranda Maverick","Karine Silva","Casey O'Neill","Eduarda Moura","JJ Aldrich","Gabriella Fernandes"]},
+{n:"Coqs (F)",lb:"135 lb",c:"Kayla Harrison",f:["Julianna Peña","Raquel Pennington","Joselyne Edwards","Norma Dumont","Ailin Perez","Yana Santos","Luana Santos","Macy Chiasson","Jacqueline Cavalcanti","Karol Rosa","Bia Mesquita","Michelle Montague","Nora Cornolle","Miesha Tate","Melissa Croden"]}
+];
+
+const NEWS=[
+{t:"Débrief · 9 août 2026",h:"Débrief IA — UFC Vegas 120 : Salkilld étrangle Gamrot en un round",
+ p:"Sensation à Las Vegas : Quillan Salkilld a soumis Mateusz Gamrot (neck crank) au 1er round pour ses débuts en main event — sa 4e finition d'affilée au 1er round. Autre choc, Alexia Thainara crée la surprise face à Amanda Lemos (décision unanime), et Yadier del Valle explose Darren Elkins par KO en 35 secondes. Tendance IA : Salkilld devient un vrai danger chez les légers, à surveiller de près.",
+ l:"https://www.mmamania.com/ufc-results/463455/ufc-vegas-120-results-quillan-salkilld-strangles-bloodied-mateusz-gamrot-inside-a-round",ls:"MMA Mania",img:{f:"Quillan Salkilld"}},
+{t:"9 août 2026",h:"UFC 330 samedi : Makhachev défend sa ceinture welterweight",
+ p:"Islam Makhachev (champion WW) affronte Ian Machado Garry (#1) samedi à Philadelphie. En co-main : Dern vs Robertson pour le titre strawweight. Michael Morales est backup.",
+ l:"https://www.ufc.com/events",ls:"UFC.com",img:{f:"Islam Makhachev"}},
+{t:"Fight week",h:"Borralho vs Pyfer annulé (UFC 330)",
+ p:"Caio Borralho s'est blessé aux côtes : son combat contre Joe Pyfer prévu à l'UFC 330 est annulé.",
+ l:"https://en.wikipedia.org/wiki/UFC_330",ls:"Wikipédia",img:{f:"Caio Borralho"}},
+{t:"UFC Paris · 5 sept",h:"Parnasse en main event à Bercy, la carte est complète !",
+ p:"Salahdine Parnasse, la star française ex-double champion KSW, affronte Dan Hooker (#9 lightweight) en main event de l'UFC Paris. Aussi : MVP vs Ruziboev, Charrière vs Lima, Letho Duclos… Prélims 18h, carte principale 21h (heure FR).",
+ l:"https://www.cnews.fr/sport/2026-07-25/ufc-paris-5-voici-les-combats-annonces-avec-notamment-une-star-du-mma-1891497",ls:"CNEWS",img:{y:"wX_QBBRiQP4"}},
+{t:"Annonce",h:"UFC 331 : Van vs Pantoja 2 le 19 septembre",
+ p:"La revanche pour le titre flyweight aura lieu au Crypto.com Arena de Los Angeles. Pantoja veut reprendre la ceinture perdue face à Joshua Van.",
+ l:"https://www.ufc.com/events",ls:"UFC.com",img:{f:"Alexandre Pantoja"}},
+{t:"Diffusion",h:"L'UFC est diffusé sur Paramount+ en 2026",
+ p:"Depuis 2026, les événements UFC (numérotés et Fight Nights) sont diffusés sur Paramount+ suite au nouvel accord de diffusion.",
+ l:"https://www.paramountplus.com/sneak-peak/ufc-schedule-2026/",ls:"Paramount+",img:{y:"5K8OI2ybt9Y"}}
+];
+
+/* Fil vidéos — renouvelé chaque lundi (format : y=id YouTube, t=titre, ch=chaîne, tag) */
+const VIDEOS=[
+{y:"uHZs_kz2yJE",t:"UFC 330 Countdown : Makhachev vs Machado Garry",ch:"UFC",tag:"⏳ Countdown"},
+{y:"gMd7VhOp1uA",t:"Alex Pereira locked in pre camp episode 4",ch:"Alex Pereira",tag:"🥊 Combattant"},
+{y:"eWNHOnYc4Fc",t:"UFC WHITE HOUSE: THE FINAL POST!",ch:"Alex Pereira",tag:"🥊 Combattant"},
+{y:"KMXUkVPmjpo",t:"THE FINAL CAMP BEFORE WAR",ch:"Alex Pereira",tag:"🥊 Combattant"},
+{y:"X2PReQAB29A",t:"CHEGOU A HORA: ÚLTIMOS AJUSTES NA CASA BRANCA!",ch:"Alex Pereira",tag:"🥊 Combattant"},
+{y:"iyLJnybPWA0",t:"ÚLTIMOS MOMENTOS ANTES DA CASA BRANCA",ch:"Alex Pereira",tag:"🥊 Combattant"},
+{y:"3pajgqiU7HU",t:"POATAN: A ROTINA DO CAMPEÃO ANTES DA CASA BRANCA",ch:"Alex Pereira",tag:"🥊 Combattant"},
+{y:"ZDXidcHBnQ0",t:"Poatan Intensifica a Preparação Para o UFC na Casa Branca",ch:"Alex Pereira",tag:"🥊 Combattant"},
+{y:"QVZO4c1nGBE",t:"HE LEADS. THEY FOLLOW | Inside Poatan's Fight Camp",ch:"Alex Pereira",tag:"🥊 Combattant"},
+{y:"6h4Pal5NO9g",t:"PEEENER YAAAAAAAN",ch:"Sean O'Malley",tag:"🥊 Combattant"},
+{y:"foQgnkxvs1o",t:"How Paddy submitted BSD in 52 seconds at UFC 329",ch:"Sean O'Malley",tag:"🥊 Combattant"},
+{y:"qI9J_n-w0fI",t:"Conor should have done this simple trick",ch:"Sean O'Malley",tag:"🥊 Combattant"},
+{y:"sSnCxQH8BjQ",t:"IWBMN 👆🏻👆🏻👆🏻",ch:"Sean O'Malley",tag:"🥊 Combattant"},
+{y:"ITnIUNZ9c9Q",t:"1 MORE SLEEP.",ch:"Sean O'Malley",tag:"🥊 Combattant"},
+{y:"TBLgNStv6OU",t:"PROPER HYDRATION WITH doingwell",ch:"Sean O'Malley",tag:"🥊 Combattant"},
+{y:"Kg00aCQpwFw",t:"HONEY THE PRESS CONFERENCE WAS MASSIVE!!!",ch:"Sean O'Malley",tag:"🥊 Combattant"},
+{y:"LvZfkweQHHc",t:"The Notorious 2",ch:"Sean O'Malley",tag:"🥊 Combattant"},
+{y:"6b-GnIZGO3Y",t:"Voy a hacer historia",ch:"Ilia Topuria",tag:"🥊 Combattant"},
+{y:"Y3UxLBsw7Ro",t:"Una obra uno de uno",ch:"Ilia Topuria",tag:"🥊 Combattant"},
+{y:"N9EUr_oVq0w",t:"La victoria está asegurada",ch:"Ilia Topuria",tag:"🥊 Combattant"},
+{y:"7ezh73p7KlA",t:"Topuria reacciona a su mural",ch:"Ilia Topuria",tag:"🥊 Combattant"},
+{y:"8CQcqjLkHys",t:"La última semana antes de hacer historia | Road To The White House #10",ch:"Ilia Topuria",tag:"🥊 Combattant"},
+{y:"WhIwJM_zqJI",t:"Alguien va a dejar de hablar muy pronto cuando se coma estas manos.",ch:"Ilia Topuria",tag:"🥊 Combattant"},
+{y:"b0XsHBw-qKU",t:"Ilia hará historia en la Casa Blanca",ch:"Ilia Topuria",tag:"🥊 Combattant"},
+{y:"qU_fLvMkBo8",t:"Topuria hackea su fuerza",ch:"Ilia Topuria",tag:"🥊 Combattant"},
+{y:"l1EpKTCATMI",t:"Into the Fire boys.",ch:"Justin Gaethje",tag:"🥊 Combattant"},
+{y:"dEzr-rWI_qE",t:"Champ VS. Livestreamer",ch:"Justin Gaethje",tag:"🥊 Combattant"},
+{y:"QN6OFg2_rD8",t:"The Art of Violence - Out tomorrow!",ch:"Justin Gaethje",tag:"🥊 Combattant"},
+{y:"MNR0ozClHVc",t:"Behind The Curtain - EPISODE 3 (UFC FREEDOM 250 Justin Gaethje VS. Ilia Topuria)",ch:"Justin Gaethje",tag:"🥊 Combattant"},
+{y:"Yc3FoDk_Idw",t:"The Art of Violence - EPISODE 4 (UFC FREEDOM 250 Justin Gaethje VS. Ilia Topuria)",ch:"Justin Gaethje",tag:"🥊 Combattant"},
+{y:"QOgW6ZVIiwk",t:"Behind The Curtain - EPISODE 4 (UFC FREEDOM 250 Justin Gaethje VS. Ilia Topuria)",ch:"Justin Gaethje",tag:"🥊 Combattant"},
+{y:"Acst_jc0GXI",t:"The Art of Violence - EPISODE 1 (UFC FREEDOM 250 Justin Gaethje VS. Ilia Topuria)",ch:"Justin Gaethje",tag:"🥊 Combattant"},
+{y:"PntKf8UM-Zs",t:"N3on Challenged Me To Spar",ch:"Justin Gaethje",tag:"🥊 Combattant"},
+{y:"zmxn7LGFP38",t:"Started Training Camp / Fight News coming soon?",ch:"Merab Dvalishvili",tag:"🥊 Combattant"},
+{y:"feuadkjG7js",t:"The work never stops 🦾🎯 #merabdvalishvili #ufc #mma",ch:"Merab Dvalishvili",tag:"🥊 Combattant"},
+{y:"UTH-RIrw4mg",t:"Media day with @rafwrestlingusa 🦾🇬🇪🤼‍♂️",ch:"Merab Dvalishvili",tag:"🥊 Combattant"},
+{y:"lz97y3Sjhew",t:"Who said chivalry is dead ? 🪓 #stake #merabdvalishvili",ch:"Merab Dvalishvili",tag:"🥊 Combattant"},
+{y:"5kL7xvS0QBw",t:"Wrestling time 🤼 #merabdvalishvili #ufc #colbycovington",ch:"Merab Dvalishvili",tag:"🥊 Combattant"},
+{y:"yHAUfP_or8g",t:"Hugo Topuria ❤️🔥 #merabdvalishvili",ch:"Merab Dvalishvili",tag:"🥊 Combattant"},
+{y:"vE8bqNPaqG8",t:"#merabdvalishvili #trending",ch:"Merab Dvalishvili",tag:"🥊 Combattant"},
+{y:"7ttnCoTxgCo",t:"My New Vipe 🛴🛋️ #merabdvalishvili #mma",ch:"Merab Dvalishvili",tag:"🥊 Combattant"},
+{y:"MWpGJ4UlhGs",t:"BORZ EP.5 | PRESS CONFERENCE CHAOS & FIGHT WEEK",ch:"Khamzat Chimaev",tag:"🥊 Combattant"},
+{y:"r5xaItKCPQk",t:"BORZ EP.4 | Khamzat Chimaev Arrives In Newark For UFC 328 Fight Week",ch:"Khamzat Chimaev",tag:"🥊 Combattant"},
+{y:"UrH8Jbt6kpw",t:"BORZ EP.3 | Running With The Wolves",ch:"Khamzat Chimaev",tag:"🥊 Combattant"},
+{y:"diXklLAsqmE",t:"BORZ EP.2 | A Way Of Life",ch:"Khamzat Chimaev",tag:"🥊 Combattant"},
+{y:"e-IQrl2iVnY",t:"BORZ EP.1 | UFC 328 Fight Camp",ch:"Khamzat Chimaev",tag:"🥊 Combattant"},
+{y:"n97StkMsLr8",t:"How khabib avoided Conor",ch:"Alexander Volkanovski",tag:"🥊 Combattant"},
+{y:"HNjvu-gVy-U",t:"Conor MAKES you fight",ch:"Alexander Volkanovski",tag:"🥊 Combattant"},
+{y:"jL_RwQxwP0c",t:"Good to bump into old mates",ch:"Alexander Volkanovski",tag:"🥊 Combattant"},
+{y:"DW8ZzZX84ek",t:"I'm always ready 🇺🇸",ch:"Alexander Volkanovski",tag:"🥊 Combattant"},
+{y:"lnnAJbYW4O0",t:"Pereira struggles with southpaws",ch:"Alexander Volkanovski",tag:"🥊 Combattant"},
+{y:"UZnVM7dqmKE",t:"Pereira stands right in front!",ch:"Alexander Volkanovski",tag:"🥊 Combattant"},
+{y:"FIetqbGrm_Y",t:"Topuria is defensive while waiting for the counter",ch:"Alexander Volkanovski",tag:"🥊 Combattant"},
+{y:"AjifQDU-Huo",t:"How Topuria KO'd me",ch:"Alexander Volkanovski",tag:"🥊 Combattant"},
+{y:"YZkgws_G41w",t:"How Strong Is UFC Quillan Salkilld's Grip Strength?! 🤯 #shorts",ch:"Helen Yee Sports",tag:"🎤 Interview"},
+{y:"AonRsQT4bQE",t:"Craziest Food Uros Medic Ever Ate?! 🤯#shorts",ch:"Helen Yee Sports",tag:"🎤 Interview"},
+{y:"_rMSuER3zC8",t:"Quillan Salkilld BEST SINGER IN UFC?! 🎤🤯#shorts",ch:"Helen Yee Sports",tag:"🎤 Interview"},
+{y:"2qVL1UVFXkM",t:"Would You Watch Khabib vs GSP at RAF? #shorts",ch:"Helen Yee Sports",tag:"🎤 Interview"},
+{y:"ORfUOiTllJ4",t:"UFC FIGHTERS EPIC REACTION TO CHICKEN FEET🤣💀#shorts",ch:"Helen Yee Sports",tag:"🎤 Interview"},
+{y:"QbdYRP9P0rM",t:"Belal Muhammad BREAKS Glasses After Colby Covington Brawl 😮#shorts",ch:"Helen Yee Sports",tag:"🎤 Interview"},
+{y:"774dkrgSMBs",t:"Colby and Belal get into it at the press conference!🤯 #shorts",ch:"Helen Yee Sports",tag:"🎤 Interview"},
+{y:"it1rSFTrtWY",t:"Colby Covington defeats Arman Tsarukyan 5-3 to become RAF crossover🏆#shorts",ch:"Helen Yee Sports",tag:"🎤 Interview"},
+{y:"nsJ7DIQ5gbo",t:"STUNNING SUBMISSION! | Mateusz Gamrot vs Quillan Salkilld | #UFCVegas120 Fight Highlights",ch:"TNT Sports MMA",tag:"📰 News"},
+{y:"xId_zcM1tJc",t:"BRUTAL STOPPAGE! | Billy Ray Goff vs Ty Miller | #UFCVegas120 Fight Highlights",ch:"TNT Sports MMA",tag:"📰 News"},
+{y:"_LzilAxN0o0",t:"FINAL FIGHT KNOCKOUT | Darren Elkins vs Yadier del Valle | #UFCVegas120 Fight Highlights",ch:"TNT Sports MMA",tag:"📰 News"},
+{y:"BNWzw0OhDm0",t:"LIGHTNING FAST! | Uroš Medić vs. Daniel Rodriguez | #UFCBelgrade Fight Highlights",ch:"TNT Sports MMA",tag:"📰 News"},
+{y:"togknhivYSM",t:"TOTAL CONTROL! | Aleksandar Rakić vs. Marcin Tybura | #UFCBelgrade Fight Highlights",ch:"TNT Sports MMA",tag:"📰 News"},
+{y:"9pGU8GliAqY",t:"BRUTAL BRAWL! | Jan Błachowicz vs. Navajo Stirling | #UFCBelgrade Fight Highlights",ch:"TNT Sports MMA",tag:"📰 News"},
+{y:"rUpSQDwEfgA",t:"EXPLOSIVE DEBUT! | Oban Elliott vs. Michael Oliveira | #UFCBelgrade Fight Highlights",ch:"TNT Sports MMA",tag:"📰 News"},
+{y:"yo1VUNRNIVU",t:"TOP 10 UFC KNOCKOUTS FROM JULY 2026",ch:"TNT Sports MMA",tag:"📰 News"},
+{y:"tYRzux_9l8I",t:"Road to UFC 329 - Partie 3",ch:"Benoît Saint Denis",tag:"🇫🇷 Combattant"},
+{y:"cIPL4TSzjvc",t:"Dernier épisode dispo 🔥",ch:"Benoît Saint Denis",tag:"🇫🇷 Combattant"},
+{y:"Y_3ltyFaJto",t:"Nouvelle vidéo disponible sur ma chaîne YouTube 🎥🇫🇷",ch:"Benoît Saint Denis",tag:"🇫🇷 Combattant"},
+{y:"8A5IZbL-R2Q",t:"Las Vegas 🔥",ch:"Benoît Saint Denis",tag:"🇫🇷 Combattant"},
+{y:"31A0mf_2rdU",t:"Road to UFC 329 - Part 3 - BSD V Pimblett",ch:"Benoît Saint Denis",tag:"🇫🇷 Combattant"},
+{y:"gJDDHqSR6qc",t:"RDV à 19H00 sur la chaîne YouTube pour le dernier épisode de Road To UFC329 🔥",ch:"Benoît Saint Denis",tag:"🇫🇷 Combattant"},
+{y:"CmQh--7NibE",t:"Road to UFC 329",ch:"Benoît Saint Denis",tag:"🇫🇷 Combattant"},
+{y:"GBHvapGiw2U",t:"Road to UFC 329",ch:"Benoît Saint Denis",tag:"🇫🇷 Combattant"},
+{y:"Z_aAKpPLTFk",t:"UFC Vegas 120 FACE-OFFS: Mateusz Gamrot vs Quillan Salkilld",ch:"MMA Weekly",tag:"📰 News"},
+{y:"UuApd58xbeY",t:"UFC Vegas 120 Official Weigh-Ins: Mateusz Gamrot & Quillan Salkilld Make Weight",ch:"MMA Weekly",tag:"📰 News"},
+{y:"-QnCs5lAE50",t:"MATEUSZ GAMROT HAS HIS SIGHTS ON PADDY PIMBLETT!",ch:"MMA Weekly",tag:"📰 News"},
+{y:"vT_CiNyvJk8",t:"Jake Paul DROPS Nate Diaz! | This Day in MMA History",ch:"MMA Weekly",tag:"📰 News"},
+{y:"Tvs9Yk8nSt4",t:"This Day in MMA: Jones vs. Cormier BRAWL Changed UFC History!",ch:"MMA Weekly",tag:"📰 News"},
+{y:"zg7asYYYzKk",t:"This Day in MMA History: Henry Cejudo Ends Demetrious Johnson's Historic Reign | UFC 227",ch:"MMA Weekly",tag:"📰 News"},
+{y:"Ewp8kFca9Wc",t:"On This Day in UFC History: Jon Jones, Gaethje & Pereira Made History on This Day",ch:"MMA Weekly",tag:"📰 News"},
+{y:"sXkz1X0-3zc",t:"Daniel Rodriguez: I Expect an Absolute War!",ch:"MMA Weekly",tag:"📰 News"},
+{y:"p9NyVa6uyEI",t:"Kenny is rocking with the veteran Gamrot to get it done against the up and coming Quillan Salkilld",ch:"Anik & Florian",tag:"🎙️ Podcast"},
+{y:"wPRwgRjiSag",t:"RJ Clifford: Welterweight Is So Loaded, Medic Has to Leapfrog Everyone",ch:"Anik & Florian",tag:"🎙️ Podcast"},
+{y:"mZqCogIhdyQ",t:"Bruce Buffer does a little bit of everything in the octagon",ch:"Anik & Florian",tag:"🎙️ Podcast"},
+{y:"uKZROr09Hl8",t:"The Call That Has Anik and Longo Split",ch:"Anik & Florian",tag:"🎙️ Podcast"},
+{y:"TE2lOp0Y-Gk",t:"Uroš Medić Calls Out Prates — And Nobody Else Will",ch:"Anik & Florian",tag:"🎙️ Podcast"},
+{y:"UxzV84BU64U",t:"\"Someone would get finished or it would be an absolute classic\"",ch:"Anik & Florian",tag:"🎙️ Podcast"},
+{y:"SHYMeRGztSk",t:"Jon Anik is confident Navajo Stirling is a future CHAMP",ch:"Anik & Florian",tag:"🎙️ Podcast"},
+{y:"dHFB3ejm3hc",t:"If you're learning from KenFlo, you've already got a head start",ch:"Anik & Florian",tag:"🎙️ Podcast"},
+{y:"qRV_-pdcGwc",t:"Les stats dingues de Makhachev vs Ian Machado Garry",ch:"RMC Sport Combat",tag:"🇫🇷 Archives"},
+{y:"9IUh61Q6tsY",t:"Résumé UFC : Quarantillo vs Ferreira, les vétérans ont fait le spectacle !",ch:"RMC Sport Combat",tag:"🇫🇷 Archives"},
+{y:"GBrXEqca8Vo",t:"Résumé UFC : Gamrot vs Salkilld, une performance XXL dans la catégorie de Parnasse et Saint Denis !",ch:"RMC Sport Combat",tag:"🇫🇷 Archives"},
+{y:"IAWUiCk1SlQ",t:"LES ENJEUX DE L'330, C'EST DISPO !",ch:"RMC Sport Combat",tag:"🇫🇷 Archives"},
+{y:"elDx5V2o2Qk",t:"Makhachev en GOAT, retour du fou des low kicks, Dern doit confirmer... Les ENJEUX de l'UFC 330",ch:"RMC Sport Combat",tag:"🇫🇷 Archives"},
+{y:"-FGpJmakPXU",t:"Résumé PFL : la décision incompréhensible lors du combat entre Battle et Rosta !",ch:"RMC Sport Combat",tag:"🇫🇷 Archives"},
+{y:"Xaaec9bFJ5o",t:"COMBATS GRATUITS🥊ONE FRIDAY FIGHTS 165",ch:"RMC Sport Combat",tag:"🇫🇷 Archives"},
+{y:"_38SDbTXoKc",t:"UFC 330 : Garry peut BATTRE le MONSTRE Islam Makhachev ! I LA CARTE",ch:"RMC Sport Combat",tag:"🇫🇷 Archives"},
+{y:"lck8ZH9HITo",t:"LE K.O DINGUE DE SALKILLD !",ch:"RMC Sport Combat",tag:"🇫🇷 Archives"},
+{y:"QQTerQPeAoM",t:"Les coulisses des derniers moments de la team Diakhaté avant son combat au PFL New York",ch:"RMC Sport Combat",tag:"🇫🇷 Archives"},
+{y:"cqtfs21eJhg",t:"Fares Ziam vs Axel Sola à Paris !",ch:"La Sueur",tag:"🇫🇷 Podcast"},
+{y:"3MTcAJ_LEJ0",t:"Le monstre qui a nagé pendant 157 jours ! 😳",ch:"La Sueur",tag:"🇫🇷 Podcast"},
+{y:"32lg7mXn7cs",t:"Ciryl Gane en 1v1 face à Rudy Gobert 🏀🔥(via ciryl_gane)",ch:"La Sueur",tag:"🇫🇷 Podcast"},
+{y:"w_4gWSdKrII",t:"Salahdine Parnasse : qui est ce crack ? 🔥",ch:"La Sueur",tag:"🇫🇷 Podcast"},
+{y:"Unh8ft35uSE",t:"Jordan Zebo vs Baki 2 : OFFICIEL !",ch:"La Sueur",tag:"🇫🇷 Podcast"},
+{y:"KcvkLrvzh1Y",t:"Salahdine Parnasse vs Dan Hooker à Paris !",ch:"La Sueur",tag:"🇫🇷 Podcast"},
+{y:"7v5xzAQ3T2o",t:"Conor McGregor : ON FAIT QUOI ?",ch:"La Sueur",tag:"🇫🇷 Podcast"},
+{y:"2qA7ENPpZ0k",t:"Benoit St-Denis : QUE FAIRE ?",ch:"La Sueur",tag:"🇫🇷 Podcast"},
+{y:"ZKjugMPUL5I",t:"That looks cold 🏔️ (via sungurov/IG)",ch:"ESPN MMA",tag:"📰 News"},
+{y:"R7cFU_gYOcs",t:"Put a cape on him🦸‍♂️ (via gezzywap/TT)",ch:"ESPN MMA",tag:"📰 News"},
+{y:"pVLo40P4k_A",t:"Conor staying his shape 💪 (via nikowilliamss__/IG)",ch:"ESPN MMA",tag:"📰 News"},
+{y:"r-9zXU_2xtE",t:"He got up 🤯 (via therealriahi/IG)",ch:"ESPN MMA",tag:"📰 News"},
+{y:"ZZcdXUgR0FI",t:"Khabib in Islam’s corner 🤝",ch:"ESPN MMA",tag:"📰 News"},
+{y:"H8-2n5s7ONk",t:"The intensity 😳 (via UFC)",ch:"ESPN MMA",tag:"📰 News"},
+{y:"dhOK7TPS-I8",t:"That had to hurt 😅 (via stillryan1/TT)",ch:"ESPN MMA",tag:"📰 News"},
+{y:"Lulz7YVCWu8",t:"They checked on the wrong fighter 😭 (via tutcobain_/TT)",ch:"ESPN MMA",tag:"📰 News"},
+{y:"FVJepXz5wSA",t:"Luke Thomas UFC 330 Preview, Does Ian Garry BEAT Islam Makhachev? Islam's Legacy!",ch:"Submission Radio",tag:"🎙️ MMA News"},
+{y:"89MkcDMX6cc",t:"SR Morning After LIVE Quillan WHAT’S NEXT? UFC 330 Fight Week PREVIEW!",ch:"Submission Radio",tag:"🎙️ MMA News"},
+{y:"5PnQcl4r4To",t:"Quillan Salkilld JUST DESTROYED Mateusz Gamrot! Is Quillan a FUTURE CHAMPION? 155 Division on FIRE!",ch:"Submission Radio",tag:"🎙️ MMA News"},
+{y:"6BZm4K7ryUs",t:"UFC 331 REACTION, Arman/Ruffy The RIGHT FIGHT? Islam/Garry Preview, Who Will Justin Gaethje Fight?",ch:"Submission Radio",tag:"🎙️ MMA News"},
+{y:"h70yqYhZyWw",t:"BEDTIME MMA ON WILL USMAN BE NEXT UFC CHAMP? ISLAM FINISHING GARRY WITHIN 3 ROUNDS? UFC SERBIA!",ch:"Submission Radio",tag:"🎙️ MMA News"},
+{y:"5UhhRooURtI",t:"'Real deal' Quillan Salkilld open to Benoit Saint Denis at MSG in NYC | UFC Vegas 120",ch:"MMA Junkie",tag:"📰 News"},
+{y:"rMsnESFjYg8",t:"42-year-old Diego Ferreira eyes King Green or Jim Miller after win | UFC Vegas 120",ch:"MMA Junkie",tag:"📰 News"},
+{y:"kXe5m_lW5Hc",t:"Alexia Thainara turns to title contention after Amanda Lemos win | UFC Vegas 120",ch:"MMA Junkie",tag:"📰 News"},
+{y:"_8lNMWU2UgU",t:"Darren Elkins emotional after losing retirement fight in 35 seconds | UFC Vegas 120",ch:"MMA Junkie",tag:"📰 News"},
+{y:"fevDfjSIvU4",t:"Ty Miller names Carlos Prates as 'dream fight' after TKO win | UFC Vegas 120",ch:"MMA Junkie",tag:"📰 News"},
+{y:"AfSvifpzJcY",t:"Steven Asplund targets Jamahal Hill, feels 'back in the right direction' | UFC Vegas 120",ch:"MMA Junkie",tag:"📰 News"},
+{y:"R0DV6d0_Wns",t:"Diyar Nurgozhay talks back-to-back wins and UFC momentum | UFC Vegas 120",ch:"MMA Junkie",tag:"📰 News"},
+{y:"jAwisH7plxc",t:"Jose Montanha says quick debut win just a sliver of skillset | UFC Vegas 120",ch:"MMA Junkie",tag:"📰 News"},
+{y:"wCkpgi3vgcg",t:"MAIN EVENT #6 - Partie 2 avec Ragnar Le Breton, Nassim Lyes, Zoé Marchal, Fadilly Camara et Zangro",ch:"Ciryl Gane",tag:"🇫🇷 Combattant"},
+{y:"na0RE6dKBow",t:"MAIN EVENT #6 - Partie 2 avec Guillaume Duseaux, Jordan Zebo, Hugo Guillon et Alexis Nicolas !",ch:"Ciryl Gane",tag:"🇫🇷 Combattant"},
+{y:"Q4jMpQNLSEM",t:"\"Je suis un mytho ou pas ?\" (Le Jeu de la Boite : Spécial Douane)",ch:"Ciryl Gane",tag:"🇫🇷 Combattant"},
+{y:"fsQF8uWlNx0",t:"QUAND AURA LIEU MON PROCHAIN COMBAT ? (je réponds à vos QUESTIONS !)",ch:"Ciryl Gane",tag:"🇫🇷 Combattant"},
+{y:"45wWdDBM4L8",t:"Quand le tournage vire au CAUCHEMAR ! (les meilleures anecdotes de Coka Chicas)",ch:"Ciryl Gane",tag:"🇫🇷 Combattant"},
+{y:"reSulm8nGew",t:"On fait le point sur ma situation (blessure, film, prochain combat...)",ch:"Ciryl Gane",tag:"🇫🇷 Combattant"},
+{y:"wyPY5jXuyRo",t:"Захват ат Ислам Махачев UFC",ch:"Islam Makhachev",tag:"🥊 Combattant"},
+{y:"j1rOqFIxA84",t:"Islam Mahkachev Zubaira Tugkugov  Khabib Nurmagomedov",ch:"Islam Makhachev",tag:"🥊 Combattant"},
+{y:"KFf0U79qLu4",t:"Islam Mahkachev после боя",ch:"Islam Makhachev",tag:"🥊 Combattant"},
+{y:"65K_6_p6NRs",t:"Крутые бросок ат Ислам Махачев UFC",ch:"Islam Makhachev",tag:"🥊 Combattant"},
+{y:"4t_qVfwPXwU",t:"Ислам Махачев и Зубайра Тухугов Тренировка в Abu Dhabi",ch:"Islam Makhachev",tag:"🥊 Combattant"},
+{y:"vlGBXB3tlus",t:"Ислам Махачев подготовка к бою за титул чемпиона UFC",ch:"Islam Makhachev",tag:"🥊 Combattant"},
+{y:"7nVEn104fks",t:"Arman Predicts Easy Win vs Ruffy after Rewatching Chandler Fight",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"qV1eDeIWjNM",t:"Arman vs Ruffy?!?! No Title Shot vs Justin Gaethje",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"lq51F1kcyvM",t:"Khabib & Conor invited to Cristiano Ronaldo Wedding",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"IVY11ITTfiE",t:"Makhachev feels Sorry for Conor McGregor",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"qoxakQ-3qpY",t:"Makhachev's Gameplan for Ian Garry Running Style - UFC 330",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"aaFcQEU2xLk",t:"Chanco calls out Ilia Topuria after his First UFC Win!",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"g0eeunL7lMk",t:"Justin Gaethje Reject giving Topuria a Rematch!!",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"eKkIrb0pUyw",t:"Tom's Cleared to Fight but he Fears Gane's Eye Pokes in the Rematch",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"PCOxQfE5PtM",t:"Paddy Trolls Topuria by the Stool he Quit on vs Justin  Gaethje",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"9x2LnSPM6Tk",t:"Dricus Du Plessis defeats Kamaru Usman Then calls For Title Shot",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"JNl_y24yiTw",t:"Conor has ONE Last Fight left on his contract -  is He Leaving The UFC?",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"VhFmgZtbNco",t:"Conor's Unbreakable Titanium KNEE is Ready for Max Trilogy",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"ncbnYL9g_34",t:"Paddy Pimblett Submits Benoit Saint Denis in 52 Seconds UFC 329",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"K_fkPuKQWMY",t:"Conor was Injured before the Fight? Dana forced him to Fight!!",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"S4EtnZKYHSw",t:"Khabib & Dustin Reacts to Conor Mcgregor loss vs Holloway",ch:"Mojahed Fudailat",tag:"🎙️ MMA News"},
+{y:"wX_QBBRiQP4",t:"PARNASSE SIGNE À L'UFC ! Début à Paris contre Dan Hooker",ch:"MMA France",tag:"🇫🇷 UFC Paris"},
+{y:"5dTvdKGUfME",t:"« Je suis français aussi » 🇫🇷",ch:"MMA France",tag:"🇫🇷 Short"},
+{y:"oFy3s2Fp75k",t:"Des combattants français reçus à l'Élysée pour le MMA",ch:"MMA France",tag:"🇫🇷 Short"},
+{y:"2mYVFsdJDI4",t:"Les meilleurs combattants français de l'UFC",ch:"MMA",tag:"🇫🇷 Short"},
+{y:"HttlUpZYDMA",t:"Une journée type d'un combattant de l'UFC",ch:"UFC",tag:"🇫🇷 Short"},
+{y:"NSYjipYyBTM",t:"Charles Jourdain, combattant francophone de l'UFC",ch:"MMA Francophone",tag:"🇫🇷 Short"},
+{y:"ANA1vGAqpVM",t:"Ce KO était… BRUTAL 🚨",ch:"UFC Shorts",tag:"💥 Short KO"},
+{y:"74BiDN767aY",t:"Finition express — même pas le temps de s'installer 🧨",ch:"UFC",tag:"💥 Short KO"},
+{y:"nr8n_8Ydzxc",t:"Un crochet gauche et les lumières s'éteignent 💥",ch:"MMA KO",tag:"💥 Short KO"},
+{y:"uu9OYpfwwMg",t:"KO féminin de folie 👊",ch:"UFC",tag:"💥 Short KO"},
+{y:"xjN9-qw2J-A",t:"Finition éclair sur le Contender Series",ch:"DWCS",tag:"💥 Short KO"},
+{y:"i4vWcgeYjG4",t:"Le respect juste après la finition ❤️",ch:"UFC",tag:"🥊 Short"},
+{y:"ixItHfYoB54",t:"Top 5 des combattants les plus excitants 🔥",ch:"UFC",tag:"🔥 Short"},
+{y:"m0GNpt_HfF8",t:"Des combattants réagissent à leurs défaites",ch:"UFC",tag:"🥊 Short"},
+{y:"z8OYUrLBMfc",t:"Topuria vs Gaethje à la Maison Blanche : les highlights du classique",ch:"UFC",tag:"🏆 Highlights"},
+{y:"cwGs9Qb-9qw",t:"BSD x Ciryl Gane : on fait le point | Ground & Pound",ch:"La Sueur",tag:"🇫🇷 Podcast"},
+{y:"5K8OI2ybt9Y",t:"UFC 330 : la bande-annonce officielle",ch:"UFC",tag:"🎬 Trailer"},
+{y:"EXkhkKfHaHE",t:"Les plus gros KO de 2026… pour l'instant 🧨",ch:"UFC Highlights",tag:"💥 KO"},
+{y:"u_gRIcX16_8",t:"Parnasse vs Hooker : les combattants réagissent (Poirier, DC, Masvidal…)",ch:"MMA News",tag:"🇫🇷 Réactions"},
+{y:"fnMWQscGZ6M",t:"Makhachev vs Machado Garry : la preview de Laura Sanko & Din Thomas",ch:"UFC",tag:"🔍 Preview"},
+{y:"PcPbWNX48vo",t:"Gane, Imavov ou BSD : qui marquera l'histoire du MMA français ?",ch:"Podcast MMA FR",tag:"🇫🇷 Débat"},
+{y:"SBqj3cPhYOc",t:"Tous les KO de l'UFC Freedom 250 🔥",ch:"UFC",tag:"💥 KO"},
+{y:"YGht6F8ZYYY",t:"Parnasse : une signature historique ? (UFC Paris 5)",ch:"Podcast MMA",tag:"🇫🇷 Podcast"},
+{y:"dO5lamPmCtM",t:"UFC Freedom 250 : tous les face-à-face (Topuria vs Gaethje, Pereira vs Gane…)",ch:"UFC",tag:"👀 Face-à-face"},
+{y:"vS7rP1x7Y5k",t:"Dan Hooker prévient : « Je vais gâcher la soirée de tout le monde à Paris »",ch:"Interview",tag:"🎤 Interview"},
+{y:"e8ilCuvP7Xs",t:"UFC : le bordel | Ground & Pound",ch:"La Sueur",tag:"🇫🇷 Podcast"},
+{y:"zssHisjpRh0",t:"Top 10 des KO UFC de juin 2026 💥",ch:"UFC Highlights",tag:"💥 KO"},
+{y:"0cqq_hhQsNQ",t:"Parnasse brise le silence sur sa signature UFC et répond aux fans",ch:"Interview",tag:"🇫🇷 Interview"},
+{y:"7GpTew4UICM",t:"L'interview la plus drôle de Ciryl Gane | UFC Freedom 250",ch:"UFC",tag:"🇫🇷 Fun"},
+{y:"5oHI0B0EEBA",t:"Les combattants réagissent aux plus beaux KO de 2026",ch:"UFC",tag:"💥 Réactions"},
+{y:"-X6iaO3d74s",t:"UFC Paris : Parnasse vs Dan Hooker en Main Event !",ch:"MMA France",tag:"🇫🇷 UFC Paris"},
+{y:"BME5P4aUGD4",t:"UFC : enfin du mouvement ! | Ground & Pound",ch:"La Sueur",tag:"🇫🇷 Podcast"},
+{y:"ihApbKRCmu4",t:"UFC 330 : les pronos des combattants eux-mêmes",ch:"UFC",tag:"🎯 Picks"},
+{y:"W1C_kTh3RFA",t:"Tous les KO et soumissions de l'UFC Abu Dhabi",ch:"UFC",tag:"💥 Finitions"},
+{y:"QMxS5Z7NAEE",t:"BSD explique pourquoi Gane va battre Aspinall",ch:"Interview",tag:"🇫🇷 Interview"},
+{y:"2SQ3dxY_5VI",t:"Parnasse arrive ENFIN à l'UFC : direction le top 10 mondial ?",ch:"MMA France",tag:"🇫🇷 Analyse"},
+{y:"5dh8v84wk2o",t:"INSTANT CLASSIC 🚨 Topuria vs Gaethje en mini-highlights",ch:"UFC",tag:"🏆 Highlights"},
+{y:"dbtFCd5YHOY",t:"Doumbé, Gane, BSD : qui est le visage du MMA en France ?",ch:"Podcast MMA FR",tag:"🇫🇷 Débat"},
+{y:"TFnbDc-LqpM",t:"2026 : que fait l'UFC ?",ch:"La Sueur",tag:"🇫🇷 Analyse"},
+{y:"SiHq7YmKnlk",t:"Machado Garry : battre Islam, McGregor et devenir champion",ch:"Interview",tag:"🎤 Interview"},
+{y:"n0yNW7UxnME",t:"UFC 329 Embedded : dans les coulisses de la fight week (Ép. 1)",ch:"UFC",tag:"🎥 Embedded"},
+{y:"x850tKy0fTw",t:"Ne jamais jouer avec l'UFC",ch:"La Sueur",tag:"🇫🇷 Analyse"},
+{y:"gkG0Pvc8Hdg",t:"UFC Freedom 250 : le récap complet de la soirée à la Maison Blanche",ch:"Analyse MMA",tag:"📋 Récap"},
+{y:"uCvn5n2I3LA",t:"Hooker vs Parnasse à l'UFC Paris !!",ch:"MMA France",tag:"🇫🇷 UFC Paris"},
+{y:"ydrDiMTd4Ic",t:"Top finitions MMA féminines 2026",ch:"MMA Highlights",tag:"💥 KO"},
+{y:"O79d-61rPvQ",t:"Quand l'UFC t'a dans le viseur",ch:"La Sueur",tag:"🇫🇷 Analyse"},
+{y:"MqK5vK_QHaM",t:"UFC 330 : prédictions et breakdown de la carte complète",ch:"Analyse MMA",tag:"🎯 Pronos"},
+{y:"Z9lF7anL2sA",t:"UFC 330 : la bande-annonce en français",ch:"UFC France",tag:"🇫🇷 Trailer"},
+{y:"QnK_EKzCytE",t:"🔴 UFC Vegas 120: Post-Fight Press Conference",ch:"UFC",tag:"🏛️ UFC"},
+{y:"vOnbuPMDJUc",t:"Every Knockout and Submission From UFC Vegas 120 | UFC Highlights",ch:"UFC",tag:"🏛️ UFC"},
+{y:"8c3wk_ogy5Y",t:"Quillan Salkilld is next level! #ufcvegas120",ch:"UFC",tag:"🏛️ UFC"},
+{y:"JZ9RdTeTkd4",t:"Quillan Salkilld Octagon Interview | UFC Vegas 120",ch:"UFC",tag:"🏛️ UFC"},
+{y:"rnUWVihR1w8",t:"Quillan Salkilld submits Gamrot! #ufcvegas120",ch:"UFC",tag:"🏛️ UFC"},
+{y:"A80qXNcoU3c",t:"what are they feeding Quillan Salkilld???? #ufcvegas120",ch:"UFC",tag:"🏛️ UFC"},
+{y:"XEFisNdkTUY",t:"Diego Ferreira Octagon Interview | UFC Vegas 120",ch:"UFC",tag:"🏛️ UFC"},
+{y:"DRR-ujOTR7s",t:"the APEX is BOOMIN' right now! #ufcvegas120",ch:"UFC",tag:"🏛️ UFC"},
+{y:"Y-F2h_8Tu2k",t:"THANK YOU DARREN ELKINS | Retirement Interview | UFC Vegas 120",ch:"UFC",tag:"🏛️ UFC"},
+];
+
+/* Résultats des événements passés — rempli automatiquement chaque lundi.
+   Format : { eventId: { "CombattantA|CombattantB": "NomDuVainqueur" } } */
+const RESULTS={};
+
+/* Combattants français de l'UFC (🇫🇷 = aussi marqués dans les classements) */
+const FR_SET=new Set(["Ciryl Gane","Nassourdine Imavov","Benoît Saint Denis","Manon Fiorot","Nora Cornolle"]);
+const FR_EXTRA=[["Salahdine Parnasse","Poids Légers"],["Morgan Charrière","Poids Plumes"],["Fares Ziam","Poids Légers"],["William Gomis","Poids Plumes"],["Kevin Jousset","Poids Welters"],["Taylor Lapilus","Poids Coqs"],["Oumar Sy","Mi-Lourds"],["Matthieu Letho Duclos","Poids Moyens"],["Axel Sola","Poids Welters"]];
+
+
+/* Photos officielles UFC.com additionnelles (combattants absents de l'API) — complété le 9 août 2026 */
+const PHOTOS={
+"Chidi Njokuani":"https://ufc.com/images/2023-03/NJOKUANI_CHIDI_03-25.png",
+"Myktybek Orolbai":"https://ufc.com/images/2026-03/OROLBAI_MYKTYBEK_03-14.png",
+"Jeremiah Wells":"https://ufc.com/images/2025-10/WELLS_JEREMIAH_11-01.png",
+"Vicente Luque":"https://ufc.com/images/2026-04/LUQUE_VICENTE_04-11.png",
+"Tresean Gore":"https://ufc.com/images/2026-04/GORE_TRESEAN_04-04.png",
+"Dustin Stoltzfus":"https://ufc.com/images/2025-09/STOLTZFUS_DUSTIN_09-13.png",
+"Mansur Abdul-Malik":"https://ufc.com/images/2026-03/ABDUL-MALIK_MANSUR_03-28.png",
+"Nursulton Ruziboev":"https://ufc.com/images/2026-06/RUZIBOEV_NURSULTON_06-27.png",
+"Felipe Lima":"https://ufc.com/images/2025-06/LIMA_FELIPE_06-28.png",
+"Nathaniel Wood":"https://ufc.com/images/2025-10/WOOD_NATHANIEL_10-25.png",
+"Mario Pinto":"https://ufc.com/images/2026-03/PINTO_MARIO_03-21.png",
+"Ryan Spann":"https://ufc.com/images/2026-04/SPANN_RYAN_04-25.png",
+"Kurtis Campbell":"https://ufc.com/images/2026-03/CAMPBELL_KURTIS_03-21.png",
+"Trevor Peek":"https://ufc.com/images/2024-09/PEEK_TREVOR_09-07.png",
+"Aaron Pico":"https://ufc.com/images/2025-08/PICO_AARON_08-16.png",
+"Alexia Thainara":"https://ufc.com/images/2026-08/THAINARA_ALEXIA_08-08.png",
+"Ante Delija":"https://ufc.com/images/2026-02/DELIJA_ANTE_02-21.png",
+"Axel Sola":"https://ufc.com/images/2026-07/SOLA_AXEL_07-25.png",
+"Bia Mesquita":"https://ufc.com/images/2025-10/MESQUITA_BIA_10-11.png",
+"Bo Nickal":"https://ufc.com/images/2026-06/NICKAL_BO_06-14.png",
+"Brando Peričić":"https://ufc.com/images/2026-04/PERICIC_BRANDO_05-02.png",
+"Christian Leroy Duncan":"https://ufc.com/images/2026-03/DUNCAN_CHRISTIAN_LEROY_03-21.png",
+"Daniel Rodriguez":"https://ufc.com/images/2026-07/RODRIGUEZ_DANIEL_08-01.png",
+"David Martinez":"https://ufc.com/images/2026-03/MARTINEZ_DAVID_02-28.png",
+"Edgar Chairez":"https://ufc.com/images/2026-02/CHAIREZ_EDGAR_02-28.png",
+"Eduarda Moura":"https://ufc.com/images/2026-02/MOURA_EDUARDA_02-07.png",
+"Fares Ziam":"https://ufc.com/images/2026-06/ZIAM_FARES_06-06.png",
+"Farid Basharat":"https://ufc.com/images/2026-07/BASHARAT_FARID_07-11.png",
+"Fatima Kline":"https://ufc.com/images/2025-11/KLINE_FATIMA_11-15.png",
+"Gabriel Bonfim":"https://ufc.com/images/2026-06/BONFIM_GABRIEL_06-06.png",
+"Gabriella Fernandes":"https://ufc.com/images/2026-03/FERNANDES_GABRIELLA_03-28.png",
+"Gregory Rodrigues":"https://ufc.com/images/2026-03/RODRIGUES_GREGORY_03-07.png",
+"Ikram Aliskerov":"https://ufc.com/images/2026-06/ALISKEROV_IKRAM_06-27.png",
+"Joe Pyfer":"https://ufc.com/images/2026-03/PYFER_JOE_03-28.png",
+"Josh Hokit":"https://ufc.com/images/2026-06/HOKIT_JOSH_06-14.png",
+"Kevin Jousset":"https://ufc.com/images/2025-02/JOUSSET_KEVIN_02-08.png",
+"Kevin Vallejos":"https://ufc.com/images/2025-12/VALLEJOS_KEVIN_12-13.png",
+"Kyoji Horiguchi":"https://ufc.com/images/2025-11/HORIGUCHI_KYOJI_11-22.png",
+"Lone'er Kavanagh":"https://ufc.com/images/2026-02/KAVANAGH_LONEER_02-28.png",
+"Luana Santos":"https://ufc.com/images/2026-06/SANTOS_LUANA_06-20.png",
+"Manuel Torres":"https://ufc.com/images/2026-06/TORRES_MANUEL_06-27.png",
+"Matthieu Letho Duclos":"https://ufc.com/images/2026-07/DUCLOS_MATTHIEU.png",
+"Mauricio Ruffy":"https://ufc.com/images/2026-06/RUFFY_MAURICIO_06-14.png",
+"Melissa Croden":"https://ufc.com/images/2025-10/CRODEN_MELISSA_10-18.png",
+"Melquizael Costa":"https://ufc.com/images/2026-02/COSTA_MELQUIZAEL_02-21.png",
+"Michael Venom Page":"https://ufc.com/images/2026-03/PAGE_MICHAEL_03-21.png",
+"Michelle Montague":"https://ufc.com/images/2026-04/MONTAGUE_MICHELLE_04-25.png",
+"Mike Malott":"https://ufc.com/images/2026-04/MALOTT_MIKE_04-18.png",
+"Mizuki":"https://ufc.com/images/2025-10/MIZUKI_10-25.png",
+"Navajo Stirling":"https://ufc.com/images/2026-07/STIRLING_NAVAJO_08-01.png",
+"Oumar Sy":"https://ufc.com/images/2026-03/SY_OUMAR_03-14.png",
+"Patricio Pitbull":"https://ufc.com/images/2026-04/PITBULL_PATRICIO_04-11.png",
+"Payton Talbott":"https://ufc.com/images/2025-12/TALBOTT_PAYTON_12-06.png",
+"Quillan Salkilld":"https://ufc.com/images/2026-08/SALKILLD_QUILLAN_08-08.png",
+"Raoni Barcelos":"https://ufc.com/images/2026-04/BARCELOS_RAONI_04-25.png",
+"Raul Rosas Jr.":"https://ufc.com/images/2026-03/ROSAS_JR_RAUL_03-07.png",
+"Steve Garcia":"https://ufc.com/images/2026-06/GARCIA_STEVE_06-14.png",
+"Taylor Lapilus":"https://ufc.com/images/2024-09/LAPILUS_TAYLOR_09-28.png",
+"Tom Nolan":"https://ufc.com/images/2025-09/NOLAN_TOM_09-27.png",
+"Tyrell Fortune":"https://ufc.com/images/2026-03/FORTUNE_TYRELL_03-28.png",
+"Uroš Medić":"https://ufc.com/images/2026-07/MEDIC_UROS_08-01.png",
+"Valter Walker":"https://ufc.com/images/2026-07/WALKER_VALTER_07-25.png",
+"William Gomis":"https://ufc.com/images/2026-05/GOMIS_WILLIAM_05-09.png",
+"Yaroslav Amosov":"https://ufc.com/images/2025-12/AMOSOV_YAROSLAV_12-13.png",
+"Morgan Charrière":"https://ufc.com/images/styles/athlete_bio_full_body/s3/2024-09/CHARRIERE_MORGAN_L_09-28.png?itok=U74Yn8DR"
+};
+
+/* Analyses IA par combat — régénérées chaque lundi par l'IA de maintenance.
+   Format : { eventId: { "A|B": "texte d'analyse" } } */
+const AI_ANALYSIS={
+"ufc330":{
+"Islam Makhachev|Ian Machado Garry":"Le grappling de Makhachev est le meilleur de la division : dès qu'il touche les jambes, le combat change de dimension. Garry a l'allonge, un jab précis et la fraîcheur, mais il devra survivre 25 minutes aux takedowns du Daghestanais — personne n'y est encore parvenu. Danger pour Islam : le premier round debout, où la vitesse de Garry peut surprendre. Tendance IA : Makhachev par soumission ou décision.",
+"Mackenzie Dern|Gillian Robertson":"Duel de grapplers pour le titre strawweight. Dern possède un jiu-jitsu de niveau mondial (championne du monde IBJJF) et un boxing en progrès ; Robertson est une finisseuse opportuniste (record de soumissions chez les femmes UFC). Si ça reste debout, avantage Dern. Au sol, quiconque prend le dos gagne. Tendance IA : Dern, mais Robertson est le piège classique.",
+"Geoff Neal|Chidi Njokuani":"Puissance pure contre allonge : Neal frappe plus fort, Njokuani touche de plus loin. Njokuani vieillit mais reste dangereux au premier round. Tendance IA : Neal par KO en milieu de combat s'il passe la distance.",
+"Myktybek Orolbai|Jeremiah Wells":"Orolbai apporte la pression et le cardio des lutteurs d'Asie centrale ; Wells est explosif mais s'éteint après le round 1. Tendance IA : Orolbai par décision.",
+"Vicente Luque|Tresean Gore":"Luque, vétéran au menton entamé mais au jeu toujours dangereux (D'Arce chirurgical), face à Gore qui n'a jamais confirmé son potentiel TUF. Tendance IA : Luque par soumission.",
+"Dustin Stoltzfus|Mansur Abdul-Malik":"Abdul-Malik est le prospect que l'UFC protège : frappe lourde, sorties expéditives. Stoltzfus est le test de routine. Tendance IA : Abdul-Malik par TKO rapide."},
+"paris":{
+"Dan Hooker|Salahdine Parnasse":"Parnasse arrive avec l'aura du phénomène français : double champion KSW, technique complète, timing d'élite — les books le donnent très large favori (~1.30). Mais attention : Hooker est un piège parfait pour des débuts UFC. Dur au mal, expérimenté au plus haut niveau, il transforme chaque combat en guerre d'usure. Si Parnasse gère l'émotion de Bercy et reste discipliné, son MMA complet fait la différence. Tendance IA : Parnasse par décision dans un combat plus dur que prévu.",
+"Michael Venom Page|Nursulton Ruziboev":"MVP reste le striker le plus imprévisible du roster, mais Ruziboev a l'allonge, la puissance et un grappling sournois. Si Ruziboev impose le clinch, MVP souffre. Tendance IA : 50/50, léger avantage MVP à la touche.",
+"Morgan Charrière|Felipe Lima":"Le Frelon devant son public : pression, low kicks, punch. Lima est techniquement propre et bien entouré. Combat très serré — tendance IA : Charrière porté par Bercy, par décision."}
+};
+
+/* ============ ÉTAT / STOCKAGE ============ */
+const store={
+  get(k,d){try{const v=localStorage.getItem("octogone_"+k);return v?JSON.parse(v):d}catch(e){return this.m&&this.m[k]!==undefined?this.m[k]:d}},
+  set(k,v){try{localStorage.setItem("octogone_"+k,JSON.stringify(v))}catch(e){this.m=this.m||{};this.m[k]=v}}
+};
+let alarms=store.get("alarms",[]);
+let apiCache=null;
+
+/* ============ UTILS ============ */
+const $=s=>document.querySelector(s);
+const frDate=iso=>new Date(iso).toLocaleString("fr-FR",{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Paris"});
+function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",2600)}
+function slug(n){return n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"")}
+function initials(n){return n.split(" ").map(w=>w[0]).slice(0,2).join("")}
+
+/* ============ NAV ============ */
+const NAV_ORDER=["s-events","s-pronos","s-rank","s-fighters","s-news","s-live","s-social","s-alarms"];
+const NAV_MODE={"s-events":"events","s-pronos":"pronos","s-rank":"rank","s-fighters":"fighters","s-news":"news","s-live":"live","s-social":"social","s-alarms":"alarms"};
+const NAV_LABEL={"s-events":"🗓️ Événements","s-pronos":"🎯 Pronos","s-rank":"🏆 Classements","s-fighters":"🥊 Combattants","s-news":"📰 Actus","s-live":"🔴 Live","s-social":"📡 Réseaux","s-alarms":"⏰ Alarmes"};
+function goPage(target){
+  if(!NAV_MODE[target])return;
+  const cur=document.querySelector("section.on");
+  const dir=(NAV_ORDER.indexOf(target)>=(cur?NAV_ORDER.indexOf(cur.id):0))?"dir-r":"dir-l";
+  document.querySelectorAll("section").forEach(x=>x.classList.remove("on","dir-r","dir-l"));
+  $("#"+target).classList.add("on",dir);
+  document.body.dataset.mode=NAV_MODE[target];
+  document.querySelectorAll("#dots .dot").forEach(d=>d.classList.toggle("on",d.dataset.s===target));
+  const lbl=$("#dotsLabel"); if(lbl)lbl.textContent=NAV_LABEL[target];
+  window.scrollTo(0,0);
+  if(target==="s-fighters"||target==="s-rank"||target==="s-news")loadApi();
+  if(target==="s-pronos"){renderHQ();renderArena();loadApi()}
+  if(target==="s-live"){renderLive();clearInterval(liveTimer);liveTimer=setInterval(renderLive,20000)}
+  else clearInterval(liveTimer);
+}
+/* Points indicateurs cliquables (remplacent la barre) */
+$("#dots").innerHTML=NAV_ORDER.map(id=>`<button class="dot${id==="s-events"?" on":""}" data-s="${id}" aria-label="${NAV_LABEL[id]}"></button>`).join("");
+$("#dots").querySelectorAll(".dot").forEach(d=>d.onclick=()=>goPage(d.dataset.s));
+document.body.dataset.mode="events";
+/* Navigation au glissement gauche/droite (avec garde anti-conflit sur les zones à défilement horizontal) */
+(function(){
+  let x0=0,y0=0,t0=0,tgt=null;
+  const zone=document.querySelector(".app")||document.body;
+  const inHScroll=el=>{for(let n=el;n&&n!==zone;n=n.parentElement){if(n.scrollWidth>n.clientWidth+6&&/(auto|scroll)/.test(getComputedStyle(n).overflowX))return true;}return false;};
+  zone.addEventListener("touchstart",e=>{const t=e.changedTouches[0];x0=t.clientX;y0=t.clientY;t0=Date.now();tgt=e.target;},{passive:true});
+  zone.addEventListener("touchend",e=>{
+    const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0,dt=Date.now()-t0;
+    if(Math.abs(dx)<55||Math.abs(dx)<Math.abs(dy)*1.4||dt>700)return;
+    if(tgt&&inHScroll(tgt))return;
+    const cur=document.querySelector("section.on"),i=NAV_ORDER.indexOf(cur?cur.id:"s-events");
+    if(dx<0&&i<NAV_ORDER.length-1)goPage(NAV_ORDER[i+1]);
+    else if(dx>0&&i>0)goPage(NAV_ORDER[i-1]);
+  },{passive:true});
+})();
+
+/* ============ HORLOGE + HERO ============ */
+setInterval(()=>{$("#clock").textContent=new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Paris"})},1000);
+function nextEvent(){const now=Date.now();return EVENTS.find(e=>new Date(e.mainUTC).getTime()+4*3600e3>now)||EVENTS[EVENTS.length-1]}
+function renderHero(){
+  const e=nextEvent(),t=new Date(e.mainUTC).getTime()-Date.now();
+  let cd="";
+  if(t>0){const d=Math.floor(t/864e5),h=Math.floor(t%864e5/36e5),m=Math.floor(t%36e5/6e4),s=Math.floor(t%6e4/1e3);
+    cd=`<div class="cd"><div><b>${d}</b><span>jours</span></div><div><b>${h}</b><span>heures</span></div><div><b>${m}</b><span>min</span></div><div><b>${s}</b><span>sec</span></div></div>`;
+  }else{cd=`<div class="cd"><div style="border-color:var(--red)"><b style="color:var(--red2);font-size:15px">🔴 EN COURS / TERMINÉ</b><span>résultats bientôt en notification</span></div></div>`}
+  $("#hero").innerHTML=`<div class="tag">⏳ Prochain événement</div><div class="name">${e.name} ${e.fr?"🇫🇷":""}</div><div class="sub">${e.loc} · Carte principale : ${frDate(e.mainUTC)}${e.est?' <span class="est">(estimé)</span>':""}</div>${cd}`;
+}
+renderHero();setInterval(renderHero,1000);
+
+/* ============ PRONOSTICS : SYSTÈME DE JEU ============ */
+function fightKey(f){return f[0]+"|"+f[1]}
+function eventLocked(evId){const e=EVENTS.find(x=>x.id===evId);return e?Date.now()>new Date(e.prelimsUTC).getTime():true}
+function fightRow(f,evId){
+  const picks=store.get("picks",{}),p=(picks[evId]||{})[fightKey(f)];
+  const res=(RESULTS[evId]||{})[fightKey(f)];
+  const locked=eventLocked(evId)||!!res;
+  const side=n=>{
+    const picked=p===n,won=res===n,lost=res&&res!==n;
+    const dk=encodeURIComponent(evId+"§"+fightKey(f)+"§"+n);
+    const ph=photoOf(n);
+    return `<div class="d-side ${picked?'picked':''} ${won?'win':''} ${lost?'lose':''} ${locked?'locked':''}" data-k="${dk}" ${locked?"":'onclick="pickDk(this)"'}>
+      <div class="d-ava" ${ph?`style="background-image:url('${ph}')"`:""}>${ph?"":initials(n)}</div>
+      <span class="d-name">${n}</span>
+      ${picked?'<span class="d-check">✓</span>':""}
+      ${won&&picked?`<span class="d-pts">+${f[3]?20:10} pts</span>`:""}
+    </div>`;
+  };
+  return `<div class="duel"><div class="d-label ${f[3]?'title':''}">${f[3]?"🏆 ":""}${f[2]}</div>
+  <div class="d-row">${side(f[0])}<span class="d-vs">VS</span>${side(f[1])}</div></div>`;
+}
+function pickDk(el){const parts=decodeURIComponent(el.dataset.k).split("§");pick(parts[0],parts[1],parts[2])}
+function pick(evId,key,name){
+  if((RESULTS[evId]||{})[key]){toast("⚠️ Combat terminé — pronos fermés !");return}
+  if(eventLocked(evId)){toast("🔒 L'événement a commencé — pronos verrouillés !");return}
+  const picks=store.get("picks",{});picks[evId]=picks[evId]||{};
+  const removed=picks[evId][key]===name;
+  if(removed){delete picks[evId][key]}else{picks[evId][key]=name}
+  store.set("picks",picks);
+  renderEvents();renderPronoCard();renderHQ();
+  if(!removed){
+    const dk=encodeURIComponent(evId+"§"+key+"§"+name);
+    const n2=document.querySelector(`.d-side[data-k="${dk}"]`);
+    if(n2)n2.classList.add("pop");
+    toast("🥊 Prono validé : "+name);
+  }else toast("Prono retiré");
+}
+const RANKS=[[0,"Amateur","🥋"],[30,"Prospect","🥊"],[80,"Contender","⚔️"],[160,"Champion","🏆"],[300,"GOAT","🐐"]];
+function computeScore(){
+  const picks=store.get("picks",{});let pts=0,total=0,correct=0,pending=0;
+  EVENTS.forEach(e=>{[...e.main,...e.prelims].forEach(f=>{
+    const k=fightKey(f),pk=(picks[e.id]||{})[k];if(!pk)return;
+    const r=(RESULTS[e.id]||{})[k];
+    if(r){total++;if(r===pk){correct++;pts+=f[3]?20:10}}
+    else pending++;
+  })});
+  return {pts,total,correct,pending};
+}
+function judgedSeq(){
+  const picks=store.get("picks",{}),seq=[];
+  EVENTS.forEach(e=>{[...e.main,...e.prelims].forEach(f=>{
+    const k=fightKey(f),pk=(picks[e.id]||{})[k],r=(RESULTS[e.id]||{})[k];
+    if(pk&&r)seq.push(r===pk);
+  })});
+  return seq;
+}
+function streaks(){
+  const s=judgedSeq();let cur=0,best=0,run=0;
+  s.forEach(ok=>{run=ok?run+1:0;if(run>best)best=run});
+  for(let i=s.length-1;i>=0&&s[i];i--)cur++;
+  return {cur,best};
+}
+function badgesState(){
+  const picks=store.get("picks",{});const {pts,correct}=computeScore();const {best}=streaks();
+  const nPicks=Object.values(picks).reduce((a,o)=>a+Object.keys(o).length,0);
+  let fullCard=false,prophet=false;
+  EVENTS.forEach(e=>{
+    const fights=[...e.main,...e.prelims];if(!fights.length)return;
+    const evp=picks[e.id]||{};
+    if(fights.every(f=>evp[fightKey(f)]))fullCard=true;
+    const judged=fights.filter(f=>evp[fightKey(f)]&&(RESULTS[e.id]||{})[fightKey(f)]);
+    if(judged.length>=4&&judged.every(f=>(RESULTS[e.id]||{})[fightKey(f)]===evp[fightKey(f)]))prophet=true;
+  });
+  return [
+    {i:"🎯",n:"Premier sang",d:"Faire son 1er prono",ok:nPicks>=1},
+    {i:"📋",n:"Carte pleine",d:"Prono sur tous les combats d'un event",ok:fullCard},
+    {i:"✅",n:"Première victoire",d:"1 bon prono jugé",ok:correct>=1},
+    {i:"🔥",n:"En feu",d:"3 bons pronos d'affilée",ok:best>=3},
+    {i:"🧠",n:"Prophète",d:"4+ bons pronos sur un même event",ok:prophet},
+    {i:"🐐",n:"Légende",d:"Atteindre 300 points",ok:pts>=300}
+  ];
+}
+function renderPronoCard(){
+  const {pts,pending}=computeScore();
+  let ri=0;for(let i=0;i<RANKS.length;i++)if(pts>=RANKS[i][0])ri=i;
+  $("#prono-card").innerHTML=`<div class="prono-slim glass" onclick="goPage('s-pronos')">
+    <span class="ps-ic">🎯</span>
+    <div><b>Mode Pronos — ${RANKS[ri][2]} ${RANKS[ri][1]} · ${pts} pts</b><small>${pending?pending+" prono"+(pending>1?"s":"")+" en attente de résultat":"Fais tes picks dans l'Arène !"}</small></div>
+    <span class="go">›</span>
+  </div>`;
+}
+function renderHQ(){
+  const {pts,total,correct,pending}=computeScore();
+  let ri=0;for(let i=0;i<RANKS.length;i++)if(pts>=RANKS[i][0])ri=i;
+  const cur=RANKS[ri],next=RANKS[ri+1];
+  const prog=next?Math.min(1,(pts-cur[0])/(next[0]-cur[0])):1;
+  const C=2*Math.PI*34;
+  const {cur:sc,best:sb}=streaks();
+  const bd=badgesState();
+  $("#pr-hq").innerHTML=`<div class="prono glass">
+  <div class="ring-wrap" style="margin-top:0">
+    <div class="ring-box">
+      <svg width="92" height="92"><circle class="ring-bg" cx="46" cy="46" r="34"/>
+      <circle class="ring-fg" id="ring-fg" cx="46" cy="46" r="34" stroke-dasharray="${C}" stroke-dashoffset="${C}"/></svg>
+      <div class="ring-center"><b>${pts}</b><span>points</span></div>
+    </div>
+    <div class="rank-info">
+      <span class="rank-badge">${cur[2]} ${cur[1]}</span>
+      <div class="rank-next">${next?`Encore <b style="color:var(--gold2)">${next[0]-pts} pts</b> pour devenir ${next[2]} <b>${next[1]}</b>`:"Rang maximum — respect éternel 🐐"}</div>
+    </div>
+  </div>
+  <div class="streak-row">
+    <div><b class="pc-ok">${correct}</b><span>bons pronos</span></div>
+    <div><b>${total}</b><span>jugés</span></div>
+    <div><b>${pending}</b><span>en attente</span></div>
+    <div><b style="color:${sc>=3?"#ff7b2e":"var(--txt)"}">${sc>=1?"🔥":""}${sc}</b><span>série en cours</span></div>
+    <div><b style="color:var(--gold2)">${total?Math.round(correct/total*100)+"%":"–"}</b><span>précision</span></div>
+  </div>
+  <div class="badges">${bd.map(b=>`<div class="badge-c ${b.ok?"onb":"off"}"><span class="bi">${b.i}</span><b>${b.n}</b><small>${b.d}</small></div>`).join("")}</div>
+  </div>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const r=$("#ring-fg");if(r)r.style.strokeDashoffset=String(C*(1-prog));
+  }));
+}
+/* ===== ARÈNE ===== */
+let arenaIdx=0;
+function arenaFights(){const out=[];EVENTS.forEach(e=>{if(eventLocked(e.id))return;[...e.main,...e.prelims].forEach(f=>out.push({e,f}))});return out}
+function renderArena(){
+  const list=arenaFights();
+  if(!list.length){$("#arena").innerHTML="<p style='color:var(--mut);font-size:13px;padding:16px'>Aucun combat ouvert aux pronos — reviens à l'annonce des prochaines cartes !</p>";return}
+  if(arenaIdx>=list.length)arenaIdx=0;if(arenaIdx<0)arenaIdx=list.length-1;
+  const {e,f}=list[arenaIdx],k=fightKey(f),p=(store.get("picks",{})[e.id]||{})[k];
+  const side=n=>{
+    const ph=photoOf(n),picked=p===n;
+    const dk=encodeURIComponent(e.id+"§"+k+"§"+n);
+    return `<div class="a-side ${picked?'picked':''}" onclick="arenaPick('${dk}')">
+      <div class="a-img" ${ph?`style="background-image:url('${ph}')"`:""}>${ph?"":initials(n)}</div>
+      <div class="a-nm">${n}</div>
+    </div>`;
+  };
+  $("#arena").innerHTML=`<div class="arena-ev">${e.fr?"🇫🇷 ":""}${e.name} · ${e.date}</div>
+  <div class="arena-div ${f[3]?'title':''}">${f[3]?"🏆 ":""}${f[2]}</div>
+  <div class="arena-row">${side(f[0])}<span class="a-vs">VS</span>${side(f[1])}</div>
+  ${(AI_ANALYSIS[e.id]||{})[k]?`<button class="ai-btn" onclick="this.nextElementSibling.classList.toggle('on')">🤖 Analyse IA du combat</button>
+  <div class="ai-box">${(AI_ANALYSIS[e.id]||{})[k]}<small>Analyse générée par IA à partir des données publiques — divertissement, pas un conseil de pari. Régénérée chaque lundi.</small></div>`:""}
+  <div class="arena-foot">
+    <button onclick="arenaIdx--;renderArena()">‹ Préc.</button>
+    <span class="prg">Combat ${arenaIdx+1} / ${list.length}${p?" · ✓":""}</span>
+    <button onclick="arenaIdx++;renderArena()">Suiv. ›</button>
+  </div>`;
+}
+function arenaPick(dk){
+  const parts=decodeURIComponent(dk).split("§");
+  pick(parts[0],parts[1],parts[2]);
+  renderArena();
+  const picked=(store.get("picks",{})[parts[0]]||{})[parts[1]];
+  if(picked)setTimeout(()=>{arenaIdx++;renderArena()},700);
+}
+/* ===== PARTAGE IMAGE ===== */
+async function sharePronos(){
+  const e=EVENTS.find(x=>(x.main.length+x.prelims.length)>0)||EVENTS[0];
+  const fights=[...e.main,...e.prelims],picks=store.get("picks",{})[e.id]||{};
+  const {pts}=computeScore();let ri=0;for(let i=0;i<RANKS.length;i++)if(pts>=RANKS[i][0])ri=i;
+  const W=1000,H=360+fights.length*92+150;
+  const c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+  x.fillStyle="#0a0a0d";x.fillRect(0,0,W,H);
+  const g=x.createRadialGradient(W/2,0,50,W/2,0,700);g.addColorStop(0,"rgba(210,10,10,.3)");g.addColorStop(1,"transparent");
+  x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.strokeStyle="rgba(210,10,10,.5)";x.lineWidth=5;
+  const oct=(cx,cy,r)=>{x.beginPath();for(let i=0;i<8;i++){const a=Math.PI/8+i*Math.PI/4;x[i?"lineTo":"moveTo"](cx+r*Math.cos(a),cy+r*Math.sin(a))}x.closePath();x.stroke()};
+  oct(W/2,120,95);
+  x.textAlign="center";x.fillStyle="#fff";x.font="italic 900 58px Arial";
+  x.fillText("OCTO",W/2,105);x.fillStyle="#ff2e2e";x.fillText("GONE",W/2,163);
+  x.fillStyle="#c9a227";x.font="900 30px Arial";x.fillText("🎯 MES PRONOS",W/2,265);
+  x.fillStyle="#fff";x.font="italic 900 34px Arial";x.fillText(e.name.toUpperCase(),W/2,310);
+  let y=380;
+  fights.forEach(f=>{
+    const pk=picks[fightKey(f)];
+    x.fillStyle="rgba(255,255,255,.06)";
+    x.beginPath();x.roundRect(60,y-38,W-120,72,14);x.fill();
+    x.font="700 27px Arial";
+    x.textAlign="right";x.fillStyle=pk===f[0]?"#ffd76a":"#e6e6ea";x.fillText((pk===f[0]?"✓ ":"")+f[0],W/2-42,y+4);
+    x.textAlign="center";x.fillStyle="#ff2e2e";x.font="italic 900 22px Arial";x.fillText("VS",W/2,y+3);
+    x.textAlign="left";x.font="700 27px Arial";x.fillStyle=pk===f[1]?"#ffd76a":"#e6e6ea";x.fillText(f[1]+(pk===f[1]?" ✓":""),W/2+42,y+4);
+    if(f[3]){x.textAlign="center";x.fillStyle="#c9a227";x.font="700 16px Arial";x.fillText("🏆 COMBAT DE TITRE",W/2,y-20)}
+    y+=92;
+  });
+  x.textAlign="center";x.fillStyle="#c9a227";x.font="900 26px Arial";
+  x.fillText(RANKS[ri][2]+" "+RANKS[ri][1]+" · "+pts+" points",W/2,y+30);
+  x.fillStyle="#9a9aa8";x.font="700 24px Arial";
+  x.fillText("Fais tes pronos sur l'app 👉 octogone-ufc.netlify.app",W/2,y+75);
+  c.toBlob(async blob=>{
+    const file=new File([blob],"mes-pronos-octogone.png",{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file],title:"Mes pronos OCTOGONE",text:"Mes pronos "+e.name+" — fais les tiens sur octogone-ufc.netlify.app 🥊"})}catch(err){}
+    }else{
+      const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mes-pronos-octogone.png";a.click();
+      toast("🖼️ Image téléchargée — partage-la !");
+    }
+  },"image/png");
+}
+
+/* ============ ÉVÉNEMENTS ============ */
+function renderEvents(){
+  const open=[...document.querySelectorAll(".ev.open")].map(x=>x.id);
+  $("#ev-list").innerHTML=EVENTS.map(e=>{
+  const [d,mo]=e.date.split(" ");
+  const nPicks=Object.keys((store.get("picks",{})[e.id])||{}).length;
+  const nFights=e.main.length+e.prelims.length;
+  const locked=eventLocked(e.id);
+  const mm=e.main[0];
+  const evhSide=n=>{const p=n?photoOf(n):null;return`<div class="evh-ph" ${p?`style="background-image:url('${p}')"`:""}>${p||!n?"":initials(n)}</div>`};
+  return `<div class="ev glass" id="ev-${e.id}">
+  ${mm?`<div class="ev-hero" onclick="this.parentNode.classList.toggle('open')">
+    <span class="evh-tag">${e.type==="ppv"?"PPV":"Fight Night"}${e.fr?" 🇫🇷":""}</span>
+    ${evhSide(mm[0])}${evhSide(mm[1])}
+    <span class="evh-vs">VS</span>
+    <div class="evh-names"><span>${mm[0]}</span><span>${mm[1]}</span></div>
+  </div>`:""}
+  <div class="ev-h" onclick="this.parentNode.classList.toggle('open')">
+    <div class="ev-date"><b>${d}</b><span>${mo}</span></div>
+    <div class="ev-t"><b>${e.fr?"🇫🇷 ":""}${e.name}</b><small>${e.loc}${nFights?` · 🎯 ${nPicks}/${nFights} pronos`:""}</small></div>
+    <span class="badge ${e.type}">${e.type==="ppv"?"PPV":"Fight Night"}</span>
+  </div>
+  <div class="ev-body">
+    ${nFights&&locked?'<div class="lock-note">🔒 Événement commencé — pronos verrouillés</div>':""}
+    ${e.main.length?'<h4>Carte principale</h4>'+e.main.map(f=>fightRow(f,e.id)).join(""):"<p style='color:var(--mut);font-size:13px'>Carte pas encore annoncée.</p>"}
+    ${e.prelims.length?'<h4>Prélims</h4>'+e.prelims.map(f=>fightRow(f,e.id)).join(""):""}
+    <div class="times">🇫🇷 <b>Heure française</b> — Prélims : <b>${frDate(e.prelimsUTC)}</b> · Carte principale : <b>${frDate(e.mainUTC)}</b> ${e.est?'<span class="est">(horaires estimés, à confirmer)</span>':"✅ confirmé"}</div>
+    <div class="watch"><div class="watch-t">📺 Où regarder en France 🇫🇷</div><div class="watch-links">${DIFFUSION_FR.links.map(l=>`<a class="${l.c}" href="${l.u}" target="_blank" rel="noopener noreferrer">${l.ic} ${l.t}</a>`).join("")}</div></div>
+    ${e.notes?`<p style="color:var(--mut);font-size:12.5px;margin-top:9px;line-height:1.5">ℹ️ ${e.notes}</p>`:""}
+    <div class="ev-actions">
+      <button class="btn gold" onclick="dlIcsFor('${e.id}')">📅 Rappel calendrier</button>
+      <button class="btn ghost" onclick="goAlarm('${e.id}')">⏰ Alarme</button>
+    </div>
+  </div></div>`;
+  }).join("");
+  open.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add("open")});
+}
+/* Bandeau du splash — photos officielles ufc.com (aucune photo de presse/Getty, licence sûre) */
+const SPLASH_HERO=[
+{n:"Khamzat Chimaev",u:"https://ufc.com/images/2025-05/CHIMAEV_KHAMZAT_10-26.png"},
+{n:"Islam Makhachev",u:"https://ufc.com/images/2025-01/7/MAKHACHEV_ISLAM_BELT_01-18.png"},
+{n:"Alex Pereira",u:"https://ufc.com/images/2025-10/PEREIRA_ALEX_10-04.png"},
+{n:"Diego Lopes",u:"https://ufc.com/images/2026-06/LOPES_DIEGO_06-14.png"}
+];
+$("#sp-hero").innerHTML=SPLASH_HERO.map(c=>`<div class="sh-item" title="${c.n}"><div class="sh-img" style="background-image:url('${c.u}')"></div><div class="sh-vig"></div><div class="sh-red"></div></div>`).join("");
+renderEvents();
+renderPronoCard();
+renderHQ();renderArena();
+function goAlarm(id){$("#al-ev").value=id;goPage('s-alarms')}
+
+/* ============ API COMBATTANTS ============ */
+async function loadApi(){
+  if(apiCache)return;
+  try{const r=await fetch("https://api.octagon-api.com/fighters");apiCache=await r.json();}
+  catch(e){apiCache="err"}
+  if(apiCache!=="err"){renderRank();renderFighters($("#f-search").value||"");renderNews();renderEvents();renderArena()}
+}
+function findApi(name){
+  if(!apiCache||apiCache==="err")return null;
+  const s=slug(name);
+  if(apiCache[s])return apiCache[s];
+  const k=Object.keys(apiCache).find(k=>slug(apiCache[k].name)===s);
+  return k?apiCache[k]:null;
+}
+function photoOf(name){if(PHOTOS[name])return PHOTOS[name];const f=findApi(name);return f&&f.imgUrl?f.imgUrl.replace(/'/g,""):null}
+
+/* ============ CLASSEMENTS ============ */
+let curDiv=1;
+$("#div-pick").innerHTML=RANKINGS.map((d,i)=>`<button class="${i===curDiv?'on':''}" onclick="pickDiv(${i},this)">${d.n}</button>`).join("");
+function pickDiv(i,btn){curDiv=i;document.querySelectorAll("#div-pick button").forEach(b=>b.classList.remove("on"));btn.classList.add("on");renderRank()}
+function ava(name){
+  const p=photoOf(name);
+  return `<div class="rk-ava" ${p?`style="background-image:url('${p}')"`:""}>${p?"":initials(name)}</div>`;
+}
+function renderRank(){
+  const d=RANKINGS[curDiv];let h="";
+  if(d.c)h+=`<div class="rk-row champ-row" onclick="openFighter('${d.c.replace(/'/g,"\\'")}')"><div class="rk-num c">👑</div>${ava(d.c)}<div class="rk-name">${d.c}<small>Champion · ${d.n}${d.lb?" · "+d.lb:""}</small></div><span class="chev">›</span></div>`;
+  h+=d.f.map((f,i)=>`<div class="rk-row" onclick="openFighter('${f.replace(/'/g,"\\'")}')"><div class="rk-num">${i+1}</div>${ava(f)}<div class="rk-name">${f}</div><span class="chev">›</span></div>`).join("");
+  $("#rk-list").innerHTML=h;
+}
+renderRank();
+
+/* ============ COMBATTANTS ============ */
+const ALL_FIGHTERS=[];
+RANKINGS.forEach(d=>{if(d.n.startsWith("P4P"))return;
+  if(d.c)ALL_FIGHTERS.push({name:d.c,div:d.n,rank:"C"});
+  d.f.forEach((f,i)=>ALL_FIGHTERS.push({name:f,div:d.n,rank:"#"+(i+1)}));
+});
+ALL_FIGHTERS.forEach(f=>{if(FR_SET.has(f.name))f.fr=true});
+FR_EXTRA.forEach(x=>ALL_FIGHTERS.push({name:x[0],div:x[1],rank:"NC",fr:true}));
+let fMode="all";
+function setMode(m,btn){fMode=m;document.querySelectorAll("#f-mode button").forEach(b=>b.classList.remove("on"));btn.classList.add("on");renderFighters($("#f-search").value||"")}
+function isFav(n){return store.get("favs",[]).includes(n)}
+function toggleFav(name,ev){
+  if(ev)ev.stopPropagation();
+  let favs=store.get("favs",[]);
+  if(favs.includes(name)){favs=favs.filter(x=>x!==name);toast("Retiré des favoris")}
+  else{favs.push(name);toast("⭐ "+name+" ajouté à tes favoris !")}
+  store.set("favs",favs);
+  renderFighters($("#f-search").value||"");renderPronoCard();
+  const fb=document.getElementById("fav-btn");
+  if(fb&&fb.dataset.name===name){fb.classList.toggle("on",favs.includes(name));fb.textContent=favs.includes(name)?"★ Favori":"☆ Suivre"}
+}
+function rankLabel(f){return f.rank==="C"?"👑 Champion":(f.rank==="NC"?"Non classé":f.rank)}
+function renderFighters(q=""){
+  let list=ALL_FIGHTERS.filter(f=>f.name.toLowerCase().includes(q.toLowerCase()));
+  if(fMode==="fav")list=list.filter(f=>isFav(f.name));
+  if(fMode==="fr")list=list.filter(f=>f.fr);
+  $("#f-grid").innerHTML=list.slice(0,90).map(f=>{
+    const p=photoOf(f.name);
+    return `<div class="f-card" onclick="openFighter('${f.name.replace(/'/g,"\\'")}')">
+      <button class="fav-star ${isFav(f.name)?'on':''}" onclick="toggleFav('${f.name.replace(/'/g,"\\'")}',event)">${isFav(f.name)?"★":"☆"}</button>
+      <div class="f-img" ${p?`style="background-image:url('${p}')"`:""}>${p?"":initials(f.name)}</div>
+      <div class="f-info"><b>${f.fr?"🇫🇷 ":""}${f.name}</b><small>${f.div}</small><br><span class="rank-b ${f.rank==="C"?"c":""}">${rankLabel(f)}</span></div>
+    </div>`;
+  }).join("")||`<p style='color:var(--mut)'>${fMode==="fav"?"Aucun favori pour l'instant — touche l'étoile ☆ sur un combattant pour le suivre !":"Aucun résultat. Essaie une autre orthographe."}</p>`;
+}
+renderFighters();
+$("#f-search").oninput=e=>renderFighters(e.target.value);
+
+/* ============ DRAPEAUX PAYS ============ */
+const FLAGS=[["dagestan","ru"],["chechen","ru"],["chechnya","ru"],["russia","ru"],["united states","us"],["usa","us"],["hawaii","us"],["brazil","br"],["france","fr"],["australia","au"],["new zealand","nz"],["ireland","ie"],["england","gb-eng"],["scotland","gb-sct"],["wales","gb-wls"],["united kingdom","gb"],["georgia","ge"],["spain","es"],["mexico","mx"],["china","cn"],["japan","jp"],["kazakhstan","kz"],["kyrgyzstan","kg"],["azerbaijan","az"],["armenia","am"],["poland","pl"],["czech","cz"],["cameroon","cm"],["nigeria","ng"],["south africa","za"],["chile","cl"],["peru","pe"],["ecuador","ec"],["argentina","ar"],["cuba","cu"],["canada","ca"],["germany","de"],["sweden","se"],["iceland","is"],["netherlands","nl"],["suriname","sr"],["moldova","md"],["ukraine","ua"],["belarus","by"],["tajikistan","tj"],["uzbekistan","uz"],["thailand","th"],["vietnam","vn"],["korea","kr"],["panama","pa"],["venezuela","ve"],["bolivia","bo"],["colombia","co"],["italy","it"],["austria","at"],["switzerland","ch"],["belgium","be"],["portugal","pt"],["morocco","ma"],["algeria","dz"],["tunisia","tn"],["senegal","sn"],["ghana","gh"],["angola","ao"],["jamaica","jm"],["guam","gu"],["mongolia","mn"],["india","in"],["philippines","ph"],["indonesia","id"],["serbia","rs"],["croatia","hr"],["bosnia","ba"],["montenegro","me"],["albania","al"],["kosovo","xk"],["romania","ro"],["bulgaria","bg"],["greece","gr"],["turkey","tr"],["israel","il"],["iran","ir"],["iraq","iq"],["lithuania","lt"],["latvia","lv"],["estonia","ee"],["finland","fi"],["norway","no"],["denmark","dk"],["slovakia","sk"],["slovenia","si"],["hungary","hu"],["egypt","eg"],["dr congo","cd"],["congo","cg"],["guyana","gy"],["dominican","do"],["puerto rico","pr"],["costa rica","cr"],["honduras","hn"],["guatemala","gt"],["paraguay","py"],["uruguay","uy"]];
+function flagOf(place){if(!place)return null;const s=place.toLowerCase();for(const p of FLAGS)if(s.includes(p[0]))return p[1];return null}
+function setFlag(code){
+  const el=document.getElementById("fp-flag");if(!el||!code)return;
+  el.style.display="block";
+  el.innerHTML=`<img src="https://flagcdn.com/w640/${code}.png" alt="" onerror="this.closest('.fp-flag').style.display='none'"><div class="ripple"></div><div class="shade"></div>`;
+}
+
+/* ============ FICHE COMBATTANT ============ */
+async function openFighter(name){
+  const meta=ALL_FIGHTERS.find(f=>f.name===name)||{div:"",rank:""};
+  $("#modal").classList.add("on");
+  $("#sheet").innerHTML=`<button class="close" onclick="closeModal()">✕</button>
+    <div class="fp-stage" id="fp-stage"><div class="fp-flag" id="fp-flag"></div><div class="fp-photo fallback" id="fp-fallback">${initials(name)}</div></div>
+    <div class="fp-body">
+      <h3 style="display:inline">${name}</h3><button class="fav-btn ${isFav(name)?'on':''}" id="fav-btn" data-name="${name}" onclick="toggleFav('${name.replace(/'/g,"\\'")}')">${isFav(name)?"★ Favori":"☆ Suivre"}</button>
+      <div class="nick" id="fp-nick"></div>
+      <div class="div">${meta.fr?"🇫🇷 ":""}${meta.div} · ${meta.rank==="C"?"👑 Champion":(meta.rank==="NC"?"Non classé":meta.rank)}</div>
+      <div id="fp-body"><div class="loading"><span class="spinner"></span>Chargement des stats en direct…</div></div>
+      <div class="fp-links">
+        <a href="https://www.ufc.com/athlete/${slug(name)}" target="_blank"><button class="btn ghost">📋 Fiche + historique des combats (UFC.com)</button></a>
+        <a href="https://www.google.com/search?q=${encodeURIComponent(name+" MMA record")}" target="_blank"><button class="btn ghost">🔎 Record complet</button></a>
+      </div>
+    </div>`;
+  if(meta.fr)setFlag("fr");
+  const purl0=PHOTOS[name];
+  if(purl0){const img=new Image();img.className="fp-photo";img.alt=name;
+    img.onload=()=>{const st=$("#fp-stage");if(st){const fb=$("#fp-fallback");if(fb)fb.remove();st.appendChild(img)}};
+    img.src=purl0;}
+  await loadApi();
+  const f=findApi(name);
+  if(f){
+    const fl=flagOf(f.placeOfBirth)||(meta.fr?"fr":null);
+    if(fl)setFlag(fl);
+    if(!purl0&&f.imgUrl){
+      const img=new Image();img.className="fp-photo";img.alt=name;
+      img.onload=()=>{const st=$("#fp-stage");if(st){const fb=$("#fp-fallback");if(fb)fb.remove();st.appendChild(img)}};
+      img.src=f.imgUrl.replace(/'/g,"");
+    }
+    if(f.nickname)$("#fp-nick").textContent='« '+f.nickname+' »';
+    const stat=(l,v)=>v&&v!=="0.00"?`<div class="stat"><span>${l}</span>${v}</div>`:"";
+    $("#fp-body").innerHTML=`
+      <div class="rec"><div><b style="color:var(--grn)" class="cnt" data-v="${f.wins||0}">0</b><span>Victoires</span></div>
+      <div><b style="color:var(--red2)" class="cnt" data-v="${f.losses||0}">0</b><span>Défaites</span></div>
+      <div><b class="cnt" data-v="${f.draws||0}">0</b><span>Nuls</span></div></div>
+      <div class="stats">
+        ${stat("Âge",f.age)}${stat("Taille",f.height?Math.round(f.height*2.54)+" cm":"")}
+        ${stat("Allonge",f.reach?Math.round(f.reach*2.54)+" cm":"")}${stat("Poids",f.weight?Math.round(f.weight*0.4536)+" kg":"")}
+        ${stat("Style",f.fightingStyle)}${stat("Camp",f.trainsAt)}
+        ${stat("Origine",f.placeOfBirth)}${stat("Début UFC",f.octagonDebut)}
+      </div>
+      <p style="color:var(--mut);font-size:11px;margin-top:10px">Photo officielle UFC.com · Stats via API publique — le record peut avoir quelques combats de retard. Historique complet via le bouton UFC.com.</p>`;
+    document.querySelectorAll(".cnt").forEach(el=>{
+      const target=parseInt(el.dataset.v)||0;let cur=0;
+      const step=Math.max(1,Math.ceil(target/22));
+      const iv=setInterval(()=>{cur+=step;if(cur>=target){cur=target;clearInterval(iv)}el.textContent=cur},34);
+    });
+  }else{
+    $("#fp-body").innerHTML=`<div class="rec"><div><b>–</b><span>Victoires</span></div><div><b>–</b><span>Défaites</span></div><div><b>–</b><span>Nuls</span></div></div>
+    <p style="color:var(--mut);font-size:12.5px;line-height:1.5">Stats détaillées indisponibles ${apiCache==="err"?"(pas de connexion internet ou API hors ligne)":"pour ce combattant (récemment classé)"} — utilise les boutons ci-dessous pour la fiche complète, la photo officielle et l'historique des combats.</p>`;
+  }
+}
+function closeModal(){$("#modal").classList.remove("on")}
+
+/* ============ MÉDIAS : FIL VIDÉOS + ACTUS ============ */
+function setSub(m,btn){
+  document.querySelectorAll(".sub-pick button").forEach(b=>b.classList.remove("on"));btn.classList.add("on");
+  $("#feed").style.display=m==="feed"?"flex":"none";
+  $("#news-list").style.display=m==="news"?"block":"none";
+}
+/* Fil infini façon TikTok : quand tu arrives au bout, une nouvelle fournée
+   mélangée est ajoutée automatiquement — tu peux scroller sans fin. */
+const VMAP={};VIDEOS.forEach(v=>VMAP[v.y]=v);
+let feedIO=null,feedCount=0;
+function shuffled(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r}
+/* "Sac à mélange" façon TikTok/Spotify : jamais deux fois la même vidéo tant que le pool entier n'a pas défilé */
+let feedBag=[];
+function nextBagBatch(n){
+  const out=[];
+  while(out.length<n){
+    if(!feedBag.length){
+      let next=shuffled(VIDEOS);
+      if(out.length&&next[0]&&next[0].y===out[out.length-1].y&&next.length>1)[next[0],next[1]]=[next[1],next[0]];
+      feedBag=next;
+    }
+    out.push(feedBag.shift());
+  }
+  return out;
+}
+function vidCard(v,first){
+  const d=document.createElement("div");d.className="vid";d.dataset.y=v.y;d.id="vid-"+(feedCount++);
+  d.innerHTML=`<div class="vbg" style="background-image:url('https://i.ytimg.com/vi/${v.y}/hqdefault.jpg')"></div>
+    <div class="vstage"><img src="https://i.ytimg.com/vi/${v.y}/hqdefault.jpg" loading="lazy" alt=""><div class="vplay"><i>▶</i></div></div>
+    <div class="voverlay"><span class="vtag">${v.tag}</span><b>${v.t}</b><small>${v.ch} · YouTube</small></div>
+    <div class="vrail">
+      <div class="vbtn"><button class="lk ${isLiked(v.y)?'on':''}">${isLiked(v.y)?"❤️":"🤍"}</button><span>J'aime</span></div>
+      <div class="vbtn"><button class="cm">💬</button><span>${commentCount(v.y)?commentCount(v.y):"Commenter"}</span></div>
+      <div class="vbtn"><button class="sh">↗️</button><span>Partager</span></div>
+    </div>
+    ${first?'<div class="vswipe">⌃ SCROLLE POUR LA SUIVANTE</div>':""}`;
+  d.querySelector(".lk").onclick=e=>likeVid(v.y,e.currentTarget);
+  d.querySelector(".cm").onclick=()=>openComments(v.y);
+  d.querySelector(".sh").onclick=()=>shareVid(v.y);
+  return d;
+}
+function appendBatch(list){
+  const sent=$("#feed-sentinel");
+  list.forEach(v=>{const c=vidCard(v,feedCount===0);$("#feed").insertBefore(c,sent);feedIO.observe(c)});
+}
+function renderFeed(){
+  const feed=$("#feed");feed.innerHTML='<div id="feed-sentinel" style="height:2px"></div>';feedCount=0;
+  feedIO=new IntersectionObserver(ens=>ens.forEach(en=>{
+    if(en.intersectionRatio>=0.6)activateVid(en.target);else deactivateVid(en.target);
+  }),{root:feed,threshold:[0,0.6]});
+  feedBag=[];
+  appendBatch(nextBagBatch(VIDEOS.length));
+  new IntersectionObserver(ens=>ens.forEach(en=>{
+    if(en.isIntersecting)appendBatch(nextBagBatch(VIDEOS.length));
+  }),{root:feed,rootMargin:"900px"}).observe($("#feed-sentinel"));
+}
+function activateVid(el){
+  const st=el.querySelector(".vstage");
+  if(st.querySelector("iframe"))return;
+  const id=el.dataset.y;
+  st.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&playsinline=1&rel=0&loop=1&playlist=${id}&cc_load_policy=1&cc_lang_pref=fr&hl=fr" title="vidéo" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+}
+function deactivateVid(el){
+  const st=el.querySelector(".vstage");
+  if(!st.querySelector("iframe"))return;
+  const id=el.dataset.y;
+  st.innerHTML=`<img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" loading="lazy" alt=""><div class="vplay"><i>▶</i></div>`;
+}
+function isLiked(y){return store.get("likes",{})[y]===true}
+function likeVid(y,btn){
+  const likes=store.get("likes",{});
+  likes[y]=!likes[y];store.set("likes",likes);
+  document.querySelectorAll(`.vid[data-y="${y}"] .lk`).forEach(b=>{b.classList.toggle("on",likes[y]);b.textContent=likes[y]?"❤️":"🤍"});
+  if(likes[y])toast("❤️ Ajouté à tes vidéos aimées");
+}
+async function shareVid(y){
+  const v=VMAP[y],url="https://www.youtube.com/watch?v="+y;
+  if(navigator.share){try{await navigator.share({title:"OCTOGONE · "+v.t,text:v.t+" — vu sur l'app OCTOGONE UFC Tracker (octogone-ufc.netlify.app)",url})}catch(e){}}
+  else{try{await navigator.clipboard.writeText(url+" — vu sur octogone-ufc.netlify.app");toast("🔗 Lien copié !")}catch(e){toast(url)}}
+}
+/* ============ COMMENTAIRES (stockés sur cet appareil) ============ */
+function allComments(){return store.get("comments",{})}
+function getComments(y){return allComments()[y]||[]}
+function commentCount(y){return getComments(y).length}
+function timeAgo(ts){
+  const s=Math.floor((Date.now()-ts)/1000);
+  if(s<60)return"à l'instant";if(s<3600)return Math.floor(s/60)+" min";
+  if(s<86400)return Math.floor(s/3600)+" h";if(s<2592000)return Math.floor(s/86400)+" j";
+  return new Date(ts).toLocaleDateString("fr-FR");
+}
+function cmAvaColor(n){let h=0;for(let i=0;i<n.length;i++)h=n.charCodeAt(i)+((h<<5)-h);return`hsl(${h%360} 70% 40%)`}
+function renderCmList(y){
+  const list=getComments(y).slice().reverse();
+  $("#cm-list").innerHTML=list.length?list.map(c=>`<div class="cm-item">
+      <div class="cm-ava" style="background:${cmAvaColor(c.n)}">${initials(c.n)}</div>
+      <div class="cm-body"><b>${c.n}</b><time>${timeAgo(c.ts)}</time><p>${c.t}</p></div>
+    </div>`).join(""):`<div class="cm-empty">💬 Aucun commentaire pour l'instant.<br>Sois le premier à réagir !</div>`;
+}
+function openComments(y){
+  const v=VMAP[y];if(!v)return;
+  const pseudo=store.get("pseudo","Fan Octogone");
+  $("#modal").classList.add("on");
+  $("#sheet").innerHTML=`<button class="close" onclick="closeModal()">✕</button>
+    <div class="cm-head"><b>💬 ${v.t}</b><small>${v.ch} · ${commentCount(y)} commentaire${commentCount(y)>1?"s":""}</small></div>
+    <div class="cm-note">💾 Les commentaires sont enregistrés sur cet appareil (pas encore de compte partagé entre utilisateurs).</div>
+    <div class="cm-compose">
+      <input class="cm-pseudo" id="cm-pseudo" maxlength="20" value="${pseudo.replace(/"/g,"&quot;")}" placeholder="Ton pseudo">
+      <textarea class="cm-text" id="cm-text" maxlength="280" placeholder="Ton avis sur ce combat, ce KO, ce prono..."></textarea>
+      <button class="cm-send" onclick="submitComment('${y}')">Publier</button>
+    </div>
+    <div class="cm-list" id="cm-list"></div>`;
+  renderCmList(y);
+  setTimeout(()=>$("#cm-text")?.focus(),200);
+}
+function submitComment(y){
+  const txt=$("#cm-text").value.trim();if(!txt)return;
+  const pseudo=($("#cm-pseudo").value.trim()||"Fan Octogone").slice(0,20);
+  store.set("pseudo",pseudo);
+  const c=allComments();c[y]=c[y]||[];c[y].push({n:pseudo,t:txt.slice(0,280),ts:Date.now()});
+  store.set("comments",c);
+  $("#cm-text").value="";
+  renderCmList(y);
+  const head=document.querySelector(".cm-head small");if(head)head.textContent=`${VMAP[y].ch} · ${commentCount(y)} commentaire${commentCount(y)>1?"s":""}`;
+  document.querySelectorAll(`.vid[data-y="${y}"] .cm`).forEach(b=>{const sp=b.nextElementSibling;if(sp)sp.textContent=commentCount(y)});
+  toast("💬 Commentaire publié !");
+}
+/* ============ LIVE (ambiance synchronisée — estimation, pas un score officiel) ============ */
+let liveTimer=null;
+function estimateCurrentFight(e){
+  const p=new Date(e.prelimsUTC).getTime(),m=new Date(e.mainUTC).getTime();
+  const end=m+(e.type==="ppv"?4:3)*3600000;
+  const seq=[...e.prelims,...[...e.main].reverse()];
+  if(!seq.length)return null;
+  const frac=Math.min(.999,Math.max(0,(Date.now()-p)/(end-p)));
+  return seq[Math.floor(frac*seq.length)];
+}
+function fmtHM(ms){
+  const s=Math.max(0,Math.floor(ms/1000));
+  const h=Math.floor(s/3600),mn=Math.floor((s%3600)/60),sec=s%60;
+  return h>0?`${h}h ${String(mn).padStart(2,"0")}m`:`${mn}m ${String(sec).padStart(2,"0")}s`;
+}
+function renderLive(){
+  const box=$("#live-hero");if(!box)return;
+  const now=Date.now();
+  const live=EVENTS.find(e=>{
+    const p=new Date(e.prelimsUTC).getTime(),m=new Date(e.mainUTC).getTime();
+    return now>=p&&now<m+(e.type==="ppv"?4:3)*3600000;
+  });
+  const side=n=>{const ph=photoOf(n);return`<div class="a-side"><div class="a-img" ${ph?`style="background-image:url('${ph}')"`:""}>${ph?"":initials(n)}</div><div class="a-nm">${n}</div></div>`};
+  if(live){
+    const f=estimateCurrentFight(live),m=new Date(live.mainUTC).getTime();
+    const phase=now<m?"🥊 Prélims en cours (estimation)":"🏆 Carte principale en cours (estimation)";
+    box.innerHTML=`<div class="live-card">
+      <span class="live-badge on"><i></i>EN DIRECT</span>
+      <div class="live-evname">${live.fr?"🇫🇷 ":""}${live.name}</div>
+      <div class="live-sub">${phase}</div>
+      ${f?`<div class="arena-div ${f[3]?'title':''}">${f[3]?"🏆 ":""}${f[2]||""}</div><div class="arena-row">${side(f[0])}<span class="a-vs">VS</span>${side(f[1])}</div>`:""}
+      <div class="live-note">⏱️ Estimation basée sur les horaires de la carte — <b>pas un score officiel en direct</b> (aucun flux gratuit UFC n'existe). Suis le vrai combat via les liens ci-dessous, et papote avec la commu dans le chat plus bas 👇</div>
+    </div>
+    <div class="watch"><div class="watch-t">📺 Où regarder en France 🇫🇷</div><div class="watch-links">${DIFFUSION_FR.links.map(l=>`<a class="${l.c}" href="${l.u}" target="_blank" rel="noopener noreferrer">${l.ic} ${l.t}</a>`).join("")}</div></div>`;
+    return;
+  }
+  const upcoming=EVENTS.filter(e=>new Date(e.prelimsUTC).getTime()>now).sort((a,b)=>new Date(a.prelimsUTC)-new Date(b.prelimsUTC))[0];
+  if(upcoming){
+    const p=new Date(upcoming.prelimsUTC).getTime();
+    box.innerHTML=`<div class="live-card">
+      <span class="live-badge wait">⏳ Pas encore commencé</span>
+      <div class="live-evname">${upcoming.fr?"🇫🇷 ":""}${upcoming.name}</div>
+      <div class="live-sub">Prélims dans <span class="live-timer">${fmtHM(p-now)}</span></div>
+      <div class="live-note">🔴 L'ambiance Live (animation + estimation du combat en cours) s'active automatiquement dès le début des prélims. Reviens ici pendant l'événement !</div>
+      <div class="ev-actions" style="margin-top:12px"><button class="btn ghost" onclick="goAlarm('${upcoming.id}')">⏰ Me rappeler pour ce combat</button></div>
+    </div>`;
+    return;
+  }
+  box.innerHTML=`<div class="live-empty">Aucun événement à venir pour le moment.<br>Reviens bientôt 👋</div>`;
+}
+function renderNews(){
+  $("#news-list").innerHTML=NEWS.map(n=>{
+    let ban="🥊",style="";
+    if(n.img){
+      if(n.img.y)style=`style="background-image:url('https://i.ytimg.com/vi/${n.img.y}/hqdefault.jpg')"`,ban="";
+      else if(n.img.f){const p=photoOf(n.img.f);if(p){style=`style="background-image:url('${p}')"`;ban=""}}
+    }
+    return `<div class="news glass"><div class="nban" ${style}><span class="nt">${n.t}</span>${ban}</div>
+    <div class="nbody"><b>${n.h}</b><p>${n.p}</p><a href="${n.l}" target="_blank">Source : ${n.ls} →</a></div></div>`;
+  }).join("");
+}
+renderFeed();renderNews();
+
+/* ============ ALARMES ============ */
+$("#al-ev").innerHTML=EVENTS.map(e=>`<option value="${e.id}">${e.date} — ${e.name}</option>`).join("");
+function alarmTime(e,when){
+  const main=new Date(e.mainUTC).getTime();
+  switch(when){
+    case "fw":{const d=new Date(e.mainUTC);const day=d.getUTCDay();const mon=new Date(main-((day+6)%7)*864e5);mon.setUTCHours(7,0,0,0);return mon.getTime()}
+    case "24h":return main-864e5; case "3h":return main-3*36e5; case "1h":return main-36e5;
+    case "prelims":return new Date(e.prelimsUTC).getTime(); case "main":return main;
+  }
+}
+const WHEN_LBL={fw:"Début de fight week",["24h"]:"24h avant","3h":"3h avant","1h":"1h avant",prelims:"Début des prélims",main:"Début de la carte principale"};
+function addAlarm(){
+  const ev=EVENTS.find(e=>e.id===$("#al-ev").value),when=$("#al-when").value;
+  const t=alarmTime(ev,when);
+  if(t<Date.now()){toast("⚠️ Ce moment est déjà passé !");return}
+  alarms.push({ev:ev.id,when,t});store.set("alarms",alarms);renderAlarms();scheduleAll();
+  if("Notification" in window&&Notification.permission==="default")Notification.requestPermission();
+  toast("🔔 Alarme activée !");
+}
+function delAlarm(i){alarms.splice(i,1);store.set("alarms",alarms);renderAlarms()}
+function renderAlarms(){
+  $("#al-list").innerHTML=alarms.length?alarms.map((a,i)=>{
+    const e=EVENTS.find(x=>x.id===a.ev);
+    return `<div class="al-item glass"><span class="ic">⏰</span><div><b>${e?e.name:a.ev}</b><small>${WHEN_LBL[a.when]} · ${frDate(new Date(a.t).toISOString())}</small></div><button class="del" onclick="delAlarm(${i})">Suppr.</button></div>`;
+  }).join(""):"<p style='color:var(--mut);font-size:13px'>Aucune alarme. Ajoute-en une ci-dessus 👆</p>";
+}
+renderAlarms();
+let timers=[];
+function scheduleAll(){
+  timers.forEach(clearTimeout);timers=[];
+  alarms.forEach(a=>{const d=a.t-Date.now();
+    if(d>0&&d<2147000000)timers.push(setTimeout(()=>fireAlarm(a),d));
+  });
+}
+function fireAlarm(a){
+  const e=EVENTS.find(x=>x.id===a.ev);
+  const msg=`${e?e.name:""} — ${WHEN_LBL[a.when]} !`;
+  try{const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    for(let i=0;i<6;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=i%2?880:660;o.type="square";g.gain.value=.25;
+      o.start(ctx.currentTime+i*.35);o.stop(ctx.currentTime+i*.35+.25);}
+  }catch(err){}
+  if("Notification" in window&&Notification.permission==="granted")new Notification("🔴 OCTOGONE — UFC",{body:msg});
+  toast("🚨 "+msg);
+}
+scheduleAll();
+loadApi(); /* précharge photos & stats dès l'ouverture */
+/* Splash d'accueil */
+function closeSplash(){
+  const s=document.getElementById("splash");if(!s||s.classList.contains("off"))return;
+  s.classList.add("off");
+  const fl=document.getElementById("flash");
+  if(fl){fl.classList.remove("go");void fl.offsetWidth;fl.classList.add("go")}
+  [["header",".enter"],[".hero",".enter"],["#prono-card",".enter"],["#ev-list",".enter"]].forEach(([sel])=>{
+    const el=document.querySelector(sel);if(!el)return;
+    el.classList.remove("enter");void el.offsetWidth;el.classList.add("enter");
+    el.addEventListener("animationend",()=>el.classList.remove("enter"),{once:true});
+  });
+}
+/* Splash = écran de déverrouillage : fermeture au tap uniquement (pas d'auto-close) */
+/* PWA : service worker (uniquement en ligne, https) */
+if("serviceWorker" in navigator && location.protocol==="https:"){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+/* ICS */
+function icsFor(e,whenTs,label){
+  const dt=t=>new Date(t).toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
+  return ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Octogone UFC//FR","BEGIN:VEVENT",
+   "UID:"+e.id+"-"+whenTs+"@octogone","DTSTAMP:"+dt(Date.now()),"DTSTART:"+dt(whenTs),
+   "DTEND:"+dt(whenTs+3*36e5),"SUMMARY:🥊 "+e.name+(label?" — "+label:""),
+   "DESCRIPTION:"+e.loc.replace(/,/g,"\\,")+" · Octogone UFC Tracker","BEGIN:VALARM","TRIGGER:-PT30M",
+   "ACTION:DISPLAY","DESCRIPTION:UFC dans 30 min !","END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
+}
+function dlBlob(txt,fn){const b=new Blob([txt],{type:"text/calendar"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=fn;a.click()}
+function dlIcs(){
+  const ev=EVENTS.find(e=>e.id===$("#al-ev").value),when=$("#al-when").value;
+  const t=alarmTime(ev,when);
+  if(t<Date.now()){toast("⚠️ Ce moment est déjà passé !");return}
+  dlBlob(icsFor(ev,t,WHEN_LBL[when]),"ufc-"+ev.id+".ics");
+  toast("📅 Fichier calendrier téléchargé — ouvre-le pour l'ajouter !");
+}
+function dlIcsFor(id){
+  const ev=EVENTS.find(e=>e.id===id);
+  dlBlob(icsFor(ev,new Date(ev.mainUTC).getTime(),"Carte principale"),"ufc-"+id+".ics");
+  toast("📅 Fichier calendrier téléchargé !");
+}
+</script>
+</body>
+</html>

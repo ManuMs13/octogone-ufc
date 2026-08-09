@@ -1,0 +1,16 @@
+{
+  "name": "OCTOGONE · UFC Tracker",
+  "short_name": "OCTOGONE",
+  "description": "Suivi UFC : événements, combattants, classements, pronostics, vidéos et alarmes",
+  "lang": "fr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07070a",
+  "theme_color": "#0a0a0c",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

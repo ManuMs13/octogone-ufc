@@ -1,0 +1,21 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Cross-Origin-Opener-Policy: same-origin
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://api.octagon-api.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://discord.com; media-src 'self' blob:; worker-src 'self'; manifest-src 'self'
+
+# frame-src élargi à discord.com (chat live) — iframe isolée, la page hôte
+# garde son propre CSP strict. (player.twitch.tv retiré : RMC Sport bloque
+# l'intégration de son flux Twitch en iframe — lien direct utilisé à la place.)
+
+# Le service worker proxifie (réseau-d'abord) les images/API cross-origin :
+# dans son contexte, fetch() = connect-src. Il lui faut donc un connect-src élargi.
+# Sûr : sw.js est du code first-party (script-src 'self', aucun inline) ; la page
+# garde son connect-src strict, donc aucune exfiltration possible via script injecté.
+/sw.js
+  Content-Security-Policy: default-src 'self'; script-src 'self'; connect-src 'self' https:; img-src https: data: blob:; object-src 'none'; base-uri 'self'
+  Cache-Control: public, max-age=0, must-revalidate
