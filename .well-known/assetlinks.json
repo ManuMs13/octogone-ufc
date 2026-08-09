@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.octogone.ufc",
+        "sha256_cert_fingerprints": ["A8:CF:46:82:90:B4:EC:25:24:E7:AA:CB:A5:EC:D2:2B:FA:12:18:82:59:28:A3:C3:55:8B:B7:FD:2E:20:3A:AF"]
+      }
+    }]
