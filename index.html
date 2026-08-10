@@ -431,6 +431,7 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 .vstage{position:relative;width:100%;aspect-ratio:16/9;z-index:2;background:#000}
 .vstage img{width:100%;height:100%;object-fit:cover;display:block}
 .vstage iframe{width:100%;height:100%;border:0;display:block}
+.vstage .yt-holder{width:100%;height:100%;background:#000}
 .vplay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(transparent 30%,rgba(0,0,0,.45));z-index:3}
 .vplay i{width:60px;height:60px;border-radius:50%;background:rgba(210,10,10,.92);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:21px;color:#fff;padding-left:5px;box-shadow:0 0 30px rgba(210,10,10,.65)}
 .voverlay{position:absolute;left:14px;right:76px;bottom:16px;z-index:5}
@@ -1549,6 +1550,32 @@ function setSub(m,btn){
    mélangée est ajoutée automatiquement — tu peux scroller sans fin. */
 const VMAP={};VIDEOS.forEach(v=>VMAP[v.y]=v);
 let feedIO=null,feedCount=0;
+/* Robustesse : si YouTube bloque une vidéo (géo-restriction, retrait...), on la
+   retire silencieusement du fil plutôt que d'afficher une erreur à l'utilisateur */
+let ytApiReady=false;
+const ytPlayers={};
+let badVideos=new Set(JSON.parse(localStorage.getItem("octogone_bad_videos")||"[]"));
+function saveBadVideos(){localStorage.setItem("octogone_bad_videos",JSON.stringify([...badVideos]));}
+(function loadYtApi(){
+  const tag=document.createElement("script");
+  tag.src="https://www.youtube.com/iframe_api";
+  document.head.appendChild(tag);
+})();
+window.onYouTubeIframeAPIReady=function(){
+  ytApiReady=true;
+  document.querySelectorAll(".vid[data-pending-activate]").forEach(el=>{el.removeAttribute("data-pending-activate");activateVid(el);});
+};
+function handleVideoError(el,id){
+  if(badVideos.has(id))return;
+  badVideos.add(id);saveBadVideos();
+  delete ytPlayers[el.id];
+  const wasVisible=el.classList.contains("vid")&&el.getBoundingClientRect().top<window.innerHeight&&el.getBoundingClientRect().bottom>0;
+  const [replacement]=nextBagBatch(1);
+  const newCard=vidCard(replacement,false);
+  el.replaceWith(newCard);
+  feedIO.observe(newCard);
+  if(wasVisible)activateVid(newCard);
+}
 function shuffled(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r}
 /* "Sac à mélange" façon TikTok/Spotify : jamais deux fois la même vidéo tant que le pool entier n'a pas défilé */
 let feedBag=[];
@@ -1597,14 +1624,24 @@ function renderFeed(){
 }
 function activateVid(el){
   const st=el.querySelector(".vstage");
-  if(st.querySelector("iframe"))return;
+  if(st.querySelector("iframe,.yt-holder"))return;
+  if(!ytApiReady){el.setAttribute("data-pending-activate","1");return;}
   const id=el.dataset.y;
-  st.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&playsinline=1&rel=0&loop=1&playlist=${id}&cc_load_policy=1&cc_lang_pref=fr&hl=fr" title="vidéo" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+  const holderId="ytph-"+el.id;
+  st.innerHTML=`<div id="${holderId}" class="yt-holder"></div>`;
+  ytPlayers[el.id]=new YT.Player(holderId,{
+    host:"https://www.youtube-nocookie.com",
+    videoId:id,
+    playerVars:{autoplay:1,mute:1,playsinline:1,rel:0,loop:1,playlist:id,cc_load_policy:1,cc_lang_pref:"fr",hl:"fr"},
+    events:{onError:()=>handleVideoError(el,id)}
+  });
 }
 function deactivateVid(el){
+  el.removeAttribute("data-pending-activate");
   const st=el.querySelector(".vstage");
-  if(!st.querySelector("iframe"))return;
+  if(!st.querySelector("iframe,.yt-holder"))return;
   const id=el.dataset.y;
+  if(ytPlayers[el.id]){try{ytPlayers[el.id].destroy()}catch(e){}delete ytPlayers[el.id];}
   st.innerHTML=`<img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" loading="lazy" alt=""><div class="vplay"><i>▶</i></div>`;
 }
 function isLiked(y){return store.get("likes",{})[y]===true}

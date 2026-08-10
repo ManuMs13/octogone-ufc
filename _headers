@@ -6,11 +6,15 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
   Cross-Origin-Opener-Policy: same-origin
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://api.octagon-api.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://discord.com; media-src 'self' blob:; worker-src 'self'; manifest-src 'self'
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests; script-src 'self' 'unsafe-inline' https://www.youtube.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://api.octagon-api.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://discord.com; media-src 'self' blob:; worker-src 'self'; manifest-src 'self'
 
 # frame-src élargi à discord.com (chat live) — iframe isolée, la page hôte
 # garde son propre CSP strict. (player.twitch.tv retiré : RMC Sport bloque
 # l'intégration de son flux Twitch en iframe — lien direct utilisé à la place.)
+
+# script-src élargi à youtube.com (iframe_api) pour détecter les vidéos
+# bloquées/indisponibles côté lecteur (onError) et les retirer du fil sans
+# afficher d'erreur — le lecteur lui-même reste sur youtube-nocookie.com.
 
 # Le service worker proxifie (réseau-d'abord) les images/API cross-origin :
 # dans son contexte, fetch() = connect-src. Il lui faut donc un connect-src élargi.

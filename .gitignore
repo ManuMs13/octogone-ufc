@@ -9,3 +9,11 @@ feature-graphic.html
 feature-graphic.png
 node_modules/
 .netlify/
+*.woff2
+*.b64
+*.css
+octogone-landing.html
+octogone-playstore.html
+shot*.cjs
+shots/
+imgcache/
