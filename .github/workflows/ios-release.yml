@@ -33,6 +33,11 @@ jobs:
       - name: Synchroniser Capacitor
         run: npx cap sync ios
 
+      - name: Déclarer l'app exempte de conformité export (HTTPS standard uniquement)
+        run: |
+          /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" ios/App/App/Info.plist || \
+          /usr/libexec/PlistBuddy -c "Set :ITSAppUsesNonExemptEncryption false" ios/App/App/Info.plist
+
       - name: Installer les pods CocoaPods
         working-directory: ios/App
         run: pod install
