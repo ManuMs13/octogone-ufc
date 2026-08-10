@@ -58,6 +58,9 @@ jobs:
       - name: Installer Fastlane
         run: gem install fastlane -N
 
+      - name: Générer un numéro de build unique (précision à la seconde)
+        run: echo "BUILD_NUMBER=$(date -u +%Y%m%d%H%M%S)" >> "$GITHUB_ENV"
+
       - name: Compiler et envoyer sur TestFlight
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
