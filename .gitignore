@@ -17,3 +17,13 @@ octogone-playstore.html
 shot*.cjs
 shots/
 imgcache/
+
+# iOS (Capacitor) — le dossier ios/ est régénéré à chaque build par la CI, jamais commité
+ios/
+fastlane/report.xml
+fastlane/test_output/
+*.mobileprovision
+*.p12
+*.cer
+GUIDE-PUBLICATION-IOS.md
+listing-app-store.md

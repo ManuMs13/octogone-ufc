@@ -1,0 +1,17 @@
+{
+  "appId": "com.octogone.ufc",
+  "appName": "OCTOGONE",
+  "webDir": "www",
+  "server": {
+    "url": "https://octogone-ufc.netlify.app",
+    "cleartext": false,
+    "allowNavigation": [
+      "octogone-ufc.netlify.app"
+    ]
+  },
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#07070a",
+    "preferredContentMode": "mobile"
+  }
+}

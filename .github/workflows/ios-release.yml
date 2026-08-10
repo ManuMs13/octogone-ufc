@@ -1,0 +1,66 @@
+name: iOS - Build & envoi TestFlight
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installer les dépendances npm
+        run: npm install
+
+      - name: Ajouter la plateforme iOS (Capacitor)
+        run: npx cap add ios
+
+      - name: Générer l'icône et le splash screen
+        run: npx capacitor-assets generate --ios
+
+      - name: Synchroniser Capacitor
+        run: npx cap sync ios
+
+      - name: Installer les pods CocoaPods
+        working-directory: ios/App
+        run: pod install
+
+      - name: Importer le certificat de distribution
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+          p12-password: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+
+      - name: Installer le profil de provisionnement
+        env:
+          PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$PROFILE_BASE64" | base64 --decode -o ~/Library/MobileDevice/Provisioning\ Profiles/octogone-appstore.mobileprovision
+
+      - name: Installer Fastlane
+        run: gem install fastlane -N
+
+      - name: Compiler et envoyer sur TestFlight
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT_BASE64 }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          BUNDLE_ID: com.octogone.ufc
+          PROFILE_NAME: ${{ secrets.IOS_PROFILE_NAME }}
+        run: fastlane release
+
+      - name: Archiver les logs Fastlane en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastlane-logs
+          path: ~/Library/Logs/gym
