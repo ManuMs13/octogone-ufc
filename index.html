@@ -437,10 +437,11 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 .news p{color:var(--mut);font-size:13px;line-height:1.65;margin-top:8px}
 .news a{color:var(--gold2);font-size:12px;text-decoration:none;display:inline-block;margin-top:10px}
 /* ===== FIL VIDÉOS ===== */
-.sub-pick{display:flex;gap:8px;margin-bottom:14px}
-.sub-pick button{flex:1;background:rgba(28,28,36,.75);border:1px solid var(--line);color:var(--mut);border-radius:12px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:.5px;transition:all .25s}
-.sub-pick button.on{background:linear-gradient(135deg,#e01212,#a80707);border-color:transparent;color:#fff;box-shadow:0 0 18px rgba(210,10,10,.4)}
-.feed{height:calc(100dvh - 245px);overflow-y:auto;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-radius:18px;background:#000;border:1px solid var(--line)}
+#s-news{padding:0;position:relative;overflow:hidden}
+.sub-pick-float{position:absolute;top:12px;left:14px;right:14px;z-index:20;display:flex;gap:8px;pointer-events:none}
+.sub-pick-float button{pointer-events:auto;flex:none;background:rgba(20,20,26,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.85);border-radius:20px;padding:8px 15px;font-size:12.5px;font-weight:800;cursor:pointer;letter-spacing:.3px;transition:all .25s}
+.sub-pick-float button.on{background:linear-gradient(135deg,#e01212,#a80707);border-color:transparent;color:#fff;box-shadow:0 0 16px rgba(210,10,10,.5)}
+.feed{height:calc(100dvh - var(--hdr-h,96px));overflow-y:auto;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:#000}
 .feed::-webkit-scrollbar{display:none}
 .vid{position:relative;height:100%;scroll-snap-align:start;scroll-snap-stop:always;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .vbg{position:absolute;inset:0;background:center/cover no-repeat;filter:blur(28px) brightness(.3);transform:scale(1.2)}
@@ -589,14 +590,15 @@ header.enter{animation:headerDrop .6s .05s cubic-bezier(.16,1,.3,1) both}
 
 <!-- ACTUS + FIL VIDÉOS -->
 <section id="s-news">
-  <h2>Médias UFC</h2>
-  <div class="sub-pick">
+  <div class="sub-pick-float">
     <button class="on" onclick="setSub('feed',this)">🎬 Fil vidéos</button>
     <button onclick="setSub('news',this)">📰 Actus</button>
   </div>
   <div id="feed" class="feed"></div>
-  <div id="news-list" style="display:none"></div>
-  <div class="mini-note">🎬 Fil vidéos et actus renouvelés chaque lundi automatiquement : Countdown, face-à-face, interviews, podcasts, contenu 🇫🇷. Touche une vidéo pour la lire directement dans l'app. · <a href="https://www.tipeee.com/octogone" target="_blank" style="color:var(--gold2);text-decoration:none">☕ Soutenir Octogone-Tracker</a></div>
+  <div id="news-wrap" style="display:none;padding:64px 16px 16px">
+    <div class="mini-note" style="margin-top:0">🎬 Fil vidéos et actus renouvelés chaque lundi automatiquement : Countdown, face-à-face, interviews, podcasts, contenu 🇫🇷. Touche une vidéo pour la lire directement dans l'app. · <a href="https://www.tipeee.com/octogone" target="_blank" style="color:var(--gold2);text-decoration:none">☕ Soutenir Octogone-Tracker</a></div>
+    <div id="news-list"></div>
+  </div>
 </section>
 
 <!-- RÉSEAUX -->
@@ -1642,9 +1644,9 @@ function closeModal(){$("#modal").classList.remove("on")}
 
 /* ============ MÉDIAS : FIL VIDÉOS + ACTUS ============ */
 function setSub(m,btn){
-  document.querySelectorAll(".sub-pick button").forEach(b=>b.classList.remove("on"));btn.classList.add("on");
+  document.querySelectorAll(".sub-pick-float button").forEach(b=>b.classList.remove("on"));btn.classList.add("on");
   $("#feed").style.display=m==="feed"?"flex":"none";
-  $("#news-list").style.display=m==="news"?"block":"none";
+  $("#news-wrap").style.display=m==="news"?"block":"none";
 }
 /* Fil infini façon TikTok : quand tu arrives au bout, une nouvelle fournée
    mélangée est ajoutée automatiquement — tu peux scroller sans fin. */
@@ -2060,6 +2062,16 @@ document.addEventListener("keydown",e=>{
   if((e.key==="Enter"||e.key===" ")&&!document.getElementById("splash")?.classList.contains("off"))closeSplash();
 });
 /* Splash = écran de déverrouillage : fermeture au tap uniquement (pas d'auto-close) */
+/* Mesure la vraie hauteur du header (varie selon l'encoche/Dynamic Island du
+   téléphone) pour que le fil vidéo plein écran s'arrête pile en dessous,
+   sans chiffre fixe qui serait faux sur certains appareils */
+function measureHeaderHeight(){
+  const h=document.querySelector("header");
+  if(h)document.documentElement.style.setProperty("--hdr-h",h.offsetHeight+"px");
+}
+measureHeaderHeight();
+window.addEventListener("resize",measureHeaderHeight);
+window.addEventListener("orientationchange",()=>setTimeout(measureHeaderHeight,150));
 /* PWA : service worker (uniquement en ligne, https) */
 if("serviceWorker" in navigator && location.protocol==="https:"){
   navigator.serviceWorker.register("sw.js").catch(()=>{});
