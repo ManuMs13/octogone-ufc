@@ -1768,20 +1768,22 @@ function activateVid(el){
   const id=el.dataset.y;
   const holderId="ytph-"+el.id;
   const cc=ccPref?1:0;
-  const mute=soundPref?0:1;
+  /* Toujours démarrer MUET : les navigateurs mobiles (Safari iOS, Chrome
+     Android) bloquent l'autoplay non-muet sans geste utilisateur préalable —
+     la vidéo restait alors bloquée en pause au lieu de se lancer seule.
+     On démarre donc toujours muet pour garantir le lancement auto, puis on
+     tente unMute() ensuite si l'utilisateur préfère le son (best-effort ;
+     le tap manuel via toggleSound reste le filet de sécurité fiable). */
   st.innerHTML=`<div id="${holderId}" class="yt-holder"></div>`;
   ensureTap(el);
   ytPlayers[el.id]=new YT.Player(holderId,{
     host:"https://www.youtube-nocookie.com",
     videoId:id,
-    playerVars:{autoplay:1,mute:mute,playsinline:1,rel:0,loop:1,playlist:id,cc_load_policy:cc,cc_lang_pref:"fr",hl:"fr",
+    playerVars:{autoplay:1,mute:1,playsinline:1,rel:0,loop:1,playlist:id,cc_load_policy:cc,cc_lang_pref:"fr",hl:"fr",
       controls:0,modestbranding:1,iv_load_policy:3,disablekb:1,fs:0},
     events:{
       onError:()=>handleVideoError(el,id),
-      /* Renforce l'état son voulu une fois le lecteur prêt — certains
-         navigateurs ignorent le paramètre mute initial selon leur politique
-         d'autoplay ; unMute()/mute() est la méthode fiable après coup. */
-      onReady:e=>{try{soundPref?e.target.unMute():e.target.mute()}catch(err){}}
+      onReady:e=>{if(soundPref){try{e.target.unMute()}catch(err){}}}
     }
   });
 }
