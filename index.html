@@ -223,27 +223,40 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 .rank-b.c{background:rgba(201,162,39,.16);border-color:var(--gold);color:var(--gold2);box-shadow:0 0 10px rgba(201,162,39,.25)}
 
 /* ===== MODAL FICHE ===== */
-.modal{position:fixed;inset:0;background:rgba(4,4,6,.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.modal{position:fixed;inset:0;background:rgba(6,6,9,.62);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:100;display:none;align-items:flex-end;justify-content:center}
 .modal.on{display:flex}
-/* ===== COMMENTAIRES ===== */
-.cm-head{padding:16px 18px 10px;border-bottom:1px solid var(--line)}
+/* ===== COMMENTAIRES (façon TikTok : liste qui défile + composeur fixé en bas) ===== */
+.cm-wrap{display:flex;flex-direction:column;max-height:80vh}
+.cm-head{padding:20px 18px 10px;border-bottom:1px solid var(--line);flex:none}
 .cm-head b{display:block;font-size:14px;line-height:1.35}
 .cm-head small{color:var(--mut);font-size:11px}
-.cm-note{margin:10px 18px 0;font-size:10.5px;color:var(--mut);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:6px 9px}
-.cm-compose{padding:12px 18px;display:flex;flex-direction:column;gap:7px;border-bottom:1px solid var(--line)}
-.cm-pseudo{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:8px 10px;color:var(--txt);font-size:12px;width:140px}
-.cm-text{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--txt);font-size:13px;resize:none;min-height:56px;font-family:inherit}
-.cm-text:focus,.cm-pseudo:focus{outline:none;border-color:var(--accent)}
-.cm-send{align-self:flex-end;background:linear-gradient(135deg,#e01212,#a80707);color:#fff;border:none;border-radius:9px;padding:8px 16px;font-weight:800;font-size:12px;cursor:pointer}
-.cm-send:active{transform:scale(.96)}
-.cm-list{padding:6px 18px 10px;display:flex;flex-direction:column;gap:12px}
+.cm-note{margin:10px 18px 0;font-size:10.5px;color:var(--mut);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:6px 9px;flex:none}
+.cm-list{padding:10px 18px;display:flex;flex-direction:column;gap:14px;flex:1;overflow-y:auto;min-height:70px}
 .cm-item{display:flex;gap:10px}
 .cm-ava{flex:none;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--red),#5a0404);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
+.ava-img{border-radius:50%;object-fit:cover;flex:none;display:block}
 .cm-body{flex:1;min-width:0}
 .cm-body b{font-size:12.5px}
 .cm-body time{color:var(--mut);font-size:10.5px;margin-left:7px}
 .cm-body p{font-size:13px;line-height:1.45;margin-top:2px;word-wrap:break-word}
 .cm-empty{color:var(--mut);font-size:12.5px;text-align:center;padding:22px 10px}
+.cm-compose{padding:10px 14px;display:flex;align-items:flex-end;gap:9px;border-top:1px solid var(--line);flex:none;background:rgba(10,10,13,.5)}
+.cm-my-ava{flex:none;border:none;background:none;padding:0;cursor:pointer;border-radius:50%}
+.cm-my-ava .ava-img,.cm-my-ava .cm-ava{width:38px;height:38px}
+.cm-compose-main{flex:1;min-width:0}
+.cm-me-name{font-size:10px;color:var(--mut);font-weight:700;margin:0 0 3px 3px}
+.cm-text{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:16px;padding:9px 13px;color:var(--txt);font-size:13px;resize:none;min-height:38px;max-height:90px;font-family:inherit;box-sizing:border-box}
+.cm-text:focus{outline:none;border-color:var(--accent)}
+.cm-send{flex:none;width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#e01212,#a80707);color:#fff;border:none;font-weight:800;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cm-send:active{transform:scale(.92)}
+/* ===== PROFIL ===== */
+.prof-edit{padding:6px 18px 20px;display:flex;flex-direction:column;align-items:center}
+.prof-ava-big .ava-img,.prof-ava-big .cm-ava{width:84px;height:84px;font-size:26px}
+.prof-upload-btn{margin-top:16px;display:inline-block;font-size:12.5px;font-weight:700;color:var(--gold2);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:20px;padding:9px 18px;cursor:pointer}
+.prof-sub{margin:16px 0 10px;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--mut)}
+.prof-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%}
+.prof-pick{aspect-ratio:1;border-radius:50%;border:2px solid transparent;background-size:cover;background-position:top center;cursor:pointer;filter:grayscale(.15)}
+.prof-pick:active{transform:scale(.94)}
 /* ===== LIVE ===== */
 .live-card{border-radius:16px;padding:18px;margin-bottom:6px;overflow:hidden;position:relative;
   background:linear-gradient(135deg,rgba(48,8,20,.85),rgba(19,19,25,.85) 60%);border:1px solid rgba(255,31,107,.4);
@@ -262,6 +275,9 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 .live-chat-fallback{text-align:center;font-size:11.5px;color:var(--mut);margin-top:9px}
 .live-chat-fallback a{color:var(--red2);font-weight:700;text-decoration:none}
 .sheet{position:relative;background:linear-gradient(180deg,#17171e,#101015);width:100%;max-width:580px;max-height:90vh;overflow-y:auto;overflow-x:hidden;border-radius:20px 20px 0 0;border:1px solid rgba(210,10,10,.35);border-bottom:none;padding:0 0 34px;animation:up .38s cubic-bezier(.2,.9,.3,1.05)}
+.sheet::before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);width:38px;height:4px;border-radius:3px;background:rgba(255,255,255,.22);z-index:6}
+.sheet:has(.cm-wrap){overflow-y:hidden;display:flex}
+.sheet:has(.cm-wrap) .cm-wrap{flex:1;min-width:0}
 @keyframes up{from{transform:translateY(70px);opacity:0}to{transform:none;opacity:1}}
 .sheet .close{position:absolute;top:14px;right:14px;z-index:5;background:rgba(28,28,36,.85);border:1px solid var(--line);color:var(--txt);width:34px;height:34px;border-radius:50%;font-size:15px;cursor:pointer}
 .fp-stage{position:relative;height:250px;overflow:hidden;border-radius:20px 20px 0 0;background:
@@ -443,6 +459,8 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 .vrail button{background:rgba(20,20,26,.68);border:1px solid rgba(255,255,255,.16);width:47px;height:47px;border-radius:50%;font-size:19px;color:#fff;cursor:pointer;backdrop-filter:blur(8px);transition:transform .15s,border-color .2s}
 .vrail button:active{transform:scale(1.15)}
 .vrail button.lk.on{border-color:#ff2e50;box-shadow:0 0 14px rgba(255,46,80,.5)}
+.vrail button.cc{font-size:16px}
+.vrail button.cc.on{border-color:var(--gold2);box-shadow:0 0 14px rgba(255,215,106,.5);color:var(--gold2)}
 .vrail span{font-size:9.5px;color:rgba(255,255,255,.8);font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.9)}
 .vswipe{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:5;color:rgba(255,255,255,.45);font-size:10px;letter-spacing:2px;animation:swipeHint 2.2s ease-in-out infinite}
 @keyframes swipeHint{0%,100%{transform:translateX(-50%) translateY(0);opacity:.45}50%{transform:translateX(-50%) translateY(-6px);opacity:.9}}
@@ -1636,6 +1654,7 @@ let feedIO=null,feedCount=0;
 let ytApiReady=false;
 const ytPlayers={};
 let badVideos=new Set(JSON.parse(localStorage.getItem("octogone_bad_videos")||"[]"));
+let ccPref=localStorage.getItem("octogone_cc_fr")!=="0";
 function saveBadVideos(){localStorage.setItem("octogone_bad_videos",JSON.stringify([...badVideos]));}
 (function loadYtApi(){
   const tag=document.createElement("script");
@@ -1681,11 +1700,13 @@ function vidCard(v,first){
       <div class="vbtn"><button class="lk ${isLiked(v.y)?'on':''}">${isLiked(v.y)?"❤️":"🤍"}</button><span>J'aime</span></div>
       <div class="vbtn"><button class="cm">💬</button><span>${commentCount(v.y)?commentCount(v.y):"Commenter"}</span></div>
       <div class="vbtn"><button class="sh">↗️</button><span>Partager</span></div>
+      <div class="vbtn"><button class="cc ${ccPref?'on':''}">🌐</button><span>Traduire</span></div>
     </div>
     ${first?'<div class="vswipe">⌃ SCROLLE POUR LA SUIVANTE</div>':""}`;
   d.querySelector(".lk").onclick=e=>likeVid(v.y,e.currentTarget);
   d.querySelector(".cm").onclick=()=>openComments(v.y);
   d.querySelector(".sh").onclick=()=>shareVid(v.y);
+  d.querySelector(".cc").onclick=e=>toggleCC(d,e.currentTarget);
   return d;
 }
 function appendBatch(list){
@@ -1709,13 +1730,31 @@ function activateVid(el){
   if(!ytApiReady){el.setAttribute("data-pending-activate","1");return;}
   const id=el.dataset.y;
   const holderId="ytph-"+el.id;
+  const cc=ccPref?1:0;
   st.innerHTML=`<div id="${holderId}" class="yt-holder"></div>`;
   ytPlayers[el.id]=new YT.Player(holderId,{
     host:"https://www.youtube-nocookie.com",
     videoId:id,
-    playerVars:{autoplay:1,mute:1,playsinline:1,rel:0,loop:1,playlist:id,cc_load_policy:1,cc_lang_pref:"fr",hl:"fr"},
+    playerVars:{autoplay:1,mute:1,playsinline:1,rel:0,loop:1,playlist:id,cc_load_policy:cc,cc_lang_pref:"fr",hl:"fr",
+      controls:0,modestbranding:1,iv_load_policy:3,disablekb:1,fs:0},
     events:{onError:()=>handleVideoError(el,id)}
   });
+}
+function toggleCC(el,btn){
+  ccPref=!ccPref;
+  localStorage.setItem("octogone_cc_fr",ccPref?"1":"0");
+  document.querySelectorAll(".vbtn .cc").forEach(b=>b.classList.toggle("on",ccPref));
+  toast(ccPref?"🌐 Sous-titres français activés (si disponibles)":"🌐 Sous-titres désactivés");
+  /* Le choix des sous-titres ne peut être changé qu'à la création du lecteur
+     (playerVars) — on recrée donc le lecteur de la vidéo active avec le
+     nouveau réglage plutôt que de tenter une API de bascule à chaud, fragile. */
+  if(ytPlayers[el.id]){
+    const st=el.querySelector(".vstage");
+    try{ytPlayers[el.id].destroy()}catch(e){}
+    delete ytPlayers[el.id];
+    st.innerHTML="";
+    activateVid(el);
+  }
 }
 function deactivateVid(el){
   el.removeAttribute("data-pending-activate");
@@ -1737,6 +1776,78 @@ async function shareVid(y){
   if(navigator.share){try{await navigator.share({title:"OCTOGONE · "+v.t,text:v.t+" — vu sur l'app OCTOGONE UFC Tracker (octogone-ufc.netlify.app)",url})}catch(e){}}
   else{try{await navigator.clipboard.writeText(url+" — vu sur octogone-ufc.netlify.app");toast("🔗 Lien copié !")}catch(e){toast(url)}}
 }
+/* ============ PROFIL (pseudo + avatar — local à l'appareil, pas de compte) ============ */
+const AVATAR_FIGHTERS=["Islam Makhachev","Khamzat Chimaev","Alex Pereira","Ciryl Gane","Ilia Topuria","Merab Dvalishvili","Alexandre Pantoja","Tom Aspinall","Justin Gaethje","Charles Oliveira","Joshua Van","Arman Tsarukyan","Leon Edwards","Dricus Du Plessis","Alexander Volkanovski","Sean Strickland"];
+let profileReturnTo=null;
+function getProfile(){
+  let p=store.get("profile",null);
+  if(!p){const legacy=store.get("pseudo","");p={name:legacy||"Fan Octogone",avatar:null};store.set("profile",p);}
+  return p;
+}
+function cmAvaColor(n){let h=0;for(let i=0;i<n.length;i++)h=n.charCodeAt(i)+((h<<5)-h);return`hsl(${h%360} 70% 40%)`}
+function avatarHtml(av,name,size){
+  if(av)return`<img src="${av}" class="ava-img" style="width:${size}px;height:${size}px" alt="">`;
+  return`<div class="cm-ava" style="width:${size}px;height:${size}px;background:${cmAvaColor(name||"?")}">${initials(name||"?")}</div>`;
+}
+function resizeImageFile(file,maxSize){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const side=Math.min(img.width,img.height);
+        const cv=document.createElement("canvas");cv.width=maxSize;cv.height=maxSize;
+        cv.getContext("2d").drawImage(img,(img.width-side)/2,(img.height-side)/2,side,side,0,0,maxSize,maxSize);
+        resolve(cv.toDataURL("image/jpeg",0.82));
+      };
+      img.onerror=()=>reject(new Error("image invalide"));
+      img.src=reader.result;
+    };
+    reader.onerror=()=>reject(new Error("lecture impossible"));
+    reader.readAsDataURL(file);
+  });
+}
+function openProfileEditor(){
+  const p=getProfile();
+  $("#modal").classList.add("on");
+  $("#sheet").innerHTML=`<button class="close" onclick="closeModal()">✕</button>
+    <div class="cm-head"><b>👤 Ton profil</b><small>Utilisé pour tes commentaires, uniquement sur cet appareil</small></div>
+    <div class="prof-edit">
+      <div class="prof-ava-big" id="prof-ava-big">${avatarHtml(p.avatar,p.name,84)}</div>
+      <input class="cm-pseudo" id="prof-name" maxlength="20" value="${p.name.replace(/"/g,"&quot;")}" placeholder="Ton pseudo" style="width:100%;box-sizing:border-box;text-align:center;margin-top:16px;padding:10px">
+      <label class="prof-upload-btn">📷 Importer une photo<input type="file" accept="image/*" id="prof-file" style="display:none"></label>
+      <div class="prof-sub">— ou choisis un combattant —</div>
+      <div class="prof-grid" id="prof-grid">
+        ${AVATAR_FIGHTERS.map(n=>{const ph=photoOf(n);return ph?`<button class="prof-pick" data-url="${ph}" title="${n}" style="background-image:url('${ph}')"></button>`:"";}).join("")}
+      </div>
+      <button class="cm-send" style="width:auto;border-radius:20px;padding:11px 26px;margin-top:18px" onclick="saveProfileEditor()">Enregistrer</button>
+    </div>`;
+  $("#prof-file").onchange=async e=>{
+    const f=e.target.files[0];if(!f)return;
+    try{
+      const dataUrl=await resizeImageFile(f,160);
+      $("#prof-ava-big").innerHTML=avatarHtml(dataUrl,p.name,84);
+      $("#prof-ava-big").dataset.pending=dataUrl;
+    }catch(err){toast("Impossible de charger cette photo");}
+  };
+  $("#prof-grid").querySelectorAll(".prof-pick").forEach(btn=>{
+    btn.onclick=()=>{
+      const url=btn.dataset.url;
+      $("#prof-ava-big").innerHTML=`<img src="${url}" class="ava-img" style="width:84px;height:84px" alt="">`;
+      $("#prof-ava-big").dataset.pending=url;
+    };
+  });
+}
+function saveProfileEditor(){
+  const p=getProfile();
+  p.name=($("#prof-name").value.trim()||"Fan Octogone").slice(0,20);
+  const pending=$("#prof-ava-big").dataset.pending;
+  if(pending)p.avatar=pending;
+  store.set("profile",p);store.set("pseudo",p.name);
+  toast("👤 Profil enregistré");
+  const back=profileReturnTo;profileReturnTo=null;
+  if(back)openComments(back);else closeModal();
+}
 /* ============ COMMENTAIRES (stockés sur cet appareil) ============ */
 function allComments(){return store.get("comments",{})}
 function getComments(y){return allComments()[y]||[]}
@@ -1747,35 +1858,39 @@ function timeAgo(ts){
   if(s<86400)return Math.floor(s/3600)+" h";if(s<2592000)return Math.floor(s/86400)+" j";
   return new Date(ts).toLocaleDateString("fr-FR");
 }
-function cmAvaColor(n){let h=0;for(let i=0;i<n.length;i++)h=n.charCodeAt(i)+((h<<5)-h);return`hsl(${h%360} 70% 40%)`}
 function renderCmList(y){
   const list=getComments(y).slice().reverse();
   $("#cm-list").innerHTML=list.length?list.map(c=>`<div class="cm-item">
-      <div class="cm-ava" style="background:${cmAvaColor(c.n)}">${initials(c.n)}</div>
+      ${avatarHtml(c.avatar,c.n,32)}
       <div class="cm-body"><b>${c.n}</b><time>${timeAgo(c.ts)}</time><p>${c.t}</p></div>
     </div>`).join(""):`<div class="cm-empty">💬 Aucun commentaire pour l'instant.<br>Sois le premier à réagir !</div>`;
 }
 function openComments(y){
   const v=VMAP[y];if(!v)return;
-  const pseudo=store.get("pseudo","Fan Octogone");
+  const p=getProfile();
   $("#modal").classList.add("on");
   $("#sheet").innerHTML=`<button class="close" onclick="closeModal()">✕</button>
-    <div class="cm-head"><b>💬 ${v.t}</b><small>${v.ch} · ${commentCount(y)} commentaire${commentCount(y)>1?"s":""}</small></div>
-    <div class="cm-note">💾 Les commentaires sont enregistrés sur cet appareil (pas encore de compte partagé entre utilisateurs).</div>
-    <div class="cm-compose">
-      <input class="cm-pseudo" id="cm-pseudo" maxlength="20" value="${pseudo.replace(/"/g,"&quot;")}" placeholder="Ton pseudo">
-      <textarea class="cm-text" id="cm-text" maxlength="280" placeholder="Ton avis sur ce combat, ce KO, ce prono..."></textarea>
-      <button class="cm-send" onclick="submitComment('${y}')">Publier</button>
-    </div>
-    <div class="cm-list" id="cm-list"></div>`;
+    <div class="cm-wrap">
+      <div class="cm-head"><b>💬 ${v.t}</b><small>${v.ch} · ${commentCount(y)} commentaire${commentCount(y)>1?"s":""}</small></div>
+      <div class="cm-note">💾 Les commentaires sont enregistrés sur cet appareil (pas encore de compte partagé entre utilisateurs).</div>
+      <div class="cm-list" id="cm-list"></div>
+      <div class="cm-compose">
+        <button class="cm-my-ava" id="cm-my-ava" title="Modifier ton profil">${avatarHtml(p.avatar,p.name,38)}</button>
+        <div class="cm-compose-main">
+          <div class="cm-me-name">${p.name}</div>
+          <textarea class="cm-text" id="cm-text" maxlength="280" placeholder="Ton avis sur ce combat, ce KO, ce prono..."></textarea>
+        </div>
+        <button class="cm-send" onclick="submitComment('${y}')">➤</button>
+      </div>
+    </div>`;
+  $("#cm-my-ava").onclick=()=>{profileReturnTo=y;openProfileEditor();};
   renderCmList(y);
   setTimeout(()=>$("#cm-text")?.focus(),200);
 }
 function submitComment(y){
   const txt=$("#cm-text").value.trim();if(!txt)return;
-  const pseudo=($("#cm-pseudo").value.trim()||"Fan Octogone").slice(0,20);
-  store.set("pseudo",pseudo);
-  const c=allComments();c[y]=c[y]||[];c[y].push({n:pseudo,t:txt.slice(0,280),ts:Date.now()});
+  const p=getProfile();
+  const c=allComments();c[y]=c[y]||[];c[y].push({n:p.name,avatar:p.avatar,t:txt.slice(0,280),ts:Date.now()});
   store.set("comments",c);
   $("#cm-text").value="";
   renderCmList(y);
