@@ -448,7 +448,8 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 .vstage img{width:100%;height:100%;object-fit:cover;display:block}
 .vstage iframe{width:100%;height:100%;border:0;display:block}
 .vstage .yt-holder{width:100%;height:100%;background:#000}
-.vplay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(transparent 30%,rgba(0,0,0,.45));z-index:3}
+.vplay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(transparent 30%,rgba(0,0,0,.45));z-index:3;pointer-events:none}
+.vtap{position:absolute;inset:0;z-index:4;background:transparent;cursor:pointer}
 .vplay i{width:60px;height:60px;border-radius:50%;background:rgba(210,10,10,.92);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:21px;color:#fff;padding-left:5px;box-shadow:0 0 30px rgba(210,10,10,.65)}
 .voverlay{position:absolute;left:14px;right:76px;bottom:16px;z-index:5}
 .voverlay .vtag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold2);background:rgba(20,20,26,.72);border:1px solid rgba(201,162,39,.4);padding:3px 10px;border-radius:14px;margin-bottom:8px;backdrop-filter:blur(6px)}
@@ -459,9 +460,8 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 .vrail button{background:rgba(20,20,26,.68);border:1px solid rgba(255,255,255,.16);width:47px;height:47px;border-radius:50%;font-size:19px;color:#fff;cursor:pointer;backdrop-filter:blur(8px);transition:transform .15s,border-color .2s}
 .vrail button:active{transform:scale(1.15)}
 .vrail button.lk.on{border-color:#ff2e50;box-shadow:0 0 14px rgba(255,46,80,.5)}
-.vrail button.cc{font-size:16px}
-.vrail button.cc.on{border-color:var(--gold2);box-shadow:0 0 14px rgba(255,215,106,.5);color:var(--gold2)}
-.vrail button.snd.on{border-color:var(--grn);box-shadow:0 0 14px rgba(46,204,113,.5)}
+.vmute-flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.7);z-index:7;font-size:52px;opacity:0;pointer-events:none;filter:drop-shadow(0 4px 18px rgba(0,0,0,.6));transition:opacity .25s,transform .25s}
+.vmute-flash.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .vrail span{font-size:9.5px;color:rgba(255,255,255,.8);font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.9)}
 .vswipe{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:5;color:rgba(255,255,255,.45);font-size:10px;letter-spacing:2px;animation:swipeHint 2.2s ease-in-out infinite}
 @keyframes swipeHint{0%,100%{transform:translateX(-50%) translateY(0);opacity:.45}50%{transform:translateX(-50%) translateY(-6px);opacity:.9}}
@@ -1693,50 +1693,78 @@ function nextBagBatch(n){
   }
   return out;
 }
+function ensureTap(el){
+  /* .vtap capte le tap au-dessus de l'iframe YouTube (qui intercepterait
+     sinon le clic lui-même) — .vstage.innerHTML est remplacé à l'activation
+     et à la désactivation du lecteur, donc .vtap doit être ré-attaché à
+     chaque fois plutôt que posé une seule fois à la création de la carte. */
+  const st=el.querySelector(".vstage");
+  let tap=st.querySelector(".vtap");
+  if(!tap){tap=document.createElement("div");tap.className="vtap";st.appendChild(tap);}
+  tap.onclick=()=>toggleSound(el);
+}
 function vidCard(v,first){
   const d=document.createElement("div");d.className="vid";d.dataset.y=v.y;d.id="vid-"+(feedCount++);
   d.innerHTML=`<div class="vbg" style="background-image:url('https://i.ytimg.com/vi/${v.y}/hqdefault.jpg')"></div>
     <div class="vstage"><img src="https://i.ytimg.com/vi/${v.y}/hqdefault.jpg" loading="lazy" alt=""><div class="vplay"><i>▶</i></div></div>
+    <div class="vmute-flash" id="mf-${d.id}"></div>
     <div class="voverlay"><span class="vtag">${v.tag}</span><b>${v.t}</b><small>${v.ch} · YouTube</small></div>
     <div class="vrail">
       <div class="vbtn"><button class="lk ${isLiked(v.y)?'on':''}">${isLiked(v.y)?"❤️":"🤍"}</button><span>J'aime</span></div>
       <div class="vbtn"><button class="cm">💬</button><span>${commentCount(v.y)?commentCount(v.y):"Commenter"}</span></div>
       <div class="vbtn"><button class="sh">↗️</button><span>Partager</span></div>
-      <div class="vbtn"><button class="cc ${ccPref?'on':''}">🌐</button><span>Traduire</span></div>
-      <div class="vbtn"><button class="snd ${soundPref?'on':''}">${soundPref?"🔊":"🔇"}</button><span>Son</span></div>
     </div>
     ${first?'<div class="vswipe">⌃ SCROLLE POUR LA SUIVANTE</div>':""}`;
   d.querySelector(".lk").onclick=e=>likeVid(v.y,e.currentTarget);
   d.querySelector(".cm").onclick=()=>openComments(v.y);
   d.querySelector(".sh").onclick=()=>shareVid(v.y);
-  d.querySelector(".cc").onclick=e=>toggleCC(d,e.currentTarget);
-  d.querySelector(".snd").onclick=()=>toggleSound(d);
+  ensureTap(d);
   return d;
 }
 function appendBatch(list){
   const sent=$("#feed-sentinel");
   list.forEach(v=>{const c=vidCard(v,feedCount===0);$("#feed").insertBefore(c,sent);feedIO.observe(c)});
 }
+const FEED_BATCH=6;
 function renderFeed(){
   const feed=$("#feed");feed.innerHTML='<div id="feed-sentinel" style="height:2px"></div>';feedCount=0;
   feedIO=new IntersectionObserver(ens=>ens.forEach(en=>{
     if(en.intersectionRatio>=0.6)activateVid(en.target);else deactivateVid(en.target);
   }),{root:feed,threshold:[0,0.6]});
   feedBag=[];
-  appendBatch(nextBagBatch(VIDEOS.length));
+  appendBatch(nextBagBatch(FEED_BATCH));
   new IntersectionObserver(ens=>ens.forEach(en=>{
-    if(en.isIntersecting)appendBatch(nextBagBatch(VIDEOS.length));
+    if(en.isIntersecting)appendBatch(nextBagBatch(FEED_BATCH));
   }),{root:feed,rootMargin:"900px"}).observe($("#feed-sentinel"));
+}
+function destroyOtherPlayers(exceptElId){
+  /* Un seul lecteur vidéo actif à la fois — plusieurs lecteurs YouTube en
+     mémoire simultanément (défilement rapide) peut faire planter le
+     navigateur mobile, surtout maintenant que le son est activé. */
+  Object.keys(ytPlayers).forEach(elId=>{
+    if(elId===exceptElId)return;
+    try{ytPlayers[elId].destroy()}catch(e){}
+    delete ytPlayers[elId];
+    const other=document.getElementById(elId);
+    const st=other&&other.querySelector(".vstage");
+    if(st&&st.querySelector("iframe,.yt-holder")){
+      const y=other.dataset.y;
+      st.innerHTML=`<img src="https://i.ytimg.com/vi/${y}/hqdefault.jpg" loading="lazy" alt=""><div class="vplay"><i>▶</i></div>`;
+      ensureTap(other);
+    }
+  });
 }
 function activateVid(el){
   const st=el.querySelector(".vstage");
   if(st.querySelector("iframe,.yt-holder"))return;
   if(!ytApiReady){el.setAttribute("data-pending-activate","1");return;}
+  destroyOtherPlayers(el.id);
   const id=el.dataset.y;
   const holderId="ytph-"+el.id;
   const cc=ccPref?1:0;
   const mute=soundPref?0:1;
   st.innerHTML=`<div id="${holderId}" class="yt-holder"></div>`;
+  ensureTap(el);
   ytPlayers[el.id]=new YT.Player(holderId,{
     host:"https://www.youtube-nocookie.com",
     videoId:id,
@@ -1754,24 +1782,13 @@ function activateVid(el){
 function toggleSound(el){
   soundPref=!soundPref;
   localStorage.setItem("octogone_sound_on",soundPref?"1":"0");
-  document.querySelectorAll(".vbtn .snd").forEach(b=>{b.classList.toggle("on",soundPref);b.textContent=soundPref?"🔊":"🔇"});
   const player=ytPlayers[el.id];
   if(player){try{soundPref?player.unMute():player.mute()}catch(e){}}
-}
-function toggleCC(el,btn){
-  ccPref=!ccPref;
-  localStorage.setItem("octogone_cc_fr",ccPref?"1":"0");
-  document.querySelectorAll(".vbtn .cc").forEach(b=>b.classList.toggle("on",ccPref));
-  toast(ccPref?"🌐 Sous-titres français activés (si disponibles)":"🌐 Sous-titres désactivés");
-  /* Le choix des sous-titres ne peut être changé qu'à la création du lecteur
-     (playerVars) — on recrée donc le lecteur de la vidéo active avec le
-     nouveau réglage plutôt que de tenter une API de bascule à chaud, fragile. */
-  if(ytPlayers[el.id]){
-    const st=el.querySelector(".vstage");
-    try{ytPlayers[el.id].destroy()}catch(e){}
-    delete ytPlayers[el.id];
-    st.innerHTML="";
-    activateVid(el);
+  const flash=document.getElementById("mf-"+el.id);
+  if(flash){
+    flash.textContent=soundPref?"🔊":"🔇";
+    flash.classList.remove("show");void flash.offsetWidth;flash.classList.add("show");
+    clearTimeout(flash._t);flash._t=setTimeout(()=>flash.classList.remove("show"),650);
   }
 }
 function deactivateVid(el){
@@ -1781,6 +1798,7 @@ function deactivateVid(el){
   const id=el.dataset.y;
   if(ytPlayers[el.id]){try{ytPlayers[el.id].destroy()}catch(e){}delete ytPlayers[el.id];}
   st.innerHTML=`<img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" loading="lazy" alt=""><div class="vplay"><i>▶</i></div>`;
+  ensureTap(el);
 }
 function isLiked(y){return store.get("likes",{})[y]===true}
 function likeVid(y,btn){
