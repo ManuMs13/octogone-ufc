@@ -445,10 +445,14 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 .feed::-webkit-scrollbar{display:none}
 .vid{position:relative;height:100%;scroll-snap-align:start;scroll-snap-stop:always;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .vbg{position:absolute;inset:0;background:center/cover no-repeat;filter:blur(28px) brightness(.3);transform:scale(1.2)}
-.vstage{position:relative;width:100%;aspect-ratio:16/9;z-index:2;background:#000}
-.vstage img{width:100%;height:100%;object-fit:cover;display:block}
-.vstage iframe{width:100%;height:100%;border:0;display:block}
-.vstage .yt-holder{width:100%;height:100%;background:#000}
+/* La vidéo remplit toute la carte (façon TikTok) au lieu d'un format 16/9
+   coincé au milieu avec du vide autour — la source YouTube reste en 16/9,
+   donc on la surdimensionne et on la centre pour qu'elle couvre tout,
+   quitte à rogner les bords gauche/droite plutôt que de laisser du noir. */
+.vstage{position:relative;width:100%;height:100%;z-index:2;background:#000;overflow:hidden}
+.vstage img{position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%);display:block}
+.vstage iframe{position:absolute;top:50%;left:50%;height:100%;width:auto;aspect-ratio:16/9;min-width:100%;transform:translate(-50%,-50%);border:0;display:block}
+.vstage .yt-holder{position:absolute;top:50%;left:50%;height:100%;width:auto;aspect-ratio:16/9;min-width:100%;transform:translate(-50%,-50%);background:#000}
 .vplay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(transparent 30%,rgba(0,0,0,.45));z-index:3;pointer-events:none}
 .vtap{position:absolute;inset:0;z-index:4;background:transparent;cursor:pointer}
 .vplay i{width:60px;height:60px;border-radius:50%;background:rgba(210,10,10,.92);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:21px;color:#fff;padding-left:5px;box-shadow:0 0 30px rgba(210,10,10,.65)}
