@@ -461,6 +461,7 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 .vrail button.lk.on{border-color:#ff2e50;box-shadow:0 0 14px rgba(255,46,80,.5)}
 .vrail button.cc{font-size:16px}
 .vrail button.cc.on{border-color:var(--gold2);box-shadow:0 0 14px rgba(255,215,106,.5);color:var(--gold2)}
+.vrail button.snd.on{border-color:var(--grn);box-shadow:0 0 14px rgba(46,204,113,.5)}
 .vrail span{font-size:9.5px;color:rgba(255,255,255,.8);font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.9)}
 .vswipe{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:5;color:rgba(255,255,255,.45);font-size:10px;letter-spacing:2px;animation:swipeHint 2.2s ease-in-out infinite}
 @keyframes swipeHint{0%,100%{transform:translateX(-50%) translateY(0);opacity:.45}50%{transform:translateX(-50%) translateY(-6px);opacity:.9}}
@@ -1655,6 +1656,7 @@ let ytApiReady=false;
 const ytPlayers={};
 let badVideos=new Set(JSON.parse(localStorage.getItem("octogone_bad_videos")||"[]"));
 let ccPref=localStorage.getItem("octogone_cc_fr")!=="0";
+let soundPref=localStorage.getItem("octogone_sound_on")!=="0";
 function saveBadVideos(){localStorage.setItem("octogone_bad_videos",JSON.stringify([...badVideos]));}
 (function loadYtApi(){
   const tag=document.createElement("script");
@@ -1701,12 +1703,14 @@ function vidCard(v,first){
       <div class="vbtn"><button class="cm">💬</button><span>${commentCount(v.y)?commentCount(v.y):"Commenter"}</span></div>
       <div class="vbtn"><button class="sh">↗️</button><span>Partager</span></div>
       <div class="vbtn"><button class="cc ${ccPref?'on':''}">🌐</button><span>Traduire</span></div>
+      <div class="vbtn"><button class="snd ${soundPref?'on':''}">${soundPref?"🔊":"🔇"}</button><span>Son</span></div>
     </div>
     ${first?'<div class="vswipe">⌃ SCROLLE POUR LA SUIVANTE</div>':""}`;
   d.querySelector(".lk").onclick=e=>likeVid(v.y,e.currentTarget);
   d.querySelector(".cm").onclick=()=>openComments(v.y);
   d.querySelector(".sh").onclick=()=>shareVid(v.y);
   d.querySelector(".cc").onclick=e=>toggleCC(d,e.currentTarget);
+  d.querySelector(".snd").onclick=()=>toggleSound(d);
   return d;
 }
 function appendBatch(list){
@@ -1731,14 +1735,28 @@ function activateVid(el){
   const id=el.dataset.y;
   const holderId="ytph-"+el.id;
   const cc=ccPref?1:0;
+  const mute=soundPref?0:1;
   st.innerHTML=`<div id="${holderId}" class="yt-holder"></div>`;
   ytPlayers[el.id]=new YT.Player(holderId,{
     host:"https://www.youtube-nocookie.com",
     videoId:id,
-    playerVars:{autoplay:1,mute:1,playsinline:1,rel:0,loop:1,playlist:id,cc_load_policy:cc,cc_lang_pref:"fr",hl:"fr",
+    playerVars:{autoplay:1,mute:mute,playsinline:1,rel:0,loop:1,playlist:id,cc_load_policy:cc,cc_lang_pref:"fr",hl:"fr",
       controls:0,modestbranding:1,iv_load_policy:3,disablekb:1,fs:0},
-    events:{onError:()=>handleVideoError(el,id)}
+    events:{
+      onError:()=>handleVideoError(el,id),
+      /* Renforce l'état son voulu une fois le lecteur prêt — certains
+         navigateurs ignorent le paramètre mute initial selon leur politique
+         d'autoplay ; unMute()/mute() est la méthode fiable après coup. */
+      onReady:e=>{try{soundPref?e.target.unMute():e.target.mute()}catch(err){}}
+    }
   });
+}
+function toggleSound(el){
+  soundPref=!soundPref;
+  localStorage.setItem("octogone_sound_on",soundPref?"1":"0");
+  document.querySelectorAll(".vbtn .snd").forEach(b=>{b.classList.toggle("on",soundPref);b.textContent=soundPref?"🔊":"🔇"});
+  const player=ytPlayers[el.id];
+  if(player){try{soundPref?player.unMute():player.mute()}catch(e){}}
 }
 function toggleCC(el,btn){
   ccPref=!ccPref;
