@@ -40,19 +40,22 @@ jobs:
 
       # Sans ces deux textes, iOS ferme l'app quand l'utilisateur choisit une
       # photo de profil (bouton « Importer une photo » de l'éditeur de profil).
+      # plutil reçoit la valeur comme argument distinct : contrairement à
+      # PlistBuddy, il n'analyse pas la chaîne de commande, donc apostrophes
+      # et virgules ne peuvent pas casser l'appel.
       - name: Déclarer l'usage de la caméra et de la photothèque
         run: |
           set -e
           P=ios/App/App/Info.plist
-          CAM="Pour prendre une photo de profil, uniquement si vous le demandez. L'image reste sur votre appareil."
-          LIB="Pour choisir une photo de profil dans vos photos, uniquement si vous le demandez. L'image reste sur votre appareil."
-          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string $CAM" "$P" || \
-          /usr/libexec/PlistBuddy -c "Set :NSCameraUsageDescription $CAM" "$P"
-          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string $LIB" "$P" || \
-          /usr/libexec/PlistBuddy -c "Set :NSPhotoLibraryUsageDescription $LIB" "$P"
+          CAM="Pour prendre une photo de profil, uniquement si vous le demandez. La photo reste sur votre appareil."
+          LIB="Pour choisir une photo de profil dans vos photos, uniquement si vous le demandez. La photo reste sur votre appareil."
+          plutil -replace NSCameraUsageDescription -string "$CAM" "$P" 2>/dev/null \
+            || plutil -insert NSCameraUsageDescription -string "$CAM" "$P"
+          plutil -replace NSPhotoLibraryUsageDescription -string "$LIB" "$P" 2>/dev/null \
+            || plutil -insert NSPhotoLibraryUsageDescription -string "$LIB" "$P"
           echo "--- Vérification ---"
-          /usr/libexec/PlistBuddy -c "Print :NSCameraUsageDescription" "$P"
-          /usr/libexec/PlistBuddy -c "Print :NSPhotoLibraryUsageDescription" "$P"
+          plutil -extract NSCameraUsageDescription raw "$P"
+          plutil -extract NSPhotoLibraryUsageDescription raw "$P"
 
       # Les notifications push exigent l'entitlement aps-environment. Le projet
       # iOS étant régénéré à chaque build, on l'ajoute ici plutôt que dans Xcode.
