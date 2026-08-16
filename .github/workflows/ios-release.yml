@@ -38,6 +38,51 @@ jobs:
           /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" ios/App/App/Info.plist || \
           /usr/libexec/PlistBuddy -c "Set :ITSAppUsesNonExemptEncryption false" ios/App/App/Info.plist
 
+      # Sans ces deux textes, iOS ferme l'app quand l'utilisateur choisit une
+      # photo de profil (bouton « Importer une photo » de l'éditeur de profil).
+      - name: Déclarer l'usage de la caméra et de la photothèque
+        run: |
+          set -e
+          P=ios/App/App/Info.plist
+          CAM="Pour prendre une photo de profil, uniquement si vous le demandez. L'image reste sur votre appareil."
+          LIB="Pour choisir une photo de profil dans vos photos, uniquement si vous le demandez. L'image reste sur votre appareil."
+          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string $CAM" "$P" || \
+          /usr/libexec/PlistBuddy -c "Set :NSCameraUsageDescription $CAM" "$P"
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string $LIB" "$P" || \
+          /usr/libexec/PlistBuddy -c "Set :NSPhotoLibraryUsageDescription $LIB" "$P"
+          echo "--- Vérification ---"
+          /usr/libexec/PlistBuddy -c "Print :NSCameraUsageDescription" "$P"
+          /usr/libexec/PlistBuddy -c "Print :NSPhotoLibraryUsageDescription" "$P"
+
+      # Les notifications push exigent l'entitlement aps-environment. Le projet
+      # iOS étant régénéré à chaque build, on l'ajoute ici plutôt que dans Xcode.
+      - name: Activer les notifications push (entitlement APNs)
+        run: |
+          set -e
+          cat > ios/App/App/App.entitlements <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>aps-environment</key>
+            <string>production</string>
+          </dict>
+          </plist>
+          PLIST
+          gem install xcodeproj -N --no-document
+          ruby -e '
+            require "xcodeproj"
+            project = Xcodeproj::Project.open("ios/App/App.xcodeproj")
+            target  = project.targets.find { |t| t.name == "App" } or abort("cible App introuvable")
+            target.build_configurations.each do |c|
+              c.build_settings["CODE_SIGN_ENTITLEMENTS"] = "App/App.entitlements"
+            end
+            project.save
+            puts "CODE_SIGN_ENTITLEMENTS positionné sur #{target.build_configurations.map(&:name).join(", ")}"
+          '
+          echo "--- Entitlements ---"
+          cat ios/App/App/App.entitlements
+
       - name: Installer les pods CocoaPods
         working-directory: ios/App
         run: pod install

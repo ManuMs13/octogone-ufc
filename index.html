@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="OCTOGONE">
-<title>OCTOGONE · UFC Tracker</title>
+<title>OCTOGONE · Tracker</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -530,7 +530,7 @@ header.enter{animation:headerDrop .6s .05s cubic-bezier(.16,1,.3,1) both}
   <div class="sp-hero" id="sp-hero"></div>
   <svg class="sp-octa" viewBox="0 0 100 100"><polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="none" stroke="#d20a0a" stroke-width="7"/><polygon points="38,22 62,22 78,38 78,62 62,78 38,78 22,62 22,38" fill="none" stroke="#c9a227" stroke-width="4"/></svg>
   <div class="sp-name">OCTO<span>GONE</span></div>
-  <div class="sp-tag">UFC Tracker</div>
+  <div class="sp-tag">Tracker</div>
   <div class="sp-bar"><i></i></div>
   <div class="sp-skip">🔓 Appuyez pour déverrouiller</div>
 </div>
@@ -545,7 +545,7 @@ header.enter{animation:headerDrop .6s .05s cubic-bezier(.16,1,.3,1) both}
 <div class="app">
 <header>
   <svg class="octa" viewBox="0 0 100 100"><polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="none" stroke="#d20a0a" stroke-width="7"/><polygon points="38,22 62,22 78,38 78,62 62,78 38,78 22,62 22,38" fill="none" stroke="#c9a227" stroke-width="4"/></svg>
-  <div class="brand"><b>OCTO<span>GONE</span></b><br><small>UFC Tracker</small></div>
+  <div class="brand"><b>OCTO<span>GONE</span></b><br><small>Tracker</small></div>
   <div class="live-dot"><i></i><span id="clock"></span></div>
   <button class="push-bell" id="pushBell" onclick="togglePush()" title="Activer les notifications" aria-label="Activer les notifications">🔔</button>
 </header>
@@ -671,7 +671,7 @@ header.enter{animation:headerDrop .6s .05s cubic-bezier(.16,1,.3,1) both}
     <a href="terms.html" target="_blank" rel="noopener" style="color:var(--gold2);text-decoration:none">📋 Conditions d'utilisation</a>
     &nbsp;·&nbsp;
     <a href="contact.html" target="_blank" rel="noopener" style="color:var(--gold2);text-decoration:none">✉️ Contact</a>
-    <br><span style="opacity:.65">OCTOGONE · UFC Tracker — application gratuite et communautaire, non affiliée à l'UFC.</span>
+    <br><span style="opacity:.65">OCTOGONE · Tracker — application gratuite et communautaire, non affiliée à l'UFC.</span>
   </div>
 </section>
 
@@ -685,8 +685,8 @@ header.enter{animation:headerDrop .6s .05s cubic-bezier(.16,1,.3,1) both}
   </div>
   <h2>💬 Chat de la commu</h2>
   <div class="live-chat-wrap glass">
-    <iframe id="live-discord" src="https://discord.com/widget?id=1530551957280788562&theme=dark" width="100%" height="420" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-    <div class="live-chat-fallback">Le chat ne s'affiche pas ? <a href="https://discord.gg/VJzfvgeSyz" target="_blank" rel="noopener">Rejoins directement sur Discord →</a></div>
+    <div class="live-chat-fallback">Viens suivre l'événement en direct avec le reste de la commu sur notre serveur Discord.</div>
+    <div class="watch-links"><a class="dc" href="https://discord.gg/VJzfvgeSyz" target="_blank" rel="noopener noreferrer">💬 Rejoindre le Discord</a></div>
   </div>
 </section>
 </div>
@@ -789,7 +789,7 @@ const DIFFUSION_FR={
   links:[
     {ic:"🟣",t:"Twitch RMC Sport",u:"https://www.twitch.tv/rmcsport",c:"tw"},
     {ic:"📱",t:"App / site RMC Sport",u:"https://rmcsport.tv",c:"rmc"},
-    {ic:"💬",t:"Liens de diffusion (Discord)",u:"https://discord.gg/VJzfvgeSyz",c:"dc"}
+    {ic:"💬",t:"Rejoindre le Discord de la commu",u:"https://discord.gg/VJzfvgeSyz",c:"dc"}
   ]
 };
 
@@ -1817,7 +1817,7 @@ function likeVid(y,btn){
 }
 async function shareVid(y){
   const v=VMAP[y],url="https://www.youtube.com/watch?v="+y;
-  if(navigator.share){try{await navigator.share({title:"OCTOGONE · "+v.t,text:v.t+" — vu sur l'app OCTOGONE UFC Tracker (octogone-ufc.netlify.app)",url})}catch(e){}}
+  if(navigator.share){try{await navigator.share({title:"OCTOGONE · "+v.t,text:v.t+" — vu sur l'app OCTOGONE (octogone-ufc.netlify.app)",url})}catch(e){}}
   else{try{await navigator.clipboard.writeText(url+" — vu sur octogone-ufc.netlify.app");toast("🔗 Lien copié !")}catch(e){toast(url)}}
 }
 /* ============ PROFIL (pseudo + avatar — local à l'appareil, pas de compte) ============ */
@@ -1916,7 +1916,7 @@ function openComments(y){
   $("#sheet").innerHTML=`<button class="close" onclick="closeModal()">✕</button>
     <div class="cm-wrap">
       <div class="cm-head"><b>💬 ${v.t}</b><small>${v.ch} · ${commentCount(y)} commentaire${commentCount(y)>1?"s":""}</small></div>
-      <div class="cm-note">💾 Les commentaires sont enregistrés sur cet appareil (pas encore de compte partagé entre utilisateurs).</div>
+      <div class="cm-note">💾 Vos commentaires sont privés : ils sont enregistrés uniquement sur cet appareil et ne sont partagés avec personne.</div>
       <div class="cm-list" id="cm-list"></div>
       <div class="cm-compose">
         <button class="cm-my-ava" id="cm-my-ava" title="Modifier ton profil">${avatarHtml(p.avatar,p.name,38)}</button>
@@ -2021,7 +2021,7 @@ function addAlarm(){
   const t=alarmTime(ev,when);
   if(t<Date.now()){toast("⚠️ Ce moment est déjà passé !");return}
   alarms.push({ev:ev.id,when,t});store.set("alarms",alarms);renderAlarms();scheduleAll();
-  if("Notification" in window&&Notification.permission==="default")Notification.requestPermission();
+  if(pushSupported()&&"Notification" in window&&Notification.permission==="default")Notification.requestPermission();
   toast("🔔 Alarme activée !");
 }
 function delAlarm(i){alarms.splice(i,1);store.set("alarms",alarms);renderAlarms()}
@@ -2091,21 +2091,105 @@ function urlBase64ToUint8Array(base64String){
   const raw=atob(base64);
   return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
 }
-function pushSupported(){
+/* Deux chemins selon la plateforme :
+   - app iOS native  -> APNs, via le pont Capacitor (le Web Push n'existe pas
+                        dans la WebView, l'API PushManager y est absente) ;
+   - site et Android -> Web Push (VAPID), inchangé.
+   On parle au plugin natif par le pont (nativePromise/addListener) plutôt que
+   par window.Capacitor.Plugins : ce dernier n'est peuplé que si le paquet JS du
+   plugin est embarqué, ce qui n'est pas le cas ici (l'app charge le site). */
+function capNative(){
+  const C = window.Capacitor;
+  if(!C || typeof C.isNativePlatform !== "function" || !C.isNativePlatform()) return null;
+  if(typeof C.nativePromise !== "function" || typeof C.addListener !== "function") return null;
+  return C;
+}
+const pnCall = (method, options) => capNative().nativePromise("PushNotifications", method, options || {});
+function webPushSupported(){
   return ("serviceWorker" in navigator) && ("PushManager" in window);
+}
+function pushSupported(){
+  return Boolean(capNative()) || webPushSupported();
 }
 function updateBell(){
   const bell = document.getElementById("pushBell");
   if(!bell) return;
-  /* Le Web Push n'existe pas dans la WebView des apps natives iOS (ni dans
-     Safari iOS hors écran d'accueil) : on masque la cloche plutôt que de
-     proposer un bouton qui ne peut qu'échouer. */
+  /* Ni APNs ni Web Push (Safari iOS hors écran d'accueil, vieux navigateurs) :
+     on masque la cloche plutôt que d'offrir un bouton qui ne peut qu'échouer. */
   if(!pushSupported()){ bell.style.display="none"; return; }
   bell.style.display="";
   bell.classList.toggle("on", localStorage.getItem("octogone_push_enabled")==="1");
 }
+
+/* --- Chemin natif (APNs) --- */
+let pnListenersReady = false;
+function initNativePush(){
+  const C = capNative();
+  if(!C || pnListenersReady) return;
+  pnListenersReady = true;
+
+  /* iOS renvoie le token d'appareil ici, de façon asynchrone après register(). */
+  C.addListener("PushNotifications", "registration", async (t) => {
+    const token = t && t.value;
+    if(!token) return;
+    try{
+      await fetch("/api/apns-subscribe",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token})});
+      localStorage.setItem("octogone_apns_token", token);
+      localStorage.setItem("octogone_push_enabled","1");
+      toast("🔔 Notifications activées !");
+    }catch(e){
+      localStorage.setItem("octogone_push_enabled","0");
+      toast("Notifications indisponibles pour le moment.");
+    }
+    updateBell();
+  });
+
+  C.addListener("PushNotifications", "registrationError", () => {
+    localStorage.setItem("octogone_push_enabled","0");
+    updateBell();
+    toast("Impossible d'activer les notifications pour le moment.");
+  });
+
+  /* Tap sur une notification : on ouvre l'onglet visé s'il y en a un. */
+  C.addListener("PushNotifications", "pushNotificationActionPerformed", (a) => {
+    const dest = a && a.notification && a.notification.data && a.notification.data.url;
+    if(dest && dest !== "/") { try{ location.href = dest; }catch(e){} }
+  });
+}
+
+async function toggleNativePush(){
+  const enabled = localStorage.getItem("octogone_push_enabled")==="1";
+  if(enabled){
+    const token = localStorage.getItem("octogone_apns_token");
+    if(token){
+      try{ await fetch("/api/apns-unsubscribe",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token})}); }catch(e){}
+    }
+    localStorage.removeItem("octogone_apns_token");
+    localStorage.setItem("octogone_push_enabled","0");
+    updateBell();
+    toast("🔕 Notifications désactivées");
+    return;
+  }
+  try{
+    let perm = await pnCall("checkPermissions");
+    if(!perm || perm.receive === "prompt" || perm.receive === "prompt-with-rationale"){
+      perm = await pnCall("requestPermissions");
+    }
+    if(!perm || perm.receive !== "granted"){
+      toast("Autorisation refusée — activable dans Réglages > OCTOGONE > Notifications.");
+      updateBell();
+      return;
+    }
+    await pnCall("register"); /* le token arrive via l'écouteur "registration" */
+  }catch(e){
+    toast("Impossible d'activer les notifications pour le moment.");
+    updateBell();
+  }
+}
+
 async function togglePush(){
-  if(!pushSupported()){ updateBell(); return; }
+  if(capNative()) return toggleNativePush();
+  if(!webPushSupported()){ updateBell(); return; }
   const enabled = localStorage.getItem("octogone_push_enabled")==="1";
   const reg = await navigator.serviceWorker.ready;
   if(enabled){
@@ -2128,18 +2212,22 @@ async function togglePush(){
     await fetch("/api/subscribe",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(sub)});
     localStorage.setItem("octogone_push_enabled","1");
   }catch(e){
-    alert("Impossible d'activer les notifications pour le moment.");
+    toast("Impossible d'activer les notifications pour le moment.");
   }
   updateBell();
 }
+/* Le pont Capacitor est injecté avant nos scripts, mais on retente au chargement
+   par sécurité — initNativePush() est idempotent. */
+initNativePush();
+window.addEventListener("load", initNativePush, { once:true });
 updateBell();
 /* ICS */
 function icsFor(e,whenTs,label){
   const dt=t=>new Date(t).toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
-  return ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Octogone UFC//FR","BEGIN:VEVENT",
+  return ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Octogone//FR","BEGIN:VEVENT",
    "UID:"+e.id+"-"+whenTs+"@octogone","DTSTAMP:"+dt(Date.now()),"DTSTART:"+dt(whenTs),
    "DTEND:"+dt(whenTs+3*36e5),"SUMMARY:🥊 "+e.name+(label?" — "+label:""),
-   "DESCRIPTION:"+e.loc.replace(/,/g,"\\,")+" · Octogone UFC Tracker","BEGIN:VALARM","TRIGGER:-PT30M",
+   "DESCRIPTION:"+e.loc.replace(/,/g,"\\,")+" · Octogone Tracker","BEGIN:VALARM","TRIGGER:-PT30M",
    "ACTION:DISPLAY","DESCRIPTION:UFC dans 30 min !","END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
 }
 function dlBlob(txt,fn){const b=new Blob([txt],{type:"text/calendar"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=fn;a.click()}

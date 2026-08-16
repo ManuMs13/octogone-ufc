@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "OCTOGONE - UFC Tracker (site statique + fonctions Netlify pour les notifications push)",
+  "description": "OCTOGONE - Tracker (site statique + fonctions Netlify pour les notifications push)",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ManuMs13/octogone-ufc.git"
@@ -17,7 +17,8 @@
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^7.4.3",
     "@capacitor/core": "^7.4.3",
-    "@capacitor/ios": "^7.4.3"
+    "@capacitor/ios": "^7.4.3",
+    "@capacitor/push-notifications": "^7.0.7"
   },
   "scripts": {
     "ios:add": "cap add ios",

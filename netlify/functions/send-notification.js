@@ -1,5 +1,6 @@
 import { getStore } from "@netlify/blobs";
 import webpush from "web-push";
+import { sendToApns, apnsConfigured } from "../lib/apns.js";
 
 export default async (req) => {
   if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
@@ -44,7 +45,25 @@ export default async (req) => {
     }
   }
 
-  return new Response(JSON.stringify({ sent, failed, removed }), { headers: { "content-type": "application/json" } });
+  /* --- App iOS native : envoi via APNs --- */
+  let ios = { sent: 0, failed: 0, removed: 0, skipped: true };
+  if (apnsConfigured()) {
+    const apnsStore = getStore("apns-tokens");
+    const { blobs: tokenBlobs } = await apnsStore.list();
+    const tokens = tokenBlobs.map((b) => b.key);
+    try {
+      const r = await sendToApns(tokens, { title, body: message, url });
+      for (const dead of r.gone) await apnsStore.delete(dead);
+      ios = { sent: r.sent, failed: r.failed, removed: r.gone.length, skipped: false };
+    } catch (err) {
+      ios = { sent: 0, failed: tokens.length, removed: 0, skipped: false, error: String(err.message || err) };
+    }
+  }
+
+  return new Response(
+    JSON.stringify({ web: { sent, failed, removed }, ios }),
+    { headers: { "content-type": "application/json" } }
+  );
 };
 
 export const config = { path: "/api/send-notification" };
