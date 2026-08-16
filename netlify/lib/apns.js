@@ -24,13 +24,26 @@ export function apnsConfigured() {
   return Boolean(process.env.APNS_KEY_ID && process.env.APNS_TEAM_ID && process.env.APNS_P8);
 }
 
+/* Reconstruit un PEM valide quelle que soit la façon dont la clé a été collée
+   dans la variable d'environnement : retours à la ligne réels, séquences "\n"
+   littérales, ou retours à la ligne aplatis en espaces par un champ mono-ligne
+   (ce que fait l'interface de Netlify). */
+export function normalizePem(raw) {
+  let k = String(raw || "").trim();
+  if (k.includes("\\n")) k = k.replace(/\\n/g, "\n");
+  if (k.includes("\n")) return k;
+
+  const m = k.match(/-----BEGIN ([A-Z0-9 ]+)-----([\s\S]*?)-----END \1-----/);
+  if (!m) return k;
+  const body = m[2].replace(/\s+/g, "").match(/.{1,64}/g) || [];
+  return `-----BEGIN ${m[1]}-----\n${body.join("\n")}\n-----END ${m[1]}-----\n`;
+}
+
 function buildJwt() {
   const now = Math.floor(Date.now() / 1000);
   if (cached && now - cached.iat < 3000) return cached.jwt;
 
-  const key = process.env.APNS_P8.includes("\\n")
-    ? process.env.APNS_P8.replace(/\\n/g, "\n")
-    : process.env.APNS_P8;
+  const key = normalizePem(process.env.APNS_P8);
 
   const unsigned =
     b64url(JSON.stringify({ alg: "ES256", kid: process.env.APNS_KEY_ID })) +
