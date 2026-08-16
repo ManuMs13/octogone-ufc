@@ -2230,41 +2230,41 @@ function icsFor(e,whenTs,label){
    "DESCRIPTION:"+e.loc.replace(/,/g,"\\,")+" · Octogone Tracker","BEGIN:VALARM","TRIGGER:-PT30M",
    "ACTION:DISPLAY","DESCRIPTION:UFC dans 30 min !","END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
 }
-/* Dans une app native (WKWebView), le téléchargement d'un Blob ne déclenche
-   rien du tout : pas de gestionnaire de téléchargement. On passe donc par la
-   feuille de partage du système, qui propose « Ajouter au calendrier ». Le
-   téléchargement classique reste le repli pour le web et Android. */
-async function dlBlob(txt,fn){
-  const type="text/calendar";
-  try{
-    const file=new File([txt],fn,{type});
-    if(navigator.canShare&&navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:"Rappel UFC — OCTOGONE"});
-      return "partage";
-    }
-  }catch(e){
-    if(e&&e.name==="AbortError")return "annule";
+/* Ajout au calendrier.
+
+   App native : télécharger un Blob ne déclenche rien dans une WKWebView. On
+   ouvre donc /api/ics, qui sert le fichier avec le bon type de contenu —
+   iOS le reconnaît et propose directement de l'ajouter au Calendrier.
+   Web : le téléchargement classique reste le plus direct. */
+function icsUrl(ev,whenTs,label){
+  const p=new URLSearchParams({id:ev.id,name:ev.name,start:String(whenTs)});
+  if(ev.loc)p.set("loc",ev.loc);
+  if(label)p.set("label",label);
+  return location.origin+"/api/ics?"+p.toString();
+}
+function addToCalendar(ev,whenTs,label){
+  if(capNative()){
+    const a=document.createElement("a");
+    a.href=icsUrl(ev,whenTs,label);
+    a.target="_blank";a.rel="noopener noreferrer";
+    document.body.appendChild(a);a.click();a.remove();
+    toast("📅 Ajoute le rappel à ton calendrier !");
+    return;
   }
-  const b=new Blob([txt],{type}),a=document.createElement("a");
-  a.href=URL.createObjectURL(b);a.download=fn;a.click();
+  const b=new Blob([icsFor(ev,whenTs,label)],{type:"text/calendar"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(b);a.download="ufc-"+ev.id+".ics";a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),5000);
-  return "telecharge";
+  toast("📅 Fichier calendrier téléchargé — ouvre-le pour l'ajouter !");
 }
-function toastIcs(r){
-  if(r==="annule")return;
-  toast(r==="partage"
-    ? "📅 Choisis « Calendrier » pour ajouter le rappel !"
-    : "📅 Fichier calendrier téléchargé — ouvre-le pour l'ajouter !");
-}
-async function dlIcs(){
+function dlIcs(){
   const ev=EVENTS.find(e=>e.id===$("#al-ev").value),when=$("#al-when").value;
   const t=alarmTime(ev,when);
   if(t<Date.now()){toast("⚠️ Ce moment est déjà passé !");return}
-  toastIcs(await dlBlob(icsFor(ev,t,WHEN_LBL[when]),"ufc-"+ev.id+".ics"));
+  addToCalendar(ev,t,WHEN_LBL[when]);
 }
-async function dlIcsFor(id){
+function dlIcsFor(id){
   const ev=EVENTS.find(e=>e.id===id);
-  toastIcs(await dlBlob(icsFor(ev,new Date(ev.mainUTC).getTime(),"Carte principale"),"ufc-"+id+".ics"));
+  addToCalendar(ev,new Date(ev.mainUTC).getTime(),"Carte principale");
 }
 </script>
 </body>
