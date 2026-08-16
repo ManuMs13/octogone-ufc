@@ -2230,18 +2230,41 @@ function icsFor(e,whenTs,label){
    "DESCRIPTION:"+e.loc.replace(/,/g,"\\,")+" · Octogone Tracker","BEGIN:VALARM","TRIGGER:-PT30M",
    "ACTION:DISPLAY","DESCRIPTION:UFC dans 30 min !","END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
 }
-function dlBlob(txt,fn){const b=new Blob([txt],{type:"text/calendar"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=fn;a.click()}
-function dlIcs(){
+/* Dans une app native (WKWebView), le téléchargement d'un Blob ne déclenche
+   rien du tout : pas de gestionnaire de téléchargement. On passe donc par la
+   feuille de partage du système, qui propose « Ajouter au calendrier ». Le
+   téléchargement classique reste le repli pour le web et Android. */
+async function dlBlob(txt,fn){
+  const type="text/calendar";
+  try{
+    const file=new File([txt],fn,{type});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:"Rappel UFC — OCTOGONE"});
+      return "partage";
+    }
+  }catch(e){
+    if(e&&e.name==="AbortError")return "annule";
+  }
+  const b=new Blob([txt],{type}),a=document.createElement("a");
+  a.href=URL.createObjectURL(b);a.download=fn;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  return "telecharge";
+}
+function toastIcs(r){
+  if(r==="annule")return;
+  toast(r==="partage"
+    ? "📅 Choisis « Calendrier » pour ajouter le rappel !"
+    : "📅 Fichier calendrier téléchargé — ouvre-le pour l'ajouter !");
+}
+async function dlIcs(){
   const ev=EVENTS.find(e=>e.id===$("#al-ev").value),when=$("#al-when").value;
   const t=alarmTime(ev,when);
   if(t<Date.now()){toast("⚠️ Ce moment est déjà passé !");return}
-  dlBlob(icsFor(ev,t,WHEN_LBL[when]),"ufc-"+ev.id+".ics");
-  toast("📅 Fichier calendrier téléchargé — ouvre-le pour l'ajouter !");
+  toastIcs(await dlBlob(icsFor(ev,t,WHEN_LBL[when]),"ufc-"+ev.id+".ics"));
 }
-function dlIcsFor(id){
+async function dlIcsFor(id){
   const ev=EVENTS.find(e=>e.id===id);
-  dlBlob(icsFor(ev,new Date(ev.mainUTC).getTime(),"Carte principale"),"ufc-"+id+".ics");
-  toast("📅 Fichier calendrier téléchargé !");
+  toastIcs(await dlBlob(icsFor(ev,new Date(ev.mainUTC).getTime(),"Carte principale"),"ufc-"+id+".ics"));
 }
 </script>
 </body>
