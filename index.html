@@ -99,6 +99,8 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 
 /* ===== BANDEAU CHAMPIONS (N&B fondu) ===== */
 /* ===== SPLASH : bandeau combattants N&B dramatique (partie haute, fondu vers le logo) ===== */
+.sp-credit{position:absolute;bottom:10px;left:0;right:0;z-index:3;text-align:center;padding:0 18px;
+  font-size:9.5px;line-height:1.4;color:rgba(255,255,255,.34)}
 .sp-hero{position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:860px;height:58vh;max-height:480px;display:flex;overflow:hidden;z-index:0;background:#000}
 .sp-hero .sh-item{flex:1;position:relative;overflow:hidden}
 .sp-hero .sh-item:not(:last-child){border-right:1px solid rgba(0,0,0,.7)}
@@ -422,6 +424,10 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 .soc-card.x:active{box-shadow:0 0 24px rgba(255,255,255,.15)}
 .soc-card.x .soc-ic{background:linear-gradient(135deg,#2a2a2e,#000);border:1px solid rgba(255,255,255,.2)}
 .soc-card.x .soc-go{background:#fff;color:#000}
+.credit{color:var(--mut);font-size:10.5px;margin-top:8px;line-height:1.45;opacity:.8}
+.credit a{color:var(--mut)}
+/* Dans l'app iOS, aucun renvoi vers une page de soutien externe. */
+html.native .ios-off{display:none!important}
 .soc-card.tipeee{border-color:rgba(201,162,39,.5)}
 .soc-card.tipeee:active{box-shadow:0 0 24px rgba(201,162,39,.35)}
 .soc-card.tipeee .soc-ic{background:linear-gradient(135deg,#f0cf6b,#a37f16);box-shadow:0 0 18px rgba(201,162,39,.5);font-size:26px}
@@ -533,6 +539,7 @@ header.enter{animation:headerDrop .6s .05s cubic-bezier(.16,1,.3,1) both}
   <div class="sp-tag">Tracker</div>
   <div class="sp-bar"><i></i></div>
   <div class="sp-skip">🔓 Appuyez pour déverrouiller</div>
+  <div class="sp-credit" id="sp-credit"></div>
 </div>
 <div id="flash"></div>
 <div class="arena">
@@ -600,7 +607,7 @@ header.enter{animation:headerDrop .6s .05s cubic-bezier(.16,1,.3,1) both}
   </div>
   <div id="feed" class="feed"></div>
   <div id="news-wrap" style="display:none;padding:64px 16px 16px">
-    <div class="mini-note" style="margin-top:0">🎬 Fil vidéos et actus renouvelés chaque lundi automatiquement : Countdown, face-à-face, interviews, podcasts, contenu 🇫🇷. Touche une vidéo pour la lire directement dans l'app. · <a href="https://fr.tipeee.com/octogone-tracker/" target="_blank" style="color:var(--gold2);text-decoration:none">☕ Soutenir Octogone-Tracker</a></div>
+    <div class="mini-note" style="margin-top:0">🎬 Fil vidéos et actus renouvelés chaque lundi automatiquement : Countdown, face-à-face, interviews, podcasts, contenu 🇫🇷. Touche une vidéo pour la lire directement dans l'app.<span class="ios-off"> · <a href="https://fr.tipeee.com/octogone-tracker/" target="_blank" style="color:var(--gold2);text-decoration:none">☕ Soutenir Octogone-Tracker</a></span></div>
     <div id="news-list"></div>
   </div>
 </section>
@@ -630,7 +637,7 @@ header.enter{animation:headerDrop .6s .05s cubic-bezier(.16,1,.3,1) both}
         <span class="soc-go">SUIVRE</span>
       </div>
     </a>
-    <a href="https://fr.tipeee.com/octogone-tracker/" target="_blank" rel="noopener">
+    <a class="ios-off" href="https://fr.tipeee.com/octogone-tracker/" target="_blank" rel="noopener">
       <div class="soc-card tipeee">
         <div class="soc-ic">☕</div>
         <div class="soc-t"><b>Soutenir Octogone-Tracker</b><small>L'app est gratuite — un café aide à la faire vivre !</small></div>
@@ -1096,73 +1103,125 @@ const FR_SET=new Set(["Ciryl Gane","Nassourdine Imavov","Benoît Saint Denis","M
 const FR_EXTRA=[["Salahdine Parnasse","Poids Légers"],["Morgan Charrière","Poids Plumes"],["Fares Ziam","Poids Légers"],["William Gomis","Poids Plumes"],["Kevin Jousset","Poids Welters"],["Taylor Lapilus","Poids Coqs"],["Oumar Sy","Mi-Lourds"],["Matthieu Letho Duclos","Poids Moyens"],["Axel Sola","Poids Welters"]];
 
 
-/* Photos officielles UFC.com additionnelles (combattants absents de l'API) — complété le 9 août 2026 */
+/* Portraits sous licence libre (Wikimedia Commons) — aucune image sous droits.
+   Format : nom -> [url, auteur, licence, page source]. L'auteur et la licence sont
+   affiches sous chaque photo, comme l'exigent les licences Creative Commons.
+   Un combattant absent d'ici s'affiche avec ses initiales (repli maison). */
 const PHOTOS={
-"Chidi Njokuani":"https://ufc.com/images/2023-03/NJOKUANI_CHIDI_03-25.png",
-"Myktybek Orolbai":"https://ufc.com/images/2026-03/OROLBAI_MYKTYBEK_03-14.png",
-"Jeremiah Wells":"https://ufc.com/images/2025-10/WELLS_JEREMIAH_11-01.png",
-"Vicente Luque":"https://ufc.com/images/2026-04/LUQUE_VICENTE_04-11.png",
-"Tresean Gore":"https://ufc.com/images/2026-04/GORE_TRESEAN_04-04.png",
-"Dustin Stoltzfus":"https://ufc.com/images/2025-09/STOLTZFUS_DUSTIN_09-13.png",
-"Mansur Abdul-Malik":"https://ufc.com/images/2026-03/ABDUL-MALIK_MANSUR_03-28.png",
-"Nursulton Ruziboev":"https://ufc.com/images/2026-06/RUZIBOEV_NURSULTON_06-27.png",
-"Felipe Lima":"https://ufc.com/images/2025-06/LIMA_FELIPE_06-28.png",
-"Nathaniel Wood":"https://ufc.com/images/2025-10/WOOD_NATHANIEL_10-25.png",
-"Mario Pinto":"https://ufc.com/images/2026-03/PINTO_MARIO_03-21.png",
-"Ryan Spann":"https://ufc.com/images/2026-04/SPANN_RYAN_04-25.png",
-"Kurtis Campbell":"https://ufc.com/images/2026-03/CAMPBELL_KURTIS_03-21.png",
-"Trevor Peek":"https://ufc.com/images/2024-09/PEEK_TREVOR_09-07.png",
-"Aaron Pico":"https://ufc.com/images/2025-08/PICO_AARON_08-16.png",
-"Alexia Thainara":"https://ufc.com/images/2026-08/THAINARA_ALEXIA_08-08.png",
-"Ante Delija":"https://ufc.com/images/2026-02/DELIJA_ANTE_02-21.png",
-"Axel Sola":"https://ufc.com/images/2026-07/SOLA_AXEL_07-25.png",
-"Bia Mesquita":"https://ufc.com/images/2025-10/MESQUITA_BIA_10-11.png",
-"Bo Nickal":"https://ufc.com/images/2026-06/NICKAL_BO_06-14.png",
-"Brando Peričić":"https://ufc.com/images/2026-04/PERICIC_BRANDO_05-02.png",
-"Christian Leroy Duncan":"https://ufc.com/images/2026-03/DUNCAN_CHRISTIAN_LEROY_03-21.png",
-"Daniel Rodriguez":"https://ufc.com/images/2026-07/RODRIGUEZ_DANIEL_08-01.png",
-"David Martinez":"https://ufc.com/images/2026-03/MARTINEZ_DAVID_02-28.png",
-"Edgar Chairez":"https://ufc.com/images/2026-02/CHAIREZ_EDGAR_02-28.png",
-"Eduarda Moura":"https://ufc.com/images/2026-02/MOURA_EDUARDA_02-07.png",
-"Fares Ziam":"https://ufc.com/images/2026-06/ZIAM_FARES_06-06.png",
-"Farid Basharat":"https://ufc.com/images/2026-07/BASHARAT_FARID_07-11.png",
-"Fatima Kline":"https://ufc.com/images/2025-11/KLINE_FATIMA_11-15.png",
-"Gabriel Bonfim":"https://ufc.com/images/2026-06/BONFIM_GABRIEL_06-06.png",
-"Gabriella Fernandes":"https://ufc.com/images/2026-03/FERNANDES_GABRIELLA_03-28.png",
-"Gregory Rodrigues":"https://ufc.com/images/2026-03/RODRIGUES_GREGORY_03-07.png",
-"Ikram Aliskerov":"https://ufc.com/images/2026-06/ALISKEROV_IKRAM_06-27.png",
-"Joe Pyfer":"https://ufc.com/images/2026-03/PYFER_JOE_03-28.png",
-"Josh Hokit":"https://ufc.com/images/2026-06/HOKIT_JOSH_06-14.png",
-"Kevin Jousset":"https://ufc.com/images/2025-02/JOUSSET_KEVIN_02-08.png",
-"Kevin Vallejos":"https://ufc.com/images/2025-12/VALLEJOS_KEVIN_12-13.png",
-"Kyoji Horiguchi":"https://ufc.com/images/2025-11/HORIGUCHI_KYOJI_11-22.png",
-"Lone'er Kavanagh":"https://ufc.com/images/2026-02/KAVANAGH_LONEER_02-28.png",
-"Luana Santos":"https://ufc.com/images/2026-06/SANTOS_LUANA_06-20.png",
-"Manuel Torres":"https://ufc.com/images/2026-06/TORRES_MANUEL_06-27.png",
-"Matthieu Letho Duclos":"https://ufc.com/images/2026-07/DUCLOS_MATTHIEU.png",
-"Mauricio Ruffy":"https://ufc.com/images/2026-06/RUFFY_MAURICIO_06-14.png",
-"Melissa Croden":"https://ufc.com/images/2025-10/CRODEN_MELISSA_10-18.png",
-"Melquizael Costa":"https://ufc.com/images/2026-02/COSTA_MELQUIZAEL_02-21.png",
-"Michael Venom Page":"https://ufc.com/images/2026-03/PAGE_MICHAEL_03-21.png",
-"Michelle Montague":"https://ufc.com/images/2026-04/MONTAGUE_MICHELLE_04-25.png",
-"Mike Malott":"https://ufc.com/images/2026-04/MALOTT_MIKE_04-18.png",
-"Mizuki":"https://ufc.com/images/2025-10/MIZUKI_10-25.png",
-"Navajo Stirling":"https://ufc.com/images/2026-07/STIRLING_NAVAJO_08-01.png",
-"Oumar Sy":"https://ufc.com/images/2026-03/SY_OUMAR_03-14.png",
-"Patricio Pitbull":"https://ufc.com/images/2026-04/PITBULL_PATRICIO_04-11.png",
-"Payton Talbott":"https://ufc.com/images/2025-12/TALBOTT_PAYTON_12-06.png",
-"Quillan Salkilld":"https://ufc.com/images/2026-08/SALKILLD_QUILLAN_08-08.png",
-"Raoni Barcelos":"https://ufc.com/images/2026-04/BARCELOS_RAONI_04-25.png",
-"Raul Rosas Jr.":"https://ufc.com/images/2026-03/ROSAS_JR_RAUL_03-07.png",
-"Steve Garcia":"https://ufc.com/images/2026-06/GARCIA_STEVE_06-14.png",
-"Taylor Lapilus":"https://ufc.com/images/2024-09/LAPILUS_TAYLOR_09-28.png",
-"Tom Nolan":"https://ufc.com/images/2025-09/NOLAN_TOM_09-27.png",
-"Tyrell Fortune":"https://ufc.com/images/2026-03/FORTUNE_TYRELL_03-28.png",
-"Uroš Medić":"https://ufc.com/images/2026-07/MEDIC_UROS_08-01.png",
-"Valter Walker":"https://ufc.com/images/2026-07/WALKER_VALTER_07-25.png",
-"William Gomis":"https://ufc.com/images/2026-05/GOMIS_WILLIAM_05-09.png",
-"Yaroslav Amosov":"https://ufc.com/images/2025-12/AMOSOV_YAROSLAV_12-13.png",
-"Morgan Charrière":"https://ufc.com/images/styles/athlete_bio_full_body/s3/2024-09/CHARRIERE_MORGAN_L_09-28.png?itok=U74Yn8DR"
+"Aaron Pico":["https://upload.wikimedia.org/wikipedia/commons/1/1b/Wrestler_Aaron_Pico_2014.png","WrestlingSavesLives","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Wrestler_Aaron_Pico_2014.png"],
+"Aiemann Zahabi":["https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/UFC_Freedom_250_Press_Conference_%289747954%29%28cropped%29.jpg/960px-UFC_Freedom_250_Press_Conference_%289747954%29%28cropped%29.jpg","U.S. Army photo by Sgt. 1st Class Brittany Primavera","Public domain","https://commons.wikimedia.org/wiki/File:UFC_Freedom_250_Press_Conference_(9747954)(cropped).jpg"],
+"Alex Pereira":["https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Alex_Pereira_in_the_Oval_Office_%28while_President_Donald_J._Trump_is_holding_a_meeting_with_UFC_fighters%29.jpg/960px-Alex_Pereira_in_the_Oval_Office_%28while_President_Donald_J._Trump_is_holding_a_meeting_with_UFC_fighters%29.jpg","The White House","Public domain","https://commons.wikimedia.org/wiki/File:Alex_Pereira_in_the_Oval_Office_(while_President_Donald_J._Trump_is_holding_a_meeting_with_UFC_fighters).jpg"],
+"Alexa Grasso":["https://upload.wikimedia.org/wikipedia/commons/a/ab/Alexa_Grasso_2020_01.png","La Tribuna","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Alexa_Grasso_2020_01.png"],
+"Alexander Volkanovski":["https://upload.wikimedia.org/wikipedia/commons/0/0f/Alexander_Volkanovski_at_UFC_232.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Alexander_Volkanovski_at_UFC_232.jpg"],
+"Alexandre Pantoja":["https://upload.wikimedia.org/wikipedia/commons/6/62/Pantoja_2025.jpg","Sexto Round","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Pantoja_2025.jpg"],
+"Aljamain Sterling":["https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Alijamain_Sterling_at_UFC_228.jpg/960px-Alijamain_Sterling_at_UFC_228.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Alijamain_Sterling_at_UFC_228.jpg"],
+"Alonzo Menifield":["https://upload.wikimedia.org/wikipedia/commons/e/e6/Alonzo_Menifield_Jan_20%2C_2019.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Alonzo_Menifield_Jan_20,_2019.jpg"],
+"Amanda Ribas":["https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Web_Summit_Rio_2023_-_6343_%2852868673328%29_%28cropped%29.jpg/960px-Web_Summit_Rio_2023_-_6343_%2852868673328%29_%28cropped%29.jpg","Web Summit Rio from Rio de Janeiro, Brazil","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Web_Summit_Rio_2023_-_6343_(52868673328)_(cropped).jpg"],
+"Angela Hill":["https://upload.wikimedia.org/wikipedia/commons/7/7c/Angela_Hill_victorious_at_Friday_Night_Fights.jpg","Friday Night Fights MuayThai","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Angela_Hill_victorious_at_Friday_Night_Fights.jpg"],
+"Arman Tsarukyan":["https://upload.wikimedia.org/wikipedia/commons/b/b9/Arman_Tsarukyan_2019.jpg","inFocus media","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Arman_Tsarukyan_2019.jpg"],
+"Arnold Allen":["https://upload.wikimedia.org/wikipedia/commons/0/07/Arnold_Allen_at_UFC_Fight_Night_147_in_London.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Arnold_Allen_at_UFC_Fight_Night_147_in_London.jpg"],
+"Asu Almabayev":["https://upload.wikimedia.org/wikipedia/commons/4/47/AsuAlmabayev.png","Qazaq Stand Up","CC BY 4.0","https://commons.wikimedia.org/wiki/File:AsuAlmabayev.png"],
+"Belal Muhammad":["https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Belal_Muhammad_UFC_%28cropped%29.jpg/960px-Belal_Muhammad_UFC_%28cropped%29.jpg","Inaquout","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Belal_Muhammad_UFC_(cropped).jpg"],
+"Beneil Dariush":["https://upload.wikimedia.org/wikipedia/commons/5/56/MMA_Holiday_Tour_at_Al_Asad_Air_Base_11_%28cropped%29.jpg","AL ASAD AIR BASE, IRAQ 12.18.2018 Photo by 1st Lt. Leland White 201st Regional Support Group","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:MMA_Holiday_Tour_at_Al_Asad_Air_Base_11_(cropped).jpg"],
+"Benoît Saint Denis":["https://upload.wikimedia.org/wikipedia/commons/1/17/Benoit_Saint_Denis_2023.png","ZACK","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Benoit_Saint_Denis_2023.png"],
+"Bo Nickal":["https://upload.wikimedia.org/wikipedia/commons/3/34/Bo_Nickal_%2852791819473%29.jpg","Noah Riffe","Public domain","https://commons.wikimedia.org/wiki/File:Bo_Nickal_(52791819473).jpg"],
+"Brandon Moreno":["https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Brandon_Moreno_February_2021.jpg/960px-Brandon_Moreno_February_2021.jpg","DiarioMMA","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Brandon_Moreno_February_2021.jpg"],
+"Brendan Allen":["https://upload.wikimedia.org/wikipedia/commons/9/9e/BrendanAllen.png","WEIGHING IN","CC BY 4.0","https://commons.wikimedia.org/wiki/File:BrendanAllen.png"],
+"Brian Ortega":["https://upload.wikimedia.org/wikipedia/commons/9/9f/Brian_Ortega_on_MMAnytt.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Brian_Ortega_on_MMAnytt.jpg"],
+"Caio Borralho":["https://upload.wikimedia.org/wikipedia/commons/4/42/Caio_Borralho_2025.jpg","Sexto Round","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Caio_Borralho_2025.jpg"],
+"Carlos Prates":["https://upload.wikimedia.org/wikipedia/commons/0/0a/Carlos_Prates_2026.jpg","Sexto Round","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Carlos_Prates_2026.jpg"],
+"Carlos Ulberg":["https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Motorcycle_stunts_on_the_South_Lawn_of_the_White_House_ahead_of_UFC_Freedom_250%2C_Saturday%2C_June_13%2C_2026_-_11%28cropped%29.jpg/960px-Motorcycle_stunts_on_the_South_Lawn_of_the_White_House_ahead_of_UFC_Freedom_250%2C_Saturday%2C_June_13%2C_2026_-_11%28cropped%29.jpg","The White House","Public domain","https://commons.wikimedia.org/wiki/File:Motorcycle_stunts_on_the_South_Lawn_of_the_White_House_ahead_of_UFC_Freedom_250,_Saturday,_June_13,_2026_-_11(cropped).jpg"],
+"Charles Oliveira":["https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Charles_Oliveira_do_Bronxs.jpg/960px-Charles_Oliveira_do_Bronxs.jpg","Renan Silva","CC0","https://commons.wikimedia.org/wiki/File:Charles_Oliveira_do_Bronxs.jpg"],
+"Ciryl Gane":["https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/UFC_Freedom_250%2C_the_mixed_martial_arts_event_produced_by_the_Ultimate_Fighting_Championship%2C_Sunday%2C_June_14%2C_2026%2C_in_the_Grand_Foyer_of_the_White_House_-_64%28cropped%29.jpg/960px-thumbnail.jpg","The White House","Public domain","https://commons.wikimedia.org/wiki/File:UFC_Freedom_250,_the_mixed_martial_arts_event_produced_by_the_Ultimate_Fighting_Championship,_Sunday,_June_14,_2026,_in_the_Grand_Foyer_of_the_White_House_-_64(cropped).jpg"],
+"Colby Covington":["https://upload.wikimedia.org/wikipedia/commons/1/18/ColbyCovingtonFortJackson2022%28cropped%29.jpg","Alexandra Shea","CC0","https://commons.wikimedia.org/wiki/File:ColbyCovingtonFortJackson2022(cropped).jpg"],
+"Cory Sandhagen":["https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/UFC%27s_Corey_Sandhagen_brings_his_fighting_spirit_to_the_1st_SOW_%281%29_%28cropped%29.jpg/960px-UFC%27s_Corey_Sandhagen_brings_his_fighting_spirit_to_the_1st_SOW_%281%29_%28cropped%29.jpg","Senior Airman Ty Pilgrim","Public domain","https://commons.wikimedia.org/wiki/File:UFC%27s_Corey_Sandhagen_brings_his_fighting_spirit_to_the_1st_SOW_(1)_(cropped).jpg"],
+"Curtis Blaydes":["https://upload.wikimedia.org/wikipedia/commons/c/c2/Curtis_Blaydes_at_UFC_221.png","MMA Zone","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Curtis_Blaydes_at_UFC_221.png"],
+"Dan Hooker":["https://upload.wikimedia.org/wikipedia/commons/1/14/DanHooker2016.png","Fight Bros NZ","CC BY 3.0","https://commons.wikimedia.org/wiki/File:DanHooker2016.png"],
+"Dan Ige":["https://upload.wikimedia.org/wikipedia/commons/d/dd/Dan_Ige_at_UFC_Fight_Night_147_in_London.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Dan_Ige_at_UFC_Fight_Night_147_in_London.jpg"],
+"Deiveson Figueiredo":["https://upload.wikimedia.org/wikipedia/commons/a/a2/Deiveson_Figueiredo_2024.jpg","Show Me The Money","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Deiveson_Figueiredo_2024.jpg"],
+"Derrick Lewis":["https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Derrick_Lewis_after_UFC_239.jpg/960px-Derrick_Lewis_after_UFC_239.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Derrick_Lewis_after_UFC_239.jpg"],
+"Dominick Reyes":["https://upload.wikimedia.org/wikipedia/commons/5/5a/Dominick_Reyes_%2854451224096%29.jpg","The White House","Public domain","https://commons.wikimedia.org/wiki/File:Dominick_Reyes_(54451224096).jpg"],
+"Dricus Du Plessis":["https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/IMG-Dricus-Duplessis%28cropped%29.jpg/960px-IMG-Dricus-Duplessis%28cropped%29.jpg","User:Philippe3017","CC0","https://commons.wikimedia.org/wiki/File:IMG-Dricus-Duplessis(cropped).jpg"],
+"Dustin Poirier":["https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Dustin_poirier_2024.jpg/960px-Dustin_poirier_2024.jpg","Poatanfan24","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Dustin_poirier_2024.jpg"],
+"Gabriel Bonfim":["https://upload.wikimedia.org/wikipedia/commons/3/34/Gabriel_Bonfim_2025.jpg","Sexto Round","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Gabriel_Bonfim_2025.jpg"],
+"Geoff Neal":["https://upload.wikimedia.org/wikipedia/commons/a/ab/Geoff_Neal_at_UFC_228.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Geoff_Neal_at_UFC_228.jpg"],
+"Giga Chikadze":["https://upload.wikimedia.org/wikipedia/commons/5/55/Giga_Chikadze_post_fight_interview_at_UFC_Fight_Night_160_in_Copenhagen.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Giga_Chikadze_post_fight_interview_at_UFC_Fight_Night_160_in_Copenhagen.jpg"],
+"Gilbert Burns":["https://upload.wikimedia.org/wikipedia/commons/a/ad/Gilbert_Burns_2024.png","Sexto Round","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Gilbert_Burns_2024.png"],
+"Gillian Robertson":["https://upload.wikimedia.org/wikipedia/commons/1/1a/Gillian_Robertson.png","MM-eh","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Gillian_Robertson.png"],
+"Gregory Rodrigues":["https://upload.wikimedia.org/wikipedia/commons/4/49/GregoryRodrigues.png","Show Me The Money","CC BY 3.0","https://commons.wikimedia.org/wiki/File:GregoryRodrigues.png"],
+"Henry Cejudo":["https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Henry_Cejudo_%2854235464255%29_%28cropped%29.jpg/960px-Henry_Cejudo_%2854235464255%29_%28cropped%29.jpg","Gage Skidmore from Surprise, AZ, United States of America","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Henry_Cejudo_(54235464255)_(cropped).jpg"],
+"Ian Machado Garry":["https://upload.wikimedia.org/wikipedia/commons/e/ee/IanGarry.jpg","Oisinvg","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:IanGarry.jpg"],
+"Ikram Aliskerov":["https://upload.wikimedia.org/wikipedia/commons/2/2e/Ikram_Aliskerov_2024.png","Sexto Round","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Ikram_Aliskerov_2024.png"],
+"Ilia Topuria":["https://upload.wikimedia.org/wikipedia/commons/7/79/Ilia_Topuria_in_the_Oval_Office_%28while_President_Donald_J._Trump_is_holding_a_meeting_with_UFC_fighters%29.jpg","The White House","Public domain","https://commons.wikimedia.org/wiki/File:Ilia_Topuria_in_the_Oval_Office_(while_President_Donald_J._Trump_is_holding_a_meeting_with_UFC_fighters).jpg"],
+"Irene Aldana":["https://upload.wikimedia.org/wikipedia/commons/7/79/Irene_Aldana_UFC_2023_02.png","Esporte na Band","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Irene_Aldana_UFC_2023_02.png"],
+"Islam Makhachev":["https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Islam_Makhachev_and_Sergey_Melikov_2025_%28cropped%29.jpg/960px-Islam_Makhachev_and_Sergey_Melikov_2025_%28cropped%29.jpg","Unknown authorUnknown author","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Islam_Makhachev_and_Sergey_Melikov_2025_(cropped).jpg"],
+"Israel Adesanya":["https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Israel_Adesanya_at_UFC_230.jpg/960px-Israel_Adesanya_at_UFC_230.jpg","MMMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Israel_Adesanya_at_UFC_230.jpg"],
+"Jailton Almeida":["https://upload.wikimedia.org/wikipedia/commons/a/a2/Almeida_2023.png","Sexto Round","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Almeida_2023.png"],
+"Jan Błachowicz":["https://upload.wikimedia.org/wikipedia/commons/a/ab/Jan_Blachowicz_at_UFC_Fight_Night_136.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Jan_Blachowicz_at_UFC_Fight_Night_136.jpg"],
+"Jared Cannonier":["https://upload.wikimedia.org/wikipedia/commons/f/f0/Jared_Cannonier_at_UFC_Fight_Night_160_in_Copenhagen.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Jared_Cannonier_at_UFC_Fight_Night_160_in_Copenhagen.jpg"],
+"Jasmine Jasudavicius":["https://upload.wikimedia.org/wikipedia/commons/5/57/Jasmine_Jasudavicius_2023.png","MM-eh","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Jasmine_Jasudavicius_2023.png"],
+"Jean Silva":["https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Jean_Silva_%2854451587575%29.jpg/960px-Jean_Silva_%2854451587575%29.jpg","The White House","Public domain","https://commons.wikimedia.org/wiki/File:Jean_Silva_(54451587575).jpg"],
+"Jéssica Andrade":["https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Jessica_Andrade_at_UFC_228.jpg/960px-Jessica_Andrade_at_UFC_228.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Jessica_Andrade_at_UFC_228.jpg"],
+"Jiří Procházka":["https://upload.wikimedia.org/wikipedia/commons/7/74/JiriProchazka2022.png","Show Jana Krause","CC BY 3.0","https://commons.wikimedia.org/wiki/File:JiriProchazka2022.png"],
+"Joe Pyfer":["https://upload.wikimedia.org/wikipedia/commons/7/7e/JoePyfer.jpg","Checkin' Ringside","CC BY 4.0","https://commons.wikimedia.org/wiki/File:JoePyfer.jpg"],
+"Josh Emmett":["https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/In_Their_Corner_UFC_Visits_Walter_Reed_Warriors_%287%29_%28cropped%29.jpg/960px-In_Their_Corner_UFC_Visits_Walter_Reed_Warriors_%287%29_%28cropped%29.jpg","Ricardo J. Reyes","Public domain","https://commons.wikimedia.org/wiki/File:In_Their_Corner_UFC_Visits_Walter_Reed_Warriors_(7)_(cropped).jpg"],
+"Josh Hokit":["https://upload.wikimedia.org/wikipedia/commons/7/7d/UFC_Freedom_250_Press_Conference_%289747953%29_%28cropped%29.jpg","U.S. Army photo by Sgt. 1st Class Brittany Primavera","Public domain","https://commons.wikimedia.org/wiki/File:UFC_Freedom_250_Press_Conference_(9747953)_(cropped).jpg"],
+"Julianna Peña":["https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Ceremonial_weigh_ins_-_Amanda_Nunes_vs_Julianna_Pe%C3%B1a_UFC_269_-_YouTube_-_0_23_%28cropped%29.jpg/960px-Ceremonial_weigh_ins_-_Amanda_Nunes_vs_Julianna_Pe%C3%B1a_UFC_269_-_YouTube_-_0_23_%28cropped%29.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Ceremonial_weigh_ins_-_Amanda_Nunes_vs_Julianna_Pe%C3%B1a_UFC_269_-_YouTube_-_0_23_(cropped).jpg"],
+"Justin Gaethje":["https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Justin_Gaethje_in_the_Oval_Office_%28while_President_Donald_J._Trump_is_holding_a_meeting_with_UFC_fighters%29.jpg/960px-Justin_Gaethje_in_the_Oval_Office_%28while_President_Donald_J._Trump_is_holding_a_meeting_with_UFC_fighters%29.jpg","The White House","Public domain","https://commons.wikimedia.org/wiki/File:Justin_Gaethje_in_the_Oval_Office_(while_President_Donald_J._Trump_is_holding_a_meeting_with_UFC_fighters).jpg"],
+"Kai Asakura":["https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Kai_Asakura_2023.png/960px-Kai_Asakura_2023.png","ホタテマン0010","CC BY 4.0","https://commons.wikimedia.org/wiki/File:Kai_Asakura_2023.png"],
+"Kai Kara-France":["https://upload.wikimedia.org/wikipedia/commons/8/8d/Kaikarafrance.png","ZalesDB","CC0","https://commons.wikimedia.org/wiki/File:Kaikarafrance.png"],
+"Kamaru Usman":["https://upload.wikimedia.org/wikipedia/commons/0/05/KamaruUsmanPress2018.png","MMAnytt","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:KamaruUsmanPress2018.png"],
+"Kayla Harrison":["https://upload.wikimedia.org/wikipedia/commons/9/99/President_Donald_Trump_congratulates_Kayla_Harrison_after_her_victory_during_UFC_316_%2854577590491%29_%28cropped%29.jpg","The White House","Public domain","https://commons.wikimedia.org/wiki/File:President_Donald_Trump_congratulates_Kayla_Harrison_after_her_victory_during_UFC_316_(54577590491)_(cropped).jpg"],
+"Kevin Holland":["https://upload.wikimedia.org/wikipedia/commons/7/71/Kevin_Holland_at_UFC_316_%2854576727207%29.jpg","The White House","Public domain","https://commons.wikimedia.org/wiki/File:Kevin_Holland_at_UFC_316_(54576727207).jpg"],
+"Khalil Rountree Jr.":["https://upload.wikimedia.org/wikipedia/commons/d/d1/Khalil_Rountree%2C_Jr.._%28cropped%29.jpg","Slsinc","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Khalil_Rountree,_Jr.._(cropped).jpg"],
+"Khamzat Chimaev":["https://upload.wikimedia.org/wikipedia/commons/b/b3/Khamzat_Chimaev_2022_%28cropped%29.png","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Khamzat_Chimaev_2022_(cropped).png"],
+"Kyoji Horiguchi":["https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Kyoji_Horiguchi_2017.jpg/960px-Kyoji_Horiguchi_2017.jpg","Bruno Massami","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Kyoji_Horiguchi_2017.jpg"],
+"Leon Edwards":["https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Leon_Edwards_2021.png/960px-Leon_Edwards_2021.png","James English","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Leon_Edwards_2021.png"],
+"Mackenzie Dern":["https://upload.wikimedia.org/wikipedia/commons/4/40/Mackenzie_Dern.png","Canal Faixa Preta","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Mackenzie_Dern.png"],
+"Magomed Ankalaev":["https://upload.wikimedia.org/wikipedia/commons/6/63/Magomed_Ankalaev_at_UFC_Fight_Night_136_in_Moscow%2C_Russia.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Magomed_Ankalaev_at_UFC_Fight_Night_136_in_Moscow,_Russia.jpg"],
+"Manel Kape":["https://upload.wikimedia.org/wikipedia/commons/a/a4/ManelKape2017.png","Bruno Massami","CC BY 3.0","https://commons.wikimedia.org/wiki/File:ManelKape2017.png"],
+"Manon Fiorot":["https://upload.wikimedia.org/wikipedia/commons/c/c1/MANON_FIOROT_ET_ALDRIC_CASSATA%2C_LE_COUPLE_GOAL_DU_MMA_-_MMA_EXTRA_ROUND_-22_-_YouTube_-_0-28-31_%28cropped%29.jpg","Lucie Bertaud","CC BY 3.0","https://commons.wikimedia.org/wiki/File:MANON_FIOROT_ET_ALDRIC_CASSATA,_LE_COUPLE_GOAL_DU_MMA_-_MMA_EXTRA_ROUND_-22_-_YouTube_-_0-28-31_(cropped).jpg"],
+"Marlon Vera":["https://upload.wikimedia.org/wikipedia/commons/c/c0/Marlon_%22Chito%22_Vera_2019.jpg","Asamblea Nacional del Ecuador","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Marlon_%22Chito%22_Vera_2019.jpg"],
+"Mateusz Gamrot":["https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Mateusz_Gamrot.jpg/960px-Mateusz_Gamrot.jpg","Roger Gor","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Mateusz_Gamrot.jpg"],
+"Mauricio Ruffy":["https://upload.wikimedia.org/wikipedia/commons/a/ad/UFC_Freedom_250_press_conference_at_the_Lincoln_Memorial_in_Washington%2C_D.C.%2C_Friday%2C_June_12%2C_2026_-_22%28cropped%29.jpg","The White House","Public domain","https://commons.wikimedia.org/wiki/File:UFC_Freedom_250_press_conference_at_the_Lincoln_Memorial_in_Washington,_D.C.,_Friday,_June_12,_2026_-_22(cropped).jpg"],
+"Max Holloway":["https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Blue_Angels%27_VIP_Rider_Max_Holloway_%281%29_%28cropped%29.jpg/960px-Blue_Angels%27_VIP_Rider_Max_Holloway_%281%29_%28cropped%29.jpg","Cpl. Samantha Sanchez","Public domain","https://commons.wikimedia.org/wiki/File:Blue_Angels%27_VIP_Rider_Max_Holloway_(1)_(cropped).jpg"],
+"Merab Dvalishvili":["https://upload.wikimedia.org/wikipedia/commons/6/66/Merab_Dvalishvili_at_UFC_316_%28cropped%29.jpg","Margo Martin","Public domain","https://commons.wikimedia.org/wiki/File:Merab_Dvalishvili_at_UFC_316_(cropped).jpg"],
+"Michael Chandler":["https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/MichaelChandler0523_%28cropped%29.jpg/960px-MichaelChandler0523_%28cropped%29.jpg","Gage Skidmore","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:MichaelChandler0523_(cropped).jpg"],
+"Michael Page":["https://upload.wikimedia.org/wikipedia/commons/0/0e/Michael_Venom_Page.png","Hrhr prph","CC0","https://commons.wikimedia.org/wiki/File:Michael_Venom_Page.png"],
+"Miesha Tate":["https://upload.wikimedia.org/wikipedia/commons/2/26/MCAS_Yuma_hosts_MMA_Fight_Night_with_guest_of_honor%2C_Miesha_Tate_%286%29_%28cropped%29.jpg","Cpl. Gideon Schippers","Public domain","https://commons.wikimedia.org/wiki/File:MCAS_Yuma_hosts_MMA_Fight_Night_with_guest_of_honor,_Miesha_Tate_(6)_(cropped).jpg"],
+"Mike Malott":["https://upload.wikimedia.org/wikipedia/commons/3/3c/Mike-malott-2023-ufc-fighter-canada.png","Btcfight","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Mike-malott-2023-ufc-fighter-canada.png"],
+"Montel Jackson":["https://upload.wikimedia.org/wikipedia/commons/a/ac/Montel_Jackson_at_UFC_232.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Montel_Jackson_at_UFC_232.jpg"],
+"Movsar Evloev":["https://upload.wikimedia.org/wikipedia/commons/b/ba/Movsar_Evloev_M-1_Challenge_2018.jpg","Press Service of the Head and Government of the Republic of Ingushetia","CC BY 4.0","https://commons.wikimedia.org/wiki/File:Movsar_Evloev_M-1_Challenge_2018.jpg"],
+"Nassourdine Imavov":["https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Nassourdine_Imavov.jpg/960px-Nassourdine_Imavov.jpg","JoeKhanMMA","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Nassourdine_Imavov.jpg"],
+"Norma Dumont":["https://upload.wikimedia.org/wikipedia/commons/a/a1/Norma_Dumont_OF.jpg","OnlyFans","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Norma_Dumont_OF.jpg"],
+"Nursulton Ruziboev":["https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/NursultonRuziboev2024.png/960px-NursultonRuziboev2024.png","SPORTS UZ","CC BY 3.0","https://commons.wikimedia.org/wiki/File:NursultonRuziboev2024.png"],
+"Paddy Pimblett":["https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/UFC_Star_Paddy_The_Baddy_Pimblett_tells_his_story_%28cropped%29.jpg/960px-UFC_Star_Paddy_The_Baddy_Pimblett_tells_his_story_%28cropped%29.jpg","James English","CC BY 3.0","https://commons.wikimedia.org/wiki/File:UFC_Star_Paddy_The_Baddy_Pimblett_tells_his_story_(cropped).jpg"],
+"Patricio Pitbull":["https://upload.wikimedia.org/wikipedia/commons/3/3e/Freire_2023.png","Sexto Round","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Freire_2023.png"],
+"Paulo Costa":["https://upload.wikimedia.org/wikipedia/commons/b/ba/Borrachinha_galo.jpg","Rafaelbruno13","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Borrachinha_galo.jpg"],
+"Petr Yan":["https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Vladimir_Putin_at_award_ceremonies_%282026-04-22%29_24%28cropped%29.jpg/960px-Vladimir_Putin_at_award_ceremonies_%282026-04-22%29_24%28cropped%29.jpg","kremlin.ru","CC BY 4.0","https://commons.wikimedia.org/wiki/File:Vladimir_Putin_at_award_ceremonies_(2026-04-22)_24(cropped).jpg"],
+"Rafael Fiziev":["https://upload.wikimedia.org/wikipedia/commons/f/f9/Fiziev_2023.png","SPORTS UZ","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Fiziev_2023.png"],
+"Raquel Pennington":["https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Raquel_Pennington_MCCS_Twentynine_Palms_presents_an_action-packed_MMA_Fight_Night_Live_at_The_Combat_Center_%285%29_%28cropped%29.jpg/960px-Raquel_Pennington_MCCS_Twentynine_Palms_presents_an_action-packed_MMA_Fight_Night_Live_at_The_Combat_Center_%285%29_%28cropped%29.jpg","Lance Cpl. Enge You","Public domain","https://commons.wikimedia.org/wiki/File:Raquel_Pennington_MCCS_Twentynine_Palms_presents_an_action-packed_MMA_Fight_Night_Live_at_The_Combat_Center_(5)_(cropped).jpg"],
+"Raul Rosas Jr.":["https://upload.wikimedia.org/wikipedia/commons/b/b4/Ra%C3%BAl_Rosas_Jr._2024.png","Chamatkar Sandhu","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Ra%C3%BAl_Rosas_Jr._2024.png"],
+"Reinier de Ridder":["https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Reinier_post_training_2.jpg/960px-Reinier_post_training_2.jpg","ReinierdeRidder","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Reinier_post_training_2.jpg"],
+"Renato Moicano":["https://upload.wikimedia.org/wikipedia/commons/e/e6/Renato_Moicano_2025.jpg","Sexto Round","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Renato_Moicano_2025.jpg"],
+"Rob Font":["https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/FONT.jpg/960px-FONT.jpg","Matchmakermike","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:FONT.jpg"],
+"Roman Dolidze":["https://upload.wikimedia.org/wikipedia/commons/2/26/Dolidze_2019.jpg","ID MENTOR","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Dolidze_2019.jpg"],
+"Rose Namajunas":["https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Rose_Namajunas.jpg/960px-Rose_Namajunas.jpg","Andy Grahn","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Rose_Namajunas.jpg"],
+"Sean Strickland":["https://upload.wikimedia.org/wikipedia/commons/4/44/Sean_Strickland_at_UFN_200.png","MMAnytt","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Sean_Strickland_at_UFN_200.png"],
+"Sergei Pavlovich":["https://upload.wikimedia.org/wikipedia/commons/e/ec/SergeiPavlovich2018.png","Страна FM","CC BY 3.0","https://commons.wikimedia.org/wiki/File:SergeiPavlovich2018.png"],
+"Shavkat Rakhmonov":["https://upload.wikimedia.org/wikipedia/commons/e/ed/Shavkat_Rakhmonov_%28cropped%29.jpg","Ruslankyrykbayev","CC0","https://commons.wikimedia.org/wiki/File:Shavkat_Rakhmonov_(cropped).jpg"],
+"Steve Garcia":["https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/UFC_Freedom_250_press_conference_at_the_Lincoln_Memorial_in_Washington%2C_D.C.%2C_Friday%2C_June_12%2C_2026_-_10%28cropped%29.jpg/960px-UFC_Freedom_250_press_conference_at_the_Lincoln_Memorial_in_Washington%2C_D.C.%2C_Friday%2C_June_12%2C_2026_-_10%28cropped%29.jpg","The White House","Public domain","https://commons.wikimedia.org/wiki/File:UFC_Freedom_250_press_conference_at_the_Lincoln_Memorial_in_Washington,_D.C.,_Friday,_June_12,_2026_-_10(cropped).jpg"],
+"Tai Tuivasa":["https://upload.wikimedia.org/wikipedia/commons/2/2d/Tai_Tuivasa_at_UFC_234.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Tai_Tuivasa_at_UFC_234.jpg"],
+"Tallison Teixeira":["https://upload.wikimedia.org/wikipedia/commons/8/86/Tallison_Teixeira_2025.jpg","Sexto Round","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Tallison_Teixeira_2025.jpg"],
+"Tatiana Suarez":["https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Tatiana_Suarez_at_UFC_228.jpg/960px-Tatiana_Suarez_at_UFC_228.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Tatiana_Suarez_at_UFC_228.jpg"],
+"Tatsuro Taira":["https://upload.wikimedia.org/wikipedia/commons/d/d2/Tatsuro_taira_2025.png","에이든 우지","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Tatsuro_taira_2025.png"],
+"Tracy Cortez":["https://upload.wikimedia.org/wikipedia/commons/5/58/Tracy_Cortez_UFC.png","We Fight All Night","CC BY 4.0","https://commons.wikimedia.org/wiki/File:Tracy_Cortez_UFC.png"],
+"Umar Nurmagomedov":["https://upload.wikimedia.org/wikipedia/commons/5/5e/UmarNurmagomedov.png","Новости ННТ","CC BY 3.0","https://commons.wikimedia.org/wiki/File:UmarNurmagomedov.png"],
+"Valentina Shevchenko":["https://upload.wikimedia.org/wikipedia/commons/7/79/Valentina_Shevchenko_2020.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Valentina_Shevchenko_2020.jpg"],
+"Vinicius Oliveira":["https://upload.wikimedia.org/wikipedia/commons/8/8b/Vinicius_Oliveira_2026.jpg","Sexto Round","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Vinicius_Oliveira_2026.jpg"],
+"Volkan Oezdemir":["https://upload.wikimedia.org/wikipedia/commons/d/d6/Volkan_Oezdemir_at_UFC_Fight_Night_153_in_Stockholm%2C_Sweden.jpg","MMAnytt","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Volkan_Oezdemir_at_UFC_Fight_Night_153_in_Stockholm,_Sweden.jpg"],
+"Yair Rodriguez":["https://upload.wikimedia.org/wikipedia/commons/8/89/Carrera_con_Yair_%22Pantera%22_Rodr%C3%ADguez_-i---i-_%2830657689682%29_cropped.jpg","File:Carrera con Yair \"Pantera\" Rodríguez -i---i- (30657689682).jpg: PLEASE COMPLETE AUTHOR INFORMATION derivative work: Alexander Gustafsson","CC0","https://commons.wikimedia.org/wiki/File:Carrera_con_Yair_%22Pantera%22_Rodr%C3%ADguez_-i---i-_(30657689682)_cropped.jpg"],
+"Zhang Weili":["https://upload.wikimedia.org/wikipedia/commons/4/4d/%E5%BC%A0%E4%BC%9F%E4%B8%BD.png","中国新闻网","CC BY 3.0","https://commons.wikimedia.org/wiki/File:%E5%BC%A0%E4%BC%9F%E4%B8%BD.png"]
 };
 
 /* Analyses IA par combat — régénérées chaque lundi par l'IA de maintenance.
@@ -1498,14 +1557,11 @@ function renderEvents(){
   }).join("");
   open.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add("open")});
 }
-/* Bandeau du splash — photos officielles ufc.com (aucune photo de presse/Getty, licence sûre) */
-const SPLASH_HERO=[
-{n:"Khamzat Chimaev",u:"https://ufc.com/images/2025-05/CHIMAEV_KHAMZAT_10-26.png"},
-{n:"Islam Makhachev",u:"https://ufc.com/images/2025-01/7/MAKHACHEV_ISLAM_BELT_01-18.png"},
-{n:"Alex Pereira",u:"https://ufc.com/images/2025-10/PEREIRA_ALEX_10-04.png"},
-{n:"Diego Lopes",u:"https://ufc.com/images/2026-06/LOPES_DIEGO_06-14.png"}
-];
-$("#sp-hero").innerHTML=SPLASH_HERO.map(c=>`<div class="sh-item" title="${c.n}"><div class="sh-img" style="background-image:url('${c.u}')"></div><div class="sh-vig"></div><div class="sh-red"></div></div>`).join("");
+/* Bandeau du splash — puise dans PHOTOS (Wikimedia Commons, licences libres).
+   Le credit des quatre portraits est affiche sous le logo. */
+const SPLASH_HERO=["Khamzat Chimaev","Islam Makhachev","Alex Pereira","Ilia Topuria"].filter(n=>PHOTOS[n]);
+$("#sp-hero").innerHTML=SPLASH_HERO.map(nom=>`<div class="sh-item" title="${nom}"><div class="sh-img" style="background-image:url('${PHOTOS[nom][0]}')"></div><div class="sh-vig"></div><div class="sh-red"></div></div>`).join("");
+$("#sp-credit").textContent="Portraits : "+SPLASH_HERO.map(nom=>PHOTOS[nom][1]+" ("+PHOTOS[nom][2]+")").join(" · ")+" — Wikimedia Commons";
 renderEvents();
 renderPronoCard();
 renderHQ();renderArena();
@@ -1525,7 +1581,10 @@ function findApi(name){
   const k=Object.keys(apiCache).find(k=>slug(apiCache[k].name)===s);
   return k?apiCache[k]:null;
 }
-function photoOf(name){if(PHOTOS[name])return PHOTOS[name];const f=findApi(name);return f&&f.imgUrl?f.imgUrl.replace(/'/g,""):null}
+function photoOf(name){const p=PHOTOS[name];return p?p[0]:null}
+/* Mention d'attribution exigee par les licences Creative Commons. */
+function photoCredit(name){const p=PHOTOS[name];if(!p)return"";
+  return `<p class="credit">📷 <a href="${p[3]}" target="_blank" rel="noopener">Photo</a> par ${p[1]} — ${p[2]}, via Wikimedia Commons.</p>`}
 
 /* ============ CLASSEMENTS ============ */
 let curDiv=1;
@@ -1607,7 +1666,7 @@ async function openFighter(name){
       </div>
     </div>`;
   if(meta.fr)setFlag("fr");
-  const purl0=PHOTOS[name];
+  const purl0=photoOf(name);
   if(purl0){const img=new Image();img.className="fp-photo";img.alt=name;
     img.onload=()=>{const st=$("#fp-stage");if(st){const fb=$("#fp-fallback");if(fb)fb.remove();st.appendChild(img)}};
     img.src=purl0;}
@@ -1616,11 +1675,6 @@ async function openFighter(name){
   if(f){
     const fl=flagOf(f.placeOfBirth)||(meta.fr?"fr":null);
     if(fl)setFlag(fl);
-    if(!purl0&&f.imgUrl){
-      const img=new Image();img.className="fp-photo";img.alt=name;
-      img.onload=()=>{const st=$("#fp-stage");if(st){const fb=$("#fp-fallback");if(fb)fb.remove();st.appendChild(img)}};
-      img.src=f.imgUrl.replace(/'/g,"");
-    }
     if(f.nickname)$("#fp-nick").textContent='« '+f.nickname+' »';
     const stat=(l,v)=>v&&v!=="0.00"?`<div class="stat"><span>${l}</span>${v}</div>`:"";
     $("#fp-body").innerHTML=`
@@ -1633,7 +1687,8 @@ async function openFighter(name){
         ${stat("Style",f.fightingStyle)}${stat("Camp",f.trainsAt)}
         ${stat("Origine",f.placeOfBirth)}${stat("Début UFC",f.octagonDebut)}
       </div>
-      <p style="color:var(--mut);font-size:11px;margin-top:10px">Photo officielle UFC.com · Stats via API publique — le record peut avoir quelques combats de retard. Historique complet via le bouton UFC.com.</p>`;
+      ${photoCredit(name)}
+      <p style="color:var(--mut);font-size:11px;margin-top:10px">Stats via API publique — le record peut avoir quelques combats de retard. Historique complet via le bouton ci-dessous.</p>`;
     document.querySelectorAll(".cnt").forEach(el=>{
       const target=parseInt(el.dataset.v)||0;let cur=0;
       const step=Math.max(1,Math.ceil(target/22));
@@ -1641,7 +1696,7 @@ async function openFighter(name){
     });
   }else{
     $("#fp-body").innerHTML=`<div class="rec"><div><b>–</b><span>Victoires</span></div><div><b>–</b><span>Défaites</span></div><div><b>–</b><span>Nuls</span></div></div>
-    <p style="color:var(--mut);font-size:12.5px;line-height:1.5">Stats détaillées indisponibles ${apiCache==="err"?"(pas de connexion internet ou API hors ligne)":"pour ce combattant (récemment classé)"} — utilise les boutons ci-dessous pour la fiche complète, la photo officielle et l'historique des combats.</p>`;
+    <p style="color:var(--mut);font-size:12.5px;line-height:1.5">Stats détaillées indisponibles ${apiCache==="err"?"(pas de connexion internet ou API hors ligne)":"pour ce combattant (récemment classé)"} — utilise les boutons ci-dessous pour la fiche complète et l'historique des combats.</p>${photoCredit(name)}`;
   }
 }
 function closeModal(){$("#modal").classList.remove("on")}
@@ -2104,6 +2159,7 @@ function capNative(){
   if(typeof C.nativePromise !== "function" || typeof C.addListener !== "function") return null;
   return C;
 }
+if(capNative())document.documentElement.classList.add("native");
 const pnCall = (method, options) => capNative().nativePromise("PushNotifications", method, options || {});
 function webPushSupported(){
   return ("serviceWorker" in navigator) && ("PushManager" in window);
