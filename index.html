@@ -2091,15 +2091,21 @@ function urlBase64ToUint8Array(base64String){
   const raw=atob(base64);
   return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
 }
+function pushSupported(){
+  return ("serviceWorker" in navigator) && ("PushManager" in window);
+}
 function updateBell(){
-  const on = localStorage.getItem("octogone_push_enabled")==="1";
-  document.getElementById("pushBell")?.classList.toggle("on", on);
+  const bell = document.getElementById("pushBell");
+  if(!bell) return;
+  /* Le Web Push n'existe pas dans la WebView des apps natives iOS (ni dans
+     Safari iOS hors écran d'accueil) : on masque la cloche plutôt que de
+     proposer un bouton qui ne peut qu'échouer. */
+  if(!pushSupported()){ bell.style.display="none"; return; }
+  bell.style.display="";
+  bell.classList.toggle("on", localStorage.getItem("octogone_push_enabled")==="1");
 }
 async function togglePush(){
-  if(!("serviceWorker" in navigator) || !("PushManager" in window)){
-    alert("Les notifications ne sont pas prises en charge sur cet appareil/navigateur.");
-    return;
-  }
+  if(!pushSupported()){ updateBell(); return; }
   const enabled = localStorage.getItem("octogone_push_enabled")==="1";
   const reg = await navigator.serviceWorker.ready;
   if(enabled){
