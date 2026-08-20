@@ -2106,7 +2106,25 @@ function capNative(){
   if(typeof C.nativePromise !== "function" || typeof C.addListener !== "function") return null;
   return C;
 }
-if(capNative())document.documentElement.classList.add("native");
+/* Masquage de l'interface propre à l'app native (.ios-off).
+
+   On n'utilise PAS capNative() ici : celui-ci exige en plus un pont utilisable
+   (nativePromise + addListener), nécessaire aux notifications mais pas à
+   l'affichage. Si le pont n'est que partiellement peuplé au moment où ce script
+   s'exécute, capNative() rend null et .ios-off resterait visible — donc un lien
+   de soutien affiché dans l'app iOS, alors que la lettre de review affirme à
+   Apple qu'il n'y en a aucun. On teste donc seulement la plateforme, et on
+   réapplique aux deux jalons de chargement (idempotent). */
+function capPlatformNative(){
+  const C = window.Capacitor;
+  return Boolean(C && typeof C.isNativePlatform === "function" && C.isNativePlatform());
+}
+function markNative(){
+  if(capPlatformNative()) document.documentElement.classList.add("native");
+}
+markNative();
+document.addEventListener("DOMContentLoaded", markNative, { once:true });
+window.addEventListener("load", markNative, { once:true });
 const pnCall = (method, options) => capNative().nativePromise("PushNotifications", method, options || {});
 function webPushSupported(){
   return ("serviceWorker" in navigator) && ("PushManager" in window);
