@@ -23,3 +23,9 @@
 /sw.js
   Content-Security-Policy: default-src 'self'; script-src 'self'; connect-src 'self' https:; img-src https: data: blob:; object-src 'none'; base-uri 'self'
   Cache-Control: public, max-age=0, must-revalidate
+
+# Netlify sert .webmanifest en application/octet-stream par défaut. Le type correct
+# est exigé pour que la PWA reste installable — c'est elle qui porte l'app Android
+# (Trusted Web Activity), donc une PWA non installable casse la fiche Play Store.
+/manifest.webmanifest
+  Content-Type: application/manifest+json

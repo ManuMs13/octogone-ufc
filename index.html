@@ -764,12 +764,13 @@ const EVENTS=[
           ["Kurtis Campbell","Trevor Peek","Featherweight",0],
           ["Matthieu Letho Duclos","Luis Felipe Dias","Middleweight",0]],
  notes:"L'événement de l'année pour la France : Parnasse (star du MMA français, ex-double champion KSW) en main event à Bercy ! Charrière et Letho Duclos aussi sur la carte."},
-{id:"glendale",name:"Noche UFC : Rodriguez vs Silva",type:"fn",date:"12 sept",
- mainUTC:"2026-09-13T01:00:00Z",prelimsUTC:"2026-09-12T22:00:00Z",est:true,
+{id:"glendale",name:"Noche UFC : Silva vs Delgado",type:"fn",date:"12 sept",
+ mainUTC:"2026-09-13T01:00:00Z",prelimsUTC:"2026-09-12T22:00:00Z",est:false,
  loc:"Desert Diamond Arena, Glendale, USA",
- main:[["Yair Rodriguez","Jean Silva","Featherweight",0]],prelims:[],notes:""},
+ main:[["Yair Rodriguez","Jean Silva","Featherweight",0]],prelims:[],
+ notes:"⚠️ Combat annulé : Yair Rodriguez s'est retiré sur blessure. Jean Silva a affronté Jose Miguel Delgado à la place et l'a soumis (étranglement arrière) au 3e round. Le duel prévu n'ayant pas eu lieu, les pronos sur ce combat ne sont pas comptabilisés."},
 {id:"ufc331",name:"UFC 331 : Van vs Pantoja 2",type:"ppv",date:"19 sept",
- mainUTC:"2026-09-20T02:00:00Z",prelimsUTC:"2026-09-20T00:00:00Z",est:true,
+ mainUTC:"2026-09-20T02:00:00Z",prelimsUTC:"2026-09-20T00:00:00Z",est:false,
  loc:"Crypto.com Arena, Los Angeles, USA",
  main:[["Joshua Van","Alexandre Pantoja","Titre Flyweight — revanche",1],
        ["Arman Tsarukyan","Mauricio Ruffy","Lightweight",0],
@@ -784,28 +785,110 @@ const EVENTS=[
           ["Casey O'Neill","Eduarda Moura","Flyweight (F)",0],
           ["Ryan Gandra","Ozzy Diaz","Middleweight",0],
           ["Michael Aswell Jr.","Joo Sang Yoo","Featherweight",0]],
- notes:"La revanche : Pantoja tente de reprendre sa ceinture face au prodige Joshua Van. La carte complète est désormais annoncée — en co-main, Arman Tsarukyan (#3 léger) affronte Mauricio Ruffy sur cinq rounds. Aussi au programme : Pitbull vs Choi, Moicano vs Ortega, Marlon Vera vs Jourdain et Tuivasa vs Despaigne."},
-{id:"apex926",name:"UFC Fight Night (carte à annoncer)",type:"fn",date:"26 sept",
+ notes:"✅ Terminé. Joshua Van conserve sa ceinture au terme de cinq rounds de folie (décision unanime). Arman Tsarukyan a détruit Mauricio Ruffy sur un coude au 1er round, Patricio Pitbull a stoppé Doo Ho Choi au 1er, et Sean Sharaf a mis Gable Steveson KO en 12 secondes. ⚠️ Moicano vs Ortega a été annulé avant le gala : les pronos sur ce combat ne sont pas comptabilisés."},
+{id:"apex926",name:"UFC Fight Night : Rosas Jr. vs Barcelos",type:"fn",date:"26 sept",
  mainUTC:"2026-09-27T01:00:00Z",prelimsUTC:"2026-09-26T22:00:00Z",est:true,
- loc:"UFC Apex, Las Vegas, USA",main:[],prelims:[],notes:"Main event pas encore annoncé — tu seras notifié dès l'annonce."},
-{id:"ufc332",name:"UFC 332 : carte à annoncer",type:"ppv",date:"3 oct",
+ loc:"UFC Apex, Las Vegas, USA",
+ main:[["Raul Rosas Jr.","Raoni Barcelos","Bantamweight",0],
+       ["Rodolfo Vieira","Robert Bryczek","Middleweight",0],
+       ["Brady Hiestand","Rinya Nakamura","Bantamweight",0],
+       ["Mehemmedeli Osmanli","Ilimbek Akylbek uulu","Bantamweight",0],
+       ["Melissa Amaya","Valesca Machado","Strawweight (F)",0],
+       ["Josiah Harrell","Elves Brener","Lightweight",0]],
+ prelims:[["Rodolfo Bellato","Christian Edwards","Light Heavyweight",0],
+          ["Montel Jackson","Ricky Simón","Bantamweight",0],
+          ["John Castañeda","Alateng Heili","Bantamweight",0],
+          ["Norma Dumont","Ailín Pérez","Bantamweight (F)",0],
+          ["Vanessa Demopoulos","Yazmin Jauregui","Strawweight (F)",0],
+          ["Mickey Gall","Sedriques Dumas","Middleweight",0]],
+ notes:"Raul Rosas Jr., le prodige mexicain (21 ans), face au vétéran brésilien Raoni Barcelos. Carte 100 % Apex, sans titre en jeu."},
+{id:"ufc332",name:"UFC 332 : Silva vs Wang",type:"ppv",date:"3 oct",
  mainUTC:"2026-10-04T02:00:00Z",prelimsUTC:"2026-10-04T00:00:00Z",est:true,
- loc:"Delta Center, Salt Lake City, USA",main:[],prelims:[],
- notes:"Main event pas encore annoncé. Combats déjà officiels : Johnny Walker vs Mick Parkin (lourds), Roman Kopylov vs Ateba Gautier (moyens), Imanol Rodríguez vs Alden Coria (mouches). Premier retour de l'UFC à Salt Lake City depuis l'UFC 307 (octobre 2024)."},
-{id:"apex1010",name:"UFC Fight Night (carte à annoncer)",type:"fn",date:"10 oct",
+ loc:"Delta Center, Salt Lake City, USA",
+ main:[["Natália Silva","Wang Cong","Titre Flyweight (F) — ceinture vacante",1],
+       ["Deiveson Figueiredo","Payton Talbott","Bantamweight",0],
+       ["King Green","Esteban Ribovics","Lightweight",0],
+       ["Roberto Soldić","Khaos Williams","Welterweight",0],
+       ["Ateba Gautier","Roman Kopylov","Middleweight",0]],
+ prelims:[["Imanol Rodríguez","Alden Coria","Flyweight",0],
+          ["Damian Pinas","Andrey Pulyaev","Middleweight",0],
+          ["Marcus McGhee","Bernardo Sopaj","Bantamweight",0],
+          ["Anthony Wint","Lucas Armand","Heavyweight",0],
+          ["Johnny Walker","Mick Parkin","Heavyweight",0],
+          ["Rafael dos Anjos","Alexander Hernandez","Lightweight",0],
+          ["Marvin Vettori","Ismail Naurdiev","Middleweight",0],
+          ["Court McGee","Eric Nolan","Welterweight",0]],
+ notes:"Valentina Shevchenko a rendu sa ceinture des mouches (blessure, absente environ un an) : Natália Silva et Wang Cong se disputent le titre vacant. Premier retour de l'UFC à Salt Lake City depuis l'UFC 307 (octobre 2024)."},
+{id:"apex1010",name:"UFC Fight Night : Allen vs Duncan",type:"fn",date:"10 oct",
  mainUTC:"2026-10-11T01:00:00Z",prelimsUTC:"2026-10-10T22:00:00Z",est:true,
- loc:"UFC Apex, Las Vegas, USA",main:[],prelims:[],notes:"Main event pas encore annoncé — tu seras notifié dès l'annonce."},
+ loc:"UFC Apex, Las Vegas, USA",
+ main:[["Brendan Allen","Christian Leroy Duncan","Middleweight",0]],
+ prelims:[["Malcolm Wellmaker","Otari Tanzilovi","Bantamweight",0],
+          ["Jai Herbert","Matheus Camilo","Lightweight",0],
+          ["Francisco Prado","Ismael Bonfim","Lightweight",0],
+          ["Darya Zheleznyakova","Alice Pereira","Bantamweight (F)",0],
+          ["Melissa Gatto","Ernesta Kareckaitė","Flyweight (F)",0],
+          ["Felipe Franco","Alexander Poppeck","Light Heavyweight",0],
+          ["Gerald Meerschaert","Julius Walker","Light Heavyweight",0],
+          ["Ketlen Souza","Loopy Godinez","Strawweight (F)",0],
+          ["Andre Fili","Kai Kamaka III","Featherweight",0],
+          ["Niko Price","Leon Shahbazyan","Welterweight",0]],
+ notes:"Brendan Allen (#5 moyen) contre Christian Leroy Duncan. Seul le main event est confirmé en tête d'affiche : la répartition carte principale / prélims des autres combats n'est pas encore officielle."},
 {id:"edmonton",name:"UFC Edmonton : Buckley vs Malott",type:"fn",date:"17 oct",
  mainUTC:"2026-10-18T01:00:00Z",prelimsUTC:"2026-10-17T22:00:00Z",est:true,
  loc:"Rogers Place, Edmonton, Canada",
  main:[["Joaquin Buckley","Mike Malott","Welterweight",0],
        ["Erin Blanchfield","Jasmine Jasudavicius","Flyweight (F)",0]],
- prelims:[],notes:"Malott, le Canadien, headline à domicile après son KO de Gilbert Burns. Premier UFC à Edmonton depuis novembre 2024."},
+ prelims:[["Marc-André Barriault","Kyle Daukaus","Middleweight",0],
+          ["Tanner Boser","Jhonata Diniz","Heavyweight",0],
+          ["Mandel Nallo","Nate Landwehr","Lightweight",0],
+          ["Jamey-Lyn Horth","Katlyn Cerminara","Flyweight (F)",0],
+          ["Melissa Croden","Chelsea Chandler","Bantamweight (F)",0],
+          ["Chad Anheliger","Steven Koslow","Bantamweight",0],
+          ["Cody Chovancek","You Su-young","Bantamweight",0],
+          ["Javad Mahjoub","Louie Sutherland","Heavyweight",0],
+          ["Louis Jourdain","Timothy Cuamba","Bantamweight",0],
+          ["Julien Leblanc","Gilbert Urbina","Middleweight",0]],
+ notes:"Malott, le Canadien, headline à domicile après son KO de Gilbert Burns. Premier UFC à Edmonton depuis novembre 2024, avec une grosse délégation canadienne en prélims."},
 {id:"ufc333",name:"UFC 333 : Volkanovski vs Evloev",type:"ppv",date:"24 oct",
  mainUTC:"2026-10-24T18:00:00Z",prelimsUTC:"2026-10-24T15:00:00Z",est:true,
  loc:"Etihad Arena, Abu Dhabi, Émirats arabes unis",
- main:[["Alexander Volkanovski","Movsar Evloev","Titre Featherweight",1]],prelims:[],
- notes:"Carte en après-midi (heure française) — événement à Abu Dhabi. Volkanovski défend son titre plumes face à Evloev, toujours invaincu."}
+ main:[["Alexander Volkanovski","Movsar Evloev","Titre Featherweight",1],
+       ["Petr Yan","Merab Dvalishvili","Titre Bantamweight — trilogie",1],
+       ["Azamat Murzakanov","Dominick Reyes","Light Heavyweight",0],
+       ["Lone'er Kavanagh","Ramazan Temirov","Flyweight",0],
+       ["Alexander Volkov","Rizvan Kuniev","Heavyweight",0]],
+ prelims:[["Nikita Krylov","Abdul-Rakhman Yakhyaev","Light Heavyweight",0],
+          ["Abusupiyan Magomedov","Cameron Rowston","Middleweight",0],
+          ["Grant Dawson","Nurullo Aliev","Lightweight",0],
+          ["Aaron Pico","Losene Keita","Featherweight",0]],
+ notes:"Double titre à Abu Dhabi : Volkanovski défend chez les plumes face à Evloev (toujours invaincu), et Petr Yan remet sa ceinture des coqs en jeu contre Merab Dvalishvili pour le 3e chapitre de leur rivalité. Carte en après-midi/soirée heure française."},
+{id:"apex1031",name:"UFC Fight Night : Moicano vs Nolan",type:"fn",date:"31 oct",
+ mainUTC:"2026-11-01T01:00:00Z",prelimsUTC:"2026-10-31T22:00:00Z",est:true,
+ loc:"UFC Apex, Las Vegas, USA",
+ main:[["Renato Moicano","Tom Nolan","Lightweight",0]],prelims:[],
+ notes:"Moicano retrouve une carte après l'annulation de son combat contre Brian Ortega à l'UFC 331. Reste de la carte à annoncer."},
+{id:"apex1107",name:"UFC Fight Night : Bonfim vs Brady",type:"fn",date:"7 nov",
+ mainUTC:"2026-11-08T02:00:00Z",prelimsUTC:"2026-11-07T23:00:00Z",est:true,
+ loc:"UFC Apex, Las Vegas, USA",
+ main:[["Gabriel Bonfim","Sean Brady","Welterweight",0]],prelims:[],
+ notes:"Duel de grapplers au sommet des welters (#5 contre #6). Reste de la carte à annoncer. ⏰ Attention : la France est déjà à l'heure d'hiver, les États-Unis aussi — horaires décalés d'une heure par rapport à octobre."},
+{id:"ufc334",name:"UFC 334 : Gane vs Hokit",type:"ppv",date:"14 nov",
+ mainUTC:"2026-11-15T03:00:00Z",prelimsUTC:"2026-11-15T01:00:00Z",est:true,
+ loc:"Madison Square Garden, New York, USA",
+ main:[["Ciryl Gane","Josh Hokit","Titre Heavyweight",1],
+       ["Kayla Harrison","Amanda Nunes","Titre Bantamweight (F)",1]],
+ prelims:[["Caio Borralho","Yousri Belgaroui","Middleweight",0],
+          ["Kevin Holland","Uroš Medić","Welterweight",0],
+          ["Stephen Thompson","Charles Radtke","Welterweight",0],
+          ["Drew Dober","Chris Duncan","Lightweight",0],
+          ["Jim Miller","Terrance McKinney","Lightweight",0],
+          ["Baisangur Susurkaev","Donte Johnson","Middleweight",0],
+          ["Luis Gurule","Bilal Hasan","Flyweight",0],
+          ["Macy Chiasson","Beatriz Mesquita","Bantamweight (F)",0],
+          ["Adrian Yañez","Juan Díaz","Bantamweight",0],
+          ["Nazim Sadykhov","Jefferson Nascimento","Lightweight",0]],
+ notes:"🇫🇷 ÉNORME pour la France : Ciryl Gane est champion des lourds (Tom Aspinall a rendu la ceinture, blessé à l'œil) et défend son titre au Madison Square Garden. En co-main, Amanda Nunes sort de sa retraite pour défier Kayla Harrison. Reste de la carte à finaliser."}
 ];
 
 /* Où regarder l'UFC en France — liens maintenus ici (aucun tarif affiché, ça bouge trop souvent) */
@@ -819,21 +902,39 @@ const DIFFUSION_FR={
 
 const RANKINGS=[
 {n:"P4P Hommes",c:null,f:["Islam Makhachev","Alexander Volkanovski","Petr Yan","Justin Gaethje","Ilia Topuria","Tom Aspinall","Sean Strickland","Merab Dvalishvili","Alex Pereira","Ciryl Gane","Joshua Van","Khamzat Chimaev","Alexandre Pantoja","Arman Tsarukyan","Charles Oliveira"]},
-{n:"Poids Mouches",lb:"125 lb",c:"Joshua Van",f:["Alexandre Pantoja","Manel Kape","Brandon Royval","Tatsuro Taira","Kyoji Horiguchi","Lone'er Kavanagh","Asu Almabayev","Brandon Moreno","Amir Albazi","Ramazan Temirov","Alex Perez","Steve Erceg","Tim Elliott","Tagir Ulanbekov","Edgar Chairez"]},
-{n:"Poids Coqs",lb:"135 lb",c:"Petr Yan",f:["Merab Dvalishvili","Sean O'Malley","Umar Nurmagomedov","Mario Bautista","Cory Sandhagen","Song Yadong","Aiemann Zahabi","David Martinez","Deiveson Figueiredo","Marlon Vera","Payton Talbott","Raul Rosas Jr.","Raoni Barcelos","Farid Basharat","Marcus McGhee"]},
-{n:"Poids Plumes",lb:"145 lb",c:"Alexander Volkanovski",f:["Movsar Evloev","Diego Lopes","Lerone Murphy","Aljamain Sterling","Yair Rodriguez","Jean Silva","Arnold Allen","Youssef Zalal","Kevin Vallejos","Steve Garcia","Brian Ortega","Aaron Pico","Melquizael Costa","David Onama","Patricio Pitbull"]},
-{n:"Poids Légers",lb:"155 lb",c:"Justin Gaethje",f:["Ilia Topuria","Arman Tsarukyan","Charles Oliveira","Max Holloway","Paddy Pimblett","Benoît Saint Denis","Mauricio Ruffy","Mateusz Gamrot","Dan Hooker","Renato Moicano","Rafael Fiziev","Quillan Salkilld","Tom Nolan","Beneil Dariush","Manuel Torres"]},
-{n:"Poids Welters",lb:"170 lb",c:"Islam Makhachev",f:["Ian Machado Garry","Carlos Prates","Michael Morales","Jack Della Maddalena","Gabriel Bonfim","Sean Brady","Belal Muhammad","Leon Edwards","Kamaru Usman","Joaquin Buckley","Yaroslav Amosov","Uroš Medić","Mike Malott","Michael Venom Page","Daniel Rodriguez"]},
-{n:"Poids Moyens",lb:"185 lb",c:"Sean Strickland",f:["Khamzat Chimaev","Dricus Du Plessis","Nassourdine Imavov","Brendan Allen","Caio Borralho","Anthony Hernandez","Joe Pyfer","Israel Adesanya","Reinier de Ridder","Christian Leroy Duncan","Gregory Rodrigues","Jared Cannonier","Ikram Aliskerov","Bo Nickal","Roman Dolidze"]},
+{n:"Poids Mouches",lb:"125 lb",c:"Joshua Van",f:["Alexandre Pantoja","Manel Kape","Brandon Royval","Tatsuro Taira","Kyoji Horiguchi","Lone'er Kavanagh","Asu Almabayev","Brandon Moreno","Amir Albazi","Ramazan Temirov","Tim Elliott","Steve Erceg","Sumudaerji","Tagir Ulanbekov","Alex Perez"]},
+{n:"Poids Coqs",lb:"135 lb",c:"Petr Yan",f:["Merab Dvalishvili","Sean O'Malley","Song Yadong","Umar Nurmagomedov","Mario Bautista","Cory Sandhagen","Aiemann Zahabi","David Martinez","Deiveson Figueiredo","Marlon Vera","Payton Talbott","Raul Rosas Jr.","Raoni Barcelos","Farid Basharat","Marcus McGhee"]},
+{n:"Poids Plumes",lb:"145 lb",c:"Alexander Volkanovski",f:["Movsar Evloev","Diego Lopes","Lerone Murphy","Aljamain Sterling","Jean Silva","Yair Rodriguez","Arnold Allen","Youssef Zalal","Kevin Vallejos","Steve Garcia","Brian Ortega","Aaron Pico","Melquizael Costa","David Onama","Patricio Pitbull"]},
+{n:"Poids Légers",lb:"155 lb",c:"Justin Gaethje",f:["Ilia Topuria","Arman Tsarukyan","Charles Oliveira","Max Holloway","Paddy Pimblett","Benoît Saint Denis","Mauricio Ruffy","Quillan Salkilld","Salahdine Parnasse","Rafael Fiziev","Renato Moicano","Mateusz Gamrot","Dan Hooker","Tom Nolan","Beneil Dariush"]},
+{n:"Poids Welters",lb:"170 lb",c:"Islam Makhachev",f:["Ian Machado Garry","Carlos Prates","Michael Morales","Jack Della Maddalena","Gabriel Bonfim","Sean Brady","Belal Muhammad","Leon Edwards","Kamaru Usman","Joaquin Buckley","Yaroslav Amosov","Uroš Medić","Mike Malott","Daniel Rodriguez","Neil Magny"]},
+{n:"Poids Moyens",lb:"185 lb",c:"Sean Strickland",f:["Khamzat Chimaev","Dricus Du Plessis","Nassourdine Imavov","Brendan Allen","Caio Borralho","Joe Pyfer","Gregory Rodrigues","Anthony Hernandez","Israel Adesanya","Christian Leroy Duncan","Jared Cannonier","Abusupiyan Magomedov","Ikram Aliskerov","Bo Nickal","Shara Magomedov"]},
 {n:"Mi-Lourds",lb:"205 lb",c:"Carlos Ulberg",f:["Magomed Ankalaev","Jiří Procházka","Alex Pereira","Khalil Rountree Jr.","Navajo Stirling","Paulo Costa","Jamahal Hill","Azamat Murzakanov","Jan Błachowicz","Dominick Reyes","Bogdan Guskov","Robert Whittaker","Johnny Walker","Alonzo Menifield","Nikita Krylov"]},
-{n:"Poids Lourds",lb:"265 lb",c:"Tom Aspinall",f:["Ciryl Gane","Alexander Volkov","Sergei Pavlovich","Josh Hokit","Waldo Cortes Acosta","Serghei Spivac","Curtis Blaydes","Rizvan Kuniev","Ante Delija","Valter Walker","Tyrell Fortune","Aleksandar Rakić","Derrick Lewis","Marcin Tybura","Brando Peričić"]},
-{n:"P4P Femmes",c:null,f:["Valentina Shevchenko","Kayla Harrison","Zhang Weili","Natalia Silva","Manon Fiorot","Mackenzie Dern","Alexa Grasso","Erin Blanchfield","Julianna Peña","Tatiana Suarez","Virna Jandiroba","Yan Xiaonan","Raquel Pennington","Rose Namajunas","Maycee Barber"]},
-{n:"Pailles (F)",lb:"115 lb",c:"Mackenzie Dern",f:["Zhang Weili","Tatiana Suarez","Virna Jandiroba","Yan Xiaonan","Gillian Robertson","Fatima Kline","Loopy Godinez","Amanda Lemos","Jéssica Andrade","Tabatha Ricci","Amanda Ribas","Alexia Thainara","Denise Gomes","Angela Hill","Mizuki"]},
-{n:"Mouches (F)",lb:"125 lb",c:"Valentina Shevchenko",f:["Natalia Silva","Manon Fiorot","Alexa Grasso","Erin Blanchfield","Rose Namajunas","Maycee Barber","Jasmine Jasudavicius","Wang Cong","Tracy Cortez","Miranda Maverick","Karine Silva","Casey O'Neill","Eduarda Moura","JJ Aldrich","Gabriella Fernandes"]},
+{n:"Poids Lourds",lb:"265 lb",c:"Ciryl Gane",f:["Tom Aspinall","Alexander Volkov","Sergei Pavlovich","Josh Hokit","Curtis Blaydes","Waldo Cortes Acosta","Rizvan Kuniev","Vitor Petrino","Serghei Spivac","Ante Delija","Valter Walker","Tyrell Fortune","Derrick Lewis","Mario Pinto","Aleksandar Rakić"]},
+{n:"P4P Femmes",c:null,f:["Valentina Shevchenko","Kayla Harrison","Zhang Weili","Natalia Silva","Mackenzie Dern","Alexa Grasso","Manon Fiorot","Erin Blanchfield","Tatiana Suarez","Julianna Peña","Virna Jandiroba","Raquel Pennington","Rose Namajunas","Denise Gomes","Maycee Barber"]},
+{n:"Pailles (F)",lb:"115 lb",c:"Mackenzie Dern",f:["Zhang Weili","Tatiana Suarez","Virna Jandiroba","Denise Gomes","Gillian Robertson","Yan Xiaonan","Fatima Kline","Loopy Godinez","Alexia Thainara","Jéssica Andrade","Tabatha Ricci","Amanda Lemos","Amanda Ribas","Angela Hill","Mizuki"]},
+{n:"Mouches (F)",lb:"125 lb",c:null,f:["Natalia Silva","Alexa Grasso","Manon Fiorot","Erin Blanchfield","Rose Namajunas","Maycee Barber","Jasmine Jasudavicius","Wang Cong","Tracy Cortez","Miranda Maverick","Karine Silva","Casey O'Neill","Eduarda Moura","Gabriella Fernandes","Regina Tarin"]},
 {n:"Coqs (F)",lb:"135 lb",c:"Kayla Harrison",f:["Julianna Peña","Raquel Pennington","Joselyne Edwards","Norma Dumont","Ailin Perez","Yana Santos","Luana Santos","Macy Chiasson","Jacqueline Cavalcanti","Karol Rosa","Bia Mesquita","Michelle Montague","Nora Cornolle","Miesha Tate","Melissa Croden"]}
 ];
 
 const NEWS=[
+{t:"Débrief · 20 septembre 2026",h:"UFC 331 : Joshua Van garde sa ceinture au bout de 25 minutes de folie",
+ p:"Le prodige birman a résisté à tout. Joshua Van conserve son titre des mouches face à Alexandre Pantoja par décision unanime (49-46, 48-47, 50-45) au terme d'un combat déjà cité pour le combat de l'année. Van a tenu Pantoja à distance avec sa vitesse et sa précision pendant que le Brésilien cherchait le corps-à-corps et la lutte. Sur le reste de la carte : Arman Tsarukyan a éteint Mauricio Ruffy d'un coude au 1er round, Patricio Pitbull a stoppé Doo Ho Choi au 1er, et Sean Sharaf a mis Gable Steveson KO en 12 secondes. Tes pronos sont enfin comptabilisés — va voir ton score dans l'onglet Pronos.",
+ l:"https://www.ufc.com/news/cryptocom-ufc-331-van-vs-pantoja-2-results",ls:"UFC.com",img:{f:"Joshua Van"}},
+{t:"🇫🇷 Énorme · 18 septembre 2026",h:"Ciryl Gane est champion des lourds — et il défend au Madison Square Garden",
+ p:"Tom Aspinall a rendu la ceinture des poids lourds : ses problèmes à l'œil, séquelles du coup illégal encaissé contre Gane à l'UFC 321, le tiennent éloigné pour une durée indéterminée. Ciryl Gane, champion intérimaire depuis sa victoire sur Alex Pereira en juin, est promu champion à part entière. Il remettra son titre en jeu le 14 novembre à l'UFC 334, au Madison Square Garden, face à Josh Hokit. En co-main event, Amanda Nunes sort de sa retraite pour défier Kayla Harrison chez les coqs. Le premier champion français des lourds de l'histoire de l'UFC.",
+ l:"https://www.cbssports.com/ufc/news/ufc-334-fight-card-ciryl-gane-vs-josh-hokit-amanda-nunes-kayla-harrison-new-york/",ls:"CBS Sports",img:{f:"Ciryl Gane"}},
+{t:"Calendrier · 5 septembre 2026",h:"Shevchenko rend sa ceinture : Natália Silva et Wang Cong pour le titre vacant à l'UFC 332",
+ p:"Valentina Shevchenko est blessée et absente environ un an : elle a rendu la ceinture des poids mouches femmes plutôt que de bloquer la division. L'UFC a réagi vite — Natália Silva, invaincue à l'UFC, affrontera la Chinoise Wang Cong pour le titre vacant en main event de l'UFC 332, le 3 octobre à Salt Lake City. Shevchenko retrouvera un combat de titre à son retour. La division apparaît donc sans championne dans les classements de l'app.",
+ l:"https://www.espn.com/mma/story/_/id/49839558/shevchenko-injured-vacates-silva-wang-vie-belt-ufc-332",ls:"ESPN",img:{f:"Natalia Silva"}},
+{t:"🇫🇷 Débrief · 5 septembre 2026",h:"UFC Paris : Parnasse explose Hooker en un round, Bercy prend feu",
+ p:"Pour sa première tête d'affiche à l'UFC, Salahdine Parnasse n'a pas tremblé : coup de pied au corps puis série de poings, Dan Hooker est stoppé à 2'35 du 1er round. L'ex-double champion KSW entre directement dans le top 15 des légers. Axel Sola a lancé la soirée en mettant Farès Ziam KO en 1'40 dans un duel 100 % français, Matthieu Letho Duclos et Nora Cornolle se sont aussi imposés. Seule ombre : Morgan Charrière s'incline aux points face à Felipe Lima.",
+ l:"https://en.wikipedia.org/wiki/UFC_Fight_Night:_Hooker_vs._Parnasse",ls:"Wikipédia",img:{f:"Salahdine Parnasse"}},
+{t:"Débrief · 29 août 2026",h:"Shanghai : Song Yadong détruit l'invincibilité d'Umar Nurmagomedov",
+ p:"Personne ne l'avait vu venir. Donné à 4 contre 1, Song Yadong a envoyé Umar Nurmagomedov au tapis d'un uppercut à 1'48 du 2e round, devant son public chinois. Umar encaisse la première défaite de sa carrière (20-1) et Song (24-9-1) bondit à la 3e place des coqs, juste derrière Merab Dvalishvili et Sean O'Malley.",
+ l:"https://www.ufc.com/news/ufc-shanghai-results-nurmagomedov-vs-song",ls:"UFC.com",img:{f:"Song Yadong"}},
+{t:"Débrief · 15 août 2026",h:"UFC 330 : Makhachev conserve sa ceinture welter au bout des cinq rounds",
+ p:"Islam Makhachev est allé au bout de la distance pour la deuxième fois de suite : décision unanime face à Ian Machado Garry, dans un combat verrouillé au sol. Mackenzie Dern a elle aussi défendu son titre sur cinq rounds face à Gillian Robertson. La soirée a surtout été marquée par les finitions : Jalin Turner en 39 secondes, Esteban Ribovics qui stoppe Edson Barboza au 2e, et Charles Johnson qui sort un twister — la soumission la plus rare du MMA — sur Eduardo Henrique.",
+ l:"https://en.wikipedia.org/wiki/UFC_330",ls:"Wikipédia",img:{f:"Islam Makhachev"}},
 {t:"Calendrier · 13 août 2026",h:"UFC 331 : la carte complète est en ligne, Tsarukyan vs Ruffy en co-main",
  p:"Les 13 combats de l'UFC 331 (19 septembre, Crypto.com Arena de Los Angeles) sont désormais dans le tracker. Derrière la revanche Joshua Van vs Alexandre Pantoja pour le titre des mouches, le co-main event oppose Arman Tsarukyan (#3 léger) à Mauricio Ruffy sur cinq rounds. La carte principale se complète avec Patricio Pitbull vs Doo Ho Choi, Renato Moicano vs Brian Ortega et Alonzo Menifield vs Iwo Baraniewski. En prélims : Gable Steveson vs Sean Sharaf, Marlon Vera vs Charles Jourdain, Tai Tuivasa vs Robelis Despaigne et Edmen Shahbazyan vs Brunno Ferreira.",
  l:"https://www.ufc.com/event/ufc-331",ls:"UFC.com",img:{f:"Arman Tsarukyan"}},
@@ -1111,13 +1212,63 @@ const VIDEOS=[
 {y:"MiSLxIHyA0E",t:"Axel Sola Hors Cage : RMC Sport en immersion avec le talent en quête d'excellence",ch:"RMC Sport Combat",tag:"🇫🇷 Archives"},
 ];
 
-/* Résultats des événements passés — rempli automatiquement chaque lundi.
-   Format : { eventId: { "CombattantA|CombattantB": "NomDuVainqueur" } } */
-const RESULTS={};
+/* Résultats des événements passés — à compléter après chaque gala.
+   Format : { eventId: { "CombattantA|CombattantB": "NomDuVainqueur" } }
+   La clé doit reprendre EXACTEMENT les deux noms du tableau EVENTS, dans le même ordre.
+   Un combat annulé ou dont l'adversaire a changé n'est pas renseigné : il reste non jugé
+   (ni point gagné, ni point perdu), ce qui est le traitement correct pour un prono.
+   Dernière mise à jour : 20 septembre 2026 (après l'UFC 331). */
+const RESULTS={
+ufc330:{
+  "Islam Makhachev|Ian Machado Garry":"Islam Makhachev",
+  "Mackenzie Dern|Gillian Robertson":"Mackenzie Dern",
+  "Jalin Turner|Kauê Fernandes":"Jalin Turner",
+  "Mansur Abdul-Malik|Dustin Stoltzfus":"Dustin Stoltzfus",
+  "Edson Barboza|Esteban Ribovics":"Esteban Ribovics",
+  "Chidi Njokuani|Joel Álvarez":"Chidi Njokuani",
+  "Charles Johnson|Eduardo Henrique":"Charles Johnson",
+  "Donte Johnson|Eric McConico":"Donte Johnson",
+  "Vicente Luque|Tresean Gore":"Tresean Gore",
+  "Rafael Tobias|Lucas Fernando":"Lucas Fernando",
+  "Neil Magny|Ramiz Brahimaj":"Neil Magny",
+  "Jeremiah Wells|Myktybek Orolbai":"Jeremiah Wells"
+},
+sacramento:{
+  "Anthony Hernandez|Gregory Rodrigues":"Gregory Rodrigues"
+},
+shanghai:{
+  "Umar Nurmagomedov|Song Yadong":"Song Yadong"
+},
+paris:{
+  "Dan Hooker|Salahdine Parnasse":"Salahdine Parnasse",
+  "Michael Venom Page|Nursulton Ruziboev":"Michael Venom Page",
+  "Morgan Charrière|Felipe Lima":"Felipe Lima",
+  "Mario Pinto|Ryan Spann":"Mario Pinto",
+  "Kurtis Campbell|Trevor Peek":"Kurtis Campbell",
+  "Matthieu Letho Duclos|Luis Felipe Dias":"Matthieu Letho Duclos"
+  /* Nathaniel Wood vs Mairon Santos : combat non disputé (changement d'adversaire) */
+},
+/* glendale : Yair Rodriguez blessé, le combat annoncé n'a pas eu lieu — aucun prono jugé */
+ufc331:{
+  "Joshua Van|Alexandre Pantoja":"Joshua Van",
+  "Arman Tsarukyan|Mauricio Ruffy":"Arman Tsarukyan",
+  "Patricio Pitbull|Doo Ho Choi":"Patricio Pitbull",
+  "Alonzo Menifield|Iwo Baraniewski":"Alonzo Menifield",
+  "Gable Steveson|Sean Sharaf":"Sean Sharaf",
+  "Marlon Vera|Charles Jourdain":"Marlon Vera",
+  "Tai Tuivasa|Robelis Despaigne":"Robelis Despaigne",
+  "Edmen Shahbazyan|Brunno Ferreira":"Edmen Shahbazyan",
+  "Giga Chikadze|Joanderson Brito":"Joanderson Brito",
+  "Casey O'Neill|Eduarda Moura":"Casey O'Neill",
+  "Ryan Gandra|Ozzy Diaz":"Ryan Gandra",
+  "Michael Aswell Jr.|Joo Sang Yoo":"Michael Aswell Jr."
+  /* Renato Moicano vs Brian Ortega : combat annulé avant le gala */
+}
+};
 
 /* Combattants français de l'UFC (🇫🇷 = aussi marqués dans les classements) */
-const FR_SET=new Set(["Ciryl Gane","Nassourdine Imavov","Benoît Saint Denis","Manon Fiorot","Nora Cornolle"]);
-const FR_EXTRA=[["Salahdine Parnasse","Poids Légers"],["Morgan Charrière","Poids Plumes"],["Fares Ziam","Poids Légers"],["William Gomis","Poids Plumes"],["Kevin Jousset","Poids Welters"],["Taylor Lapilus","Poids Coqs"],["Oumar Sy","Mi-Lourds"],["Matthieu Letho Duclos","Poids Moyens"],["Axel Sola","Poids Welters"]];
+const FR_SET=new Set(["Ciryl Gane","Nassourdine Imavov","Benoît Saint Denis","Manon Fiorot","Nora Cornolle","Salahdine Parnasse"]);
+const FR_EXTRA=[["Morgan Charrière","Poids Plumes"],["Fares Ziam","Poids Légers"],["William Gomis","Poids Plumes"],["Kevin Jousset","Poids Welters"],["Taylor Lapilus","Poids Coqs"],["Oumar Sy","Mi-Lourds"],["Matthieu Letho Duclos","Poids Moyens"],["Axel Sola","Poids Welters"]];
 
 
 /* Photos officielles UFC.com additionnelles (combattants absents de l'API) — complété le 9 août 2026 */
@@ -1488,7 +1639,7 @@ async function sharePronos(){
 /* ============ ÉVÉNEMENTS ============ */
 function renderEvents(){
   const open=[...document.querySelectorAll(".ev.open")].map(x=>x.id);
-  $("#ev-list").innerHTML=EVENTS.map(e=>{
+  const evCard=e=>{
   const [d,mo]=e.date.split(" ");
   const nPicks=Object.keys((store.get("picks",{})[e.id])||{}).length;
   const nFights=e.main.length+e.prelims.length;
@@ -1519,7 +1670,15 @@ function renderEvents(){
       <button class="btn ghost" onclick="goAlarm('${e.id}')">⏰ Alarme</button>
     </div>
   </div></div>`;
-  }).join("");
+  };
+  /* Les événements passés restent dans l'app (ils portent les résultats et donc les points
+     des pronos), mais ils descendent sous leur propre titre : sinon ils s'empilent en tête
+     de la liste « à venir » et, chaque mois qui passe, repoussent le prochain gala plus bas. */
+  const limite=Date.now()-4*3600e3;
+  const aVenir=EVENTS.filter(e=>new Date(e.mainUTC).getTime()>limite);
+  const passes=EVENTS.filter(e=>new Date(e.mainUTC).getTime()<=limite).reverse();
+  $("#ev-list").innerHTML=aVenir.map(evCard).join("")
+    +(passes.length?`<h2 class="ev-past-sep">✅ Résultats des galas passés</h2>`+passes.map(evCard).join(""):"");
   open.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add("open")});
 }
 /* Bandeau du splash — photos officielles ufc.com (aucune photo de presse/Getty, licence sûre) */
