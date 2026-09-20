@@ -1,0 +1,46 @@
+name: Vérifier les données
+
+# Netlify déploie automatiquement sur push. Cette vérification tourne donc en
+# parallèle du déploiement : elle n'empêche pas la mise en ligne, mais elle
+# fait échouer le commit de façon visible si les données sont incohérentes
+# (prono jamais jugé, calendrier dans le désordre, résultat oublié…).
+# C'est le filet de la mise à jour hebdomadaire automatique.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "sw.js"
+      - "tools/verifier-donnees.mjs"
+  pull_request:
+    paths:
+      - "index.html"
+      - "sw.js"
+  workflow_dispatch: {}
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Cohérence des données et syntaxe
+        run: node tools/verifier-donnees.mjs
+
+      # Le cache du service worker DOIT changer à chaque déploiement, sinon les
+      # utilisateurs gardent l'ancienne version de l'app en mémoire.
+      - name: Le cache du service worker a-t-il été bumpé ?
+        if: github.event_name == 'push'
+        run: |
+          set -e
+          avant=$(git show ${{ github.event.before }}:sw.js 2>/dev/null | grep -oP 'const CACHE = "\K[^"]+' || echo "")
+          apres=$(grep -oP 'const CACHE = "\K[^"]+' sw.js)
+          if [ -n "$avant" ] && [ "$avant" = "$apres" ] && ! git diff --quiet ${{ github.event.before }} HEAD -- index.html; then
+            echo "::error::index.html a changé mais CACHE est resté à $apres — les utilisateurs ne verront pas la mise à jour."
+            exit 1
+          fi
+          echo "cache : ${avant:-(inconnu)} -> $apres"
