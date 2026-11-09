@@ -891,7 +891,7 @@ const EVENTS=[
           ["Lucia Szabová","Tainara Lisboa","Bantamweight (F)",0]],
  notes:"✅ Terminé. Tom Nolan surprend Renato Moicano et le stoppe (punches et coudes) au 3e round, décrochant la plus belle victoire de sa carrière dans son premier main event. Jacobe Smith bat Randy Brown par décision unanime en co-main, Cody Durden et Luana Santos s'imposent aussi aux points, et Jean-Paul Lebosnoyani arrache la victoire face à Farman Hasanov (arrêt médical au 3e round). En prélims, Julian Erosa signe un KO au 1er round et Joseph Kropschot soumet Nick Klein par armbar inversé."},
 {id:"apex1107",name:"UFC Fight Night : Cortes-Acosta vs Walker",type:"fn",date:"7 nov",
- mainUTC:"2026-11-08T02:00:00Z",prelimsUTC:"2026-11-07T23:00:00Z",est:true,
+ mainUTC:"2026-11-08T02:00:00Z",prelimsUTC:"2026-11-07T23:00:00Z",est:false,
  loc:"UFC Apex, Las Vegas, USA",
  main:[["Waldo Cortes Acosta","Johnny Walker","Heavyweight",0],
        ["Tatiana Suarez","Virna Jandiroba","Strawweight (F)",0],
@@ -907,7 +907,7 @@ const EVENTS=[
           ["Mantas Kondratavičius","Andre Petroski","Middleweight",0],
           ["Wellington Turman","Ko Seok-hyeon","Welterweight",0],
           ["José Henrique Souza","Jonny Parsons","Welterweight",0]],
- notes:"⚠️ Carte chamboulée : Sean Brady, touché par une infection au genou, s'est retiré de son main event face à Gabriel Bonfim — le combat est annulé et Bonfim n'a pas été reprogrammé sur cette carte. Pour sauver la tête d'affiche, l'UFC a bookée en urgence Waldo Cortes Acosta face à Johnny Walker chez les lourds. Tatiana Suarez (#2 pailles) vs Virna Jandiroba monte en carte principale (le duel Petroski vs Kondratavičius, lui, reste en prélims). Autres changements : Alvin Hines (vertiges) cède sa place à Thomas Petersen face à Gabriel Lorenço, et Lucas Brennan (rupture des ligaments du genou) quitte la carte — Austin Bashi est désormais rebooké face à Carlos Calderon."},
+ notes:"✅ Terminé. Johnny Walker stoppe Waldo Cortes Acosta (TKO, coups de poing) à 2'27 du 3e round — Fight of the Night — et se relance chez les lourds après la série de défaites de Cortes Acosta, bookée en urgence après le forfait de Sean Brady (infection au genou) face à Gabriel Bonfim. Tatiana Suarez bat Virna Jandiroba par décision unanime en co-main, un duel annulé à deux reprises depuis 2023. Elijah Smith (K.-O. en 1 minute) et Thomas Petersen (TKO au 3e, en remplacement d'Alvin Hines) décrochent chacun une Performance of the Night. Nina Milošević et Mitch Raposo s'imposent aussi en carte principale. En prélims, Austin Bashi (qui remplaçait Lucas Brennan, blessé) soumet Carlos Calderon, et Andre Petroski (qui remplaçait Wesley Schultz) stoppe Mantas Kondratavičius."},
 {id:"ufc334",name:"UFC 334 : Gane vs Hokit",type:"ppv",date:"14 nov",
  mainUTC:"2026-11-15T03:00:00Z",prelimsUTC:"2026-11-15T01:00:00Z",est:true,
  loc:"Madison Square Garden, New York, USA",
@@ -957,11 +957,21 @@ const EVENTS=[
  loc:"American Airlines Center, Dallas, USA",
  main:[],prelims:[],
  notes:"Annoncé le 24 octobre 2026 : premier retour de l'UFC à Dallas depuis l'UFC 277 (2022). Date et salle confirmées, mais aucun combat n'est encore officialisé — carte à suivre dans une prochaine mise à jour."},
-{id:"toronto",name:"UFC 336 : retour à Toronto",type:"ppv",date:"30 jan",
+{id:"toronto",name:"UFC 336 : Van vs Kape",type:"ppv",date:"30 jan",
  mainUTC:"2027-01-31T03:00:00Z",prelimsUTC:"2027-01-31T01:00:00Z",est:true,
  loc:"Scotiabank Arena, Toronto, Canada",
- main:[],prelims:[],
- notes:"Annoncé le 17 octobre 2026 : retour de l'UFC à Toronto pour un événement numéroté (UFC 336) au Scotiabank Arena. Date et salle confirmées, mais aucun combat n'est encore officialisé par l'UFC — un main event Joshua Van vs Manel Kape et un choc Carlos Prates vs Michael Morales circulent dans la presse spécialisée, sans confirmation officielle à ce stade. Carte à suivre dans une prochaine mise à jour."}];
+ main:[["Joshua Van","Manel Kape","Titre Flyweight",1],
+       ["Carlos Prates","Michael Morales","Titre Welterweight vacant — intérimaire",1]],
+ prelims:[],
+ notes:"Retour de l'UFC à Toronto pour un événement numéroté (UFC 336) au Scotiabank Arena, annoncé le 17 octobre 2026. Carte officialisée le 24 octobre : Joshua Van défend sa ceinture des mouches face à Manel Kape en main event. En co-main, Carlos Prates affronte Michael Morales pour le titre des welters, laissé vacant sur cette carte — Islam Makhachev, indisponible, ne défend pas sa ceinture. Reste de la carte à suivre dans une prochaine mise à jour."},
+{id:"sydney",name:"UFC Fight Night : Salkilld vs Saint Denis",type:"fn",date:"6 fév",
+ mainUTC:"2027-02-06T22:00:00Z",prelimsUTC:"2027-02-06T20:00:00Z",est:false,
+ loc:"Afterpay Arena, Sydney Olympic Park, Australie",
+ main:[["Quillan Salkilld","Benoît Saint Denis","Lightweight",0],
+       ["Bogdan Guskov","Robert Whittaker","Light Heavyweight",0]],
+ prelims:[["Marwan Rahiki","Joo Sang Yoo","Featherweight",0],
+          ["Kaan Ofli","Joanderson Brito","Featherweight",0]],
+ notes:"🇫🇷 Benoît Saint Denis en tête d'affiche à Sydney face à l'Australien Quillan Salkilld (6-0 à l'UFC, sur une série de finitions au 1er round). En co-main, Robert Whittaker retrouve sa ville natale pour la première fois depuis 2014, face à Bogdan Guskov. Carte encore incomplète à cette date : à suivre dans une prochaine mise à jour."}];
 
 /* Où regarder l'UFC en France — liens maintenus ici (aucun tarif affiché, ça bouge trop souvent) */
 const DIFFUSION_FR={
@@ -989,6 +999,15 @@ const RANKINGS=[
 ];
 
 const NEWS=[
+{t:"🇫🇷 Calendrier · 9 novembre 2026",h:"Benoît Saint Denis en tête d'affiche à Sydney le 6 février 2027",
+ p:"Nouvel événement ajouté au tracker : Benoît Saint Denis affrontera l'Australien Quillan Salkilld (6-0 à l'UFC) en main event à Sydney. Robert Whittaker, de retour dans sa ville natale pour la première fois depuis 2014, complète la tête d'affiche face à Bogdan Guskov. La carte n'est pas encore bouclée par l'UFC.",
+ l:"https://www.ufc.com/event/ufc-fight-night-february-06-2027",ls:"UFC.com",img:{f:"Benoît Saint Denis"}},
+{t:"Calendrier · 9 novembre 2026",h:"UFC 336 à Toronto : Van défend sa ceinture face à Kape, titre welter vacant en jeu pour Prates vs Morales",
+ p:"La carte du 30 janvier à Toronto se précise : Joshua Van défendra son titre des mouches face à Manel Kape en main event. En co-main, Carlos Prates affronte Michael Morales pour le titre des welters laissé vacant sur cette carte — Islam Makhachev, indisponible, ne défend pas sa ceinture ce soir-là.",
+ l:"https://cagesidepress.com/2026/10/24/prates-vs-morales-for-interim-gold-van-vs-kape-announced-for-ufc-336/",ls:"Cageside Press",img:{f:"Carlos Prates"}},
+{t:"Débrief · 7 novembre 2026",h:"UFC Vegas 124 : Johnny Walker stoppe Cortes Acosta au 3e round dans un main event de la dernière minute",
+ p:"Bookée en urgence après le forfait de Sean Brady (infection au genou), la tête d'affiche a quand même offert le Fight of the Night : Johnny Walker stoppe Waldo Cortes Acosta à 2'27 du 3e round, qui encaisse une 3e défaite de rang. Tatiana Suarez bat Virna Jandiroba par décision unanime en co-main, un duel annulé à deux reprises depuis 2023. Elijah Smith (K.-O. en 1 minute) et Thomas Petersen décrochent chacun une Performance of the Night. Va voir ton score dans l'onglet Pronos.",
+ l:"https://www.ufc.com/news/ufc-fight-night-cortes-acosta-vs-walker-results",ls:"UFC.com",img:{f:"Johnny Walker"}},
 {t:"Calendrier · 5 novembre 2026",h:"L'UFC confirme un retour à Toronto le 30 janvier 2027 (UFC 336)",
  p:"Le Scotiabank Arena accueillera un événement numéroté le 30 janvier 2027, premier passage de l'UFC à Toronto depuis plusieurs années. Aucun combat n'est encore officialisé par l'UFC à cette date : un choc Joshua Van vs Manel Kape pour le titre des mouches circule dans la presse spécialisée, à prendre avec précaution tant que l'UFC ne l'a pas confirmé.",
  l:"https://cagesidepress.com/2026/10/17/ufc-336-announced-for-toronto-on-january-30/",ls:"Cageside Press",img:{}},
@@ -1474,6 +1493,22 @@ apex1031:{
   "Nick Klein|Joseph Kropschot":"Joseph Kropschot",
   "Talita Alencar|Piera Rodriguez":"Piera Rodriguez",
   "Lucia Szabová|Tainara Lisboa":"Lucia Szabová"
+},
+apex1107:{
+  "Waldo Cortes Acosta|Johnny Walker":"Johnny Walker",
+  "Tatiana Suarez|Virna Jandiroba":"Tatiana Suarez",
+  "Davey Grant|Elijah Smith":"Elijah Smith",
+  "Billy Elekana|Lucas Fernando":"Lucas Fernando",
+  "Priscila Cachoeira|Nina Milošević":"Nina Milošević",
+  "Mitch Raposo|Marcos Degli":"Mitch Raposo",
+  "Keiichiro Nakamura|Ollie Schmid":"Ollie Schmid",
+  "Gabriel Lorenço|Thomas Petersen":"Thomas Petersen",
+  "Karine Silva|Gabriella Fernandes":"Karine Silva",
+  "Murtazali Magomedov|José Mauro Delano":"Murtazali Magomedov",
+  "Austin Bashi|Carlos Calderon":"Austin Bashi",
+  "Mantas Kondratavičius|Andre Petroski":"Andre Petroski",
+  "Wellington Turman|Ko Seok-hyeon":"Ko Seok-hyeon",
+  "José Henrique Souza|Jonny Parsons":"José Henrique Souza"
 }
 };
 
